@@ -13,3 +13,15 @@
 #   File description:
 #       - main file
 #
+
+
+#define main loop
+def mainFuntion():
+    while True: 
+        #do stuff
+        print('test')
+
+
+
+#execute main loop
+mainFuntion()
