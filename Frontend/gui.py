@@ -19,8 +19,8 @@ import bTreeVisualization
 def mainFuntion():
     #while True: 
         #do stuff
-        test = bTreeVisualization.bTreeVisualization() #why do i have to do it like that?
-        print(test.version)
+        testTree = bTreeVisualization.BTreeVisualization() #why do i have to do it like that?
+        testTree.drawTree()
 
 
 
