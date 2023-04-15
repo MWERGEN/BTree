@@ -13,3 +13,7 @@
 #   File description:
 #       - visualization of the B-tree
 #
+import igraph as graphPackage
+
+class bTreeVisualization:
+    version = graphPackage.__version__

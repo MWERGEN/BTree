@@ -13,13 +13,15 @@
 #   File description:
 #       - main file
 #
-
+import bTreeVisualization
 
 #define main loop
 def mainFuntion():
-    while True: 
+    #while True: 
         #do stuff
-        print('test')
+        test = bTreeVisualization.bTreeVisualization() #why do i have to do it like that?
+        print(test.version)
+
 
 
 
