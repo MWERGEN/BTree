@@ -18,12 +18,14 @@ import matplotlib.pyplot as plt
 
 class BTreeVisualization:
     def drawTree(self):
-        bTree = graphPackage.Graph()
-        g = graphPackage.Graph(n=4, edges=[[0, 1], [0, 2]])
-        layout = g.layout(layout='auto')
-        coords_subgraph = layout[:2]  # Coordinates of the first two vertices
+        bTree = graphPackage.Graph(n = 12, directed = True)
+        bTree.add_edges([
+            (1,0),(2,1),(3,2),(4,3),(5,1),(6,2),(7,6),(8,7),(9,0),(10,0),(11,10)
+        ])
+        bTree.vs['label'] = ['0','1','2','3','4','5','6','7','8','9','10','11',]
+        layout = bTree.layout('reingold_tilford')
         fig, ax = plt.subplots()
-        graphPackage.plot(g, target=ax)
+        graphPackage.plot(bTree, target=ax, layout=layout)
         plt.show()
 
         
