@@ -18,14 +18,17 @@ import matplotlib.pyplot as plt
 
 class BTreeVisualization:
     def drawTree(self):
-        bTree = graphPackage.Graph(n = 12, directed = True)
+        bTree = graphPackage.Graph(n = 3, directed = True)
         bTree.add_edges([
-            (1,0),(2,1),(3,2),(4,3),(5,1),(6,2),(7,6),(8,7),(9,0),(10,0),(11,10)
+            (0,1),(0,2)
         ])
-        bTree.vs['label'] = ['0','1','2','3','4','5','6','7','8','9','10','11',]
-        layout = bTree.layout('reingold_tilford')
+        bTree.vs['label'] = ['0','1','2']
+        layout = bTree.layout('tree') #tree layout
+        layout.rotate(180) #needs to be rotatet, otherwise it would be upside down
+        visual_style = {}
+        visual_style['vertex_shape'] = 'rectangle'
         fig, ax = plt.subplots()
-        graphPackage.plot(bTree, target=ax, layout=layout)
+        graphPackage.plot(bTree, target=ax, layout=layout,**visual_style)
         plt.show()
 
         
