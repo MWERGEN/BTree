@@ -13,17 +13,14 @@
 #   File description:
 #       - main file
 #
-import bTreeVisualization
+import bTreeVisualization as bt
 
 #define main loop
 def mainFuntion():
-    #while True: 
-        #do stuff
-        testTree = bTreeVisualization.BTreeVisualization() #why do i have to do it like that?
+    # while True: 
+        # do stuff
+        testTree = bt.BTreeVisualization() # why do i have to do it like that?
         testTree.drawTree()
-
-
-
 
 #execute main loop
 mainFuntion()
