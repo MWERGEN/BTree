@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 np.random.seed(2)
 x, y = (2, 3)
 g = ig.Graph(17)
-g2 = ig.Graph(23)
+g2 = ig.Graph(23, directed=True)
 
 ctr = 0
 xVal = 0.9
