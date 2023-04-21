@@ -13,3 +13,7 @@
 #   File description:
 #       - edges to connect each node of the B-tree
 #
+class Edge:
+    def __init__(self, parent, child):
+        self.parent = parent
+        self.children = child
