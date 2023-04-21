@@ -14,11 +14,15 @@
 #       - Nodes for the B-tree to store keys
 #
 class Node:
-    def __init__(self, key,edges):
+    def __init__(self,key,parent,children ):
         self.key = key
-        self.edges = edges
+        self.parent = parent
+        self.children = children
 
 
     #print node
     def __str__(self):
+        return f"{self.key}"
+    
+    def __repr__(self):
         return f"{self.key}"
