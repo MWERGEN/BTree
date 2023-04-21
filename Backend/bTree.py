@@ -15,16 +15,19 @@
 #       - inserting, deleting and searching algorithm
 #       - balanceing algorithmn
 #
+from node import Node
+
 class BTree:
-    def __init__(self,rootNode, nodes, edges):
+    #list to store nodes with keys
+    def __init__(self,rootNode, nodes):
         self.rootNode = rootNode
-        self.nodes = nodes
-        self.edges = edges
+        self.nodes = []
 
 
     #TODO implement inserting a key
-    def insertKey(key):
-        null
+    def insertKey(self,key):
+        newNode = Node(key,self.rootNode,None)
+        self.nodes.append(newNode)
     
     #TODO implement deleting key
     def deleteKey(key):
