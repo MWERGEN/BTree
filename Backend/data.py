@@ -18,7 +18,3 @@ from bTree import BTree
 #testing bTree in backend
 #tree with at least 2 keys and max 4 keys in each node!
 testTree = BTree(2)
-
-#insert first key
-testTree.insertKey(69)
-print(testTree)

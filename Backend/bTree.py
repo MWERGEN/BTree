@@ -19,19 +19,13 @@ from node import Node
 
 class BTree:
     def __init__(self, order):
-        rootNode = None
-        self.nodes = []
+        self.rootNode = Node(True)
         self.order = order
 
 
     #TODO implement inserting a key
     def insertKey(self,key):
-        #if tree is empty, make root node and insert key
-        if not self.nodes:
-            self.rootNode = Node()
-            self.rootNode.addKey(key)
-            self.nodes.append(self.rootNode)
-        #search right node to insert
+        null
     
 
     #TODO implement deleting key
@@ -39,7 +33,7 @@ class BTree:
         null
 
     #TODO search key
-    def searchNode(self,key):
+    def searchKey(self,key, node = None):
         null
 
     #TODO balancing algorithmn
@@ -48,4 +42,4 @@ class BTree:
 
     #print bTree to console
     def __str__(self):
-        return f"{self.nodes}"
+        return f"{self.rootNode}"
