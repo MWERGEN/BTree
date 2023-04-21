@@ -28,7 +28,7 @@ class BTree:
     def insertKey(self,key):
         #if tree is empty, make root node and insert key
         if not self.nodes:
-            self.rootNode = Node(None,None)
+            self.rootNode = Node()
             self.rootNode.addKey(key)
             self.nodes.append(self.rootNode)
         #search right node to insert
@@ -39,7 +39,7 @@ class BTree:
         null
 
     #TODO search key
-    def searchKey(key):
+    def searchNode(self,key):
         null
 
     #TODO balancing algorithmn
