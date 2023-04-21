@@ -14,10 +14,11 @@
 #       - Nodes for the B-tree to store keys
 #
 class Node:
-    def __init__(self,parent,children ):
+    def __init__(self):
         self.keys = []
-        self.parent = parent
-        self.children = children
+        self.parent = None
+        self.child = [None]
+        self.leaf = True
 
 
     #print node
@@ -34,3 +35,13 @@ class Node:
     #add key to Node
     def addKey(self, key):
         self.keys.append(key)
+
+    def searchKey(self, key):
+        i = 0
+        while i < self.n and key >= self.key[i]:
+            i += 1
+        if i < self.n and key == self.key[i]:
+            return self
+        if self.leaf:
+            return None
+        return self.searchKey(self.child[i], key)
