@@ -25,7 +25,11 @@ class BTree:
 
     #TODO implement inserting a key
     def insertKey(self,key):
-        null
+        #root has space for key
+        if self.rootNode.getNumOfKeys() < 2 * self.order:
+            self.rootNode.keys.append(key)
+        else:
+            print("root is full!")
     
 
     #TODO implement deleting key
