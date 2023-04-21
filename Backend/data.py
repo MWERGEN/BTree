@@ -13,3 +13,13 @@
 #   File description:
 #       - user data from the GUI
 #
+from bTree import BTree
+from edge import Edge
+from node import Node
+
+#testing bTree in backend
+testNode = Node(1,None)
+rootEdges = Edge(None,testNode)
+rootNode = Node(0,rootEdges)
+test = BTree(rootNode,testNode,rootEdges)
+print(test)
