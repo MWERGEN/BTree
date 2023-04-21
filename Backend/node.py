@@ -16,7 +16,7 @@
 class Node:
     def __init__(self, leaf = False):
         self.keys = []
-        self.child = [None]
+        self.children = [None]
         self.leaf = leaf
 
 
@@ -30,4 +30,7 @@ class Node:
 
     def getKeys(self):
         return self.keys
+    
+    def getNumOfKeys(self):
+        return len(self.keys)
     
