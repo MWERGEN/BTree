@@ -18,17 +18,22 @@
 from node import Node
 
 class BTree:
-    #list to store nodes with keys
-    def __init__(self,rootNode, nodes):
-        self.rootNode = rootNode
+    def __init__(self, order):
+        rootNode = None
         self.nodes = []
+        self.order = order
 
 
     #TODO implement inserting a key
     def insertKey(self,key):
-        newNode = Node(key,self.rootNode,None)
-        self.nodes.append(newNode)
+        #if tree is empty, make root node and insert key
+        if not self.nodes:
+            self.rootNode = Node(None,None)
+            self.rootNode.addKey(key)
+            self.nodes.append(self.rootNode)
+        #search right node to insert
     
+
     #TODO implement deleting key
     def deleteKey(key):
         null
@@ -43,4 +48,4 @@ class BTree:
 
     #print bTree to console
     def __str__(self):
-        return f"{self.rootNode} {self.nodes}"
+        return f"{self.nodes}"
