@@ -25,22 +25,53 @@ class BTree:
 
     #TODO implement inserting a key
     def insertKey(self,key):
-        #root has space for key
-        root = self.rootNode
-        if root.getNumOfKeys() < 2 * self.order:
-            self.rootNode.keys.append(key)
+        root = self.rootNode 
+        if len(root.keys) == (2 * self.order ): #if to many keys -> split node
+            temp = Node()
+            temp.children.insert(0, root) #reference to child
+            self.rootNode = temp
+            self.splitNode(temp,0) #split the full node
+            self.insertNotFull(temp,key)
+        #node has space so add key in it
         else:
-            #place key in different node
-            print('root full')
-            #no other nodes
-            if len(self.rootNode.children) == 0:
-                newNode = Node(True)
-                if newNode.addKeyToNode(key, self.order) is None:
-                    print('passt')
-                    self.rootNode.children.append(newNode) #give ref to new node
-            else:
-                print('there are different nodes!')
-    
+            self.insertNotFull(root,key)
+
+
+    #TODO implement split node
+    #split child node
+    def splitNode(self, parent, i):
+        order = self.order
+        splitNode = parent.children[i] #node which will be splitted
+        newNode = Node(splitNode.leaf) #second node where the other half of the keys will go 
+        parent.children.insert(i + 1, newNode) #add reference to children 
+        parent.keys.insert(i, splitNode.keys[order - 1]) #fill parent with splitkey
+        newNode.keys = splitNode.keys[order: (2 * order) - 1]
+        splitNode.keys = splitNode.keys[0: order - 1]
+        if not splitNode.leaf:
+            newNode.children = splitNode.children[order: 2 * order]
+            splitNode.children = splitNode.children[0: order - 1]
+
+
+    #insert key into not full node
+    def insertNotFull(self, node, key):
+        i = len(node.keys) - 1 #size of the keys list
+        if node.leaf: #if node is leaf just find correct place to insert key
+            node.keys.append(None) #make space for one more key
+            while i >= 0 and key < node.keys[i]:
+                node.keys[i + 1] = node.keys[i] #shift key one place to the right
+                i -= 1
+            node.keys[i + 1] = key
+        else:
+            while i >= 0 and key < node.keys[i]:
+                i -= 1
+            i += 1
+            if len(node.children[i].keys) == (2 * self.order) - 1:
+                self.splitNode(node, i)
+                if key > node.keys[i]:
+                    i += 1
+            self.insertNotFull(node.children[i], key)
+
+
 
     #TODO implement deleting key
     def deleteKey(key):
@@ -57,9 +88,14 @@ class BTree:
 
 
     #print tree
-    def printTree(self,rootNode, level = 0 ):
-        print(level ," " , rootNode.keys)
-        for child in rootNode.children:
-            self.printTree(child, level + 1)
+    def printTree(self, node, l=0):
+        print("Level ", l, " Anzahl Schlüssel ", len(node.keys))
+        for i in node.keys:
+            print(i)
+        print()
+        l += 1
+        if len(node.children) > 0:
+            for i in node.children:
+                self.printTree(i, l)
 
 
