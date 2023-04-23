@@ -26,10 +26,20 @@ class BTree:
     #TODO implement inserting a key
     def insertKey(self,key):
         #root has space for key
-        if self.rootNode.getNumOfKeys() < 2 * self.order:
+        root = self.rootNode
+        if root.getNumOfKeys() < 2 * self.order:
             self.rootNode.keys.append(key)
         else:
-            print("root is full!")
+            #place key in different node
+            print('root full')
+            #no other nodes
+            if len(self.rootNode.children) == 0:
+                newNode = Node(True)
+                if newNode.addKeyToNode(key, self.order) is None:
+                    print('passt')
+                    self.rootNode.children.append(newNode) #give ref to new node
+            else:
+                print('there are different nodes!')
     
 
     #TODO implement deleting key
@@ -37,13 +47,19 @@ class BTree:
         null
 
     #TODO search key
-    def searchKey(self,key, node = None):
+    def searchKey(self,key, nextNode = None):
         null
+    
 
     #TODO balancing algorithmn
     def balanceTree():
         null
 
-    #print bTree to console
-    def __str__(self):
-        return f"{self.rootNode}"
+
+    #print tree
+    def printTree(self,rootNode, level = 0 ):
+        print(level ," " , rootNode.keys)
+        for child in rootNode.children:
+            self.printTree(child, level + 1)
+
+

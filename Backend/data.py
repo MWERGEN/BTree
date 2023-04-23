@@ -17,12 +17,12 @@ from bTree import BTree
 
 #testing bTree in backend
 #tree with at least 2 keys and max 4 keys in each node!
-testTree = BTree(2)
+testTree = BTree(1)
 
 #insert one key
 testTree.insertKey(2)
 testTree.insertKey(3)
 testTree.insertKey(10)
-testTree.insertKey(69)
 testTree.insertKey(54)
-print(testTree)
+
+testTree.printTree(testTree.rootNode)
