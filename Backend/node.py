@@ -16,7 +16,7 @@
 class Node:
     def __init__(self, leaf = False):
         self.keys = []
-        self.children = [None]
+        self.children = []
         self.leaf = leaf
 
 
@@ -34,3 +34,11 @@ class Node:
     def getNumOfKeys(self):
         return len(self.keys)
     
+    def addKeyToNode(self, newKey, order):
+        #check if node has space
+        if(len(self.keys) <= 2 * order):
+            self.keys.append(newKey)
+        else:
+        #node has no space!
+            print('error adding!')
+            return None
