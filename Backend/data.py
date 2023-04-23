@@ -16,13 +16,18 @@
 from bTree import BTree
 
 #testing bTree in backend
-#tree with at least 2 keys and max 4 keys in each node!
-testTree = BTree(1)
+#tree with at least 1 keys and max 2 keys in each node!
+testTree = BTree(3)
 
 #insert one key
-testTree.insertKey(2)
-testTree.insertKey(3)
+testTree.insertKey(7)
+testTree.insertKey(1)
+testTree.insertKey(8)
+testTree.insertKey(12)
+
 testTree.insertKey(10)
-testTree.insertKey(54)
+testTree.insertKey(16)
+testTree.insertKey(2)
+
 
 testTree.printTree(testTree.rootNode)

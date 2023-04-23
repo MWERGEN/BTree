@@ -18,27 +18,3 @@ class Node:
         self.keys = []
         self.children = []
         self.leaf = leaf
-
-
-    #print node
-    def __str__(self):
-        return f"{self.keys}"
-    
-    def __repr__(self):
-        return f"{self.keys}"
-
-
-    def getKeys(self):
-        return self.keys
-    
-    def getNumOfKeys(self):
-        return len(self.keys)
-    
-    def addKeyToNode(self, newKey, order):
-        #check if node has space
-        if(len(self.keys) <= 2 * order):
-            self.keys.append(newKey)
-        else:
-        #node has no space!
-            print('error adding!')
-            return None
