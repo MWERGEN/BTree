@@ -23,3 +23,5 @@ for i in range(10):
     testTree.insertKey(i*3)
 
 testTree.printTree(testTree.rootNode)
+
+print(testTree.searchKey(12))
