@@ -11,16 +11,27 @@
 ###############################################
 #
 #   File description:
-#       - main file
+#       - gui file
 #
-import bTreeVisualization as bt
+from Frontend import bTreeVisualization as bt
 
-#define main loop
-def mainFuntion():
-    # while True: 
-        # do stuff
-        testTree = bt.BTreeVisualization() # why do i have to do it like that?
-        testTree.drawTree()
+class Gui:
+    # TODO implement mainloop
 
-#execute main loop
-mainFuntion()
+    #define main loop
+    #def mainFuntion():
+        # while True: 
+            # do stuff
+
+    # function for testing draw-behaviour of graph
+    def drawGraphTest(self):
+        # btree Visualization object (4 nodes, k = 3, key-width = 0.06)
+        self.GraphNodes = bt.BTreeVisualization(4, 3, 0.06)
+        # predefine 4 nodes 
+        self.GraphNodes.addGNodeVis([0.82, 0, 0.82, 1.64], [0, -0.5, -0.5, -0.5])
+        # calc where the references will be inside the nodes
+        self.GraphNodes.calcRefPositions()
+        # calculate all graphs
+        self.GraphNodes.assertValuesToGraphs()
+        # draw all graphs
+        self.GraphNodes.drawTree()

@@ -1,10 +1,13 @@
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# TODO: Remove this file in the end -> is only for testing 
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
 import numpy as np
-from scipy.spatial import Delaunay
+# from scipy.spatial import Delaunay
 import igraph as ig
 import matplotlib.pyplot as plt
 
-np.random.seed(2)
-x, y = (2, 3)
 g = ig.Graph(17)
 g2 = ig.Graph(23, directed=True)
 
