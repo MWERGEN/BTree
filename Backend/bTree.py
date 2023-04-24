@@ -85,10 +85,22 @@ class BTree:
     def deleteKey(key):
         null
 
-    #TODO search key
-    def searchKey(self,key, nextNode = None):
-        null
-    
+    #search key in node
+    #go through node and check if key is there
+    #if not and node has no children -> key is not in the tree
+    #if node has children go to child node with current index i
+    def searchKey(self, key, nextNode = None):
+        if nextNode is not None: #if function is called recursively
+            i = 0
+            while i < len(nextNode.keys) and key > nextNode.keys[i]: #go through node and check at which point key is smaller
+                i += 1
+            if i < len(nextNode.keys) and key == nextNode.keys[i]:
+                return nextNode
+            elif nextNode.leaf: #if keys is not found and node is a leaf -> key is not in the tree
+                return None
+            return self.searchKey(key, nextNode.children[i]) #go to node in which key maybe is 
+        else:
+            self.searchKey(key,self.rootNode) #if function is called for the first time it goes from the root 
 
 
     #print tree
