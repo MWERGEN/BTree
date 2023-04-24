@@ -90,10 +90,6 @@ class BTree:
         null
     
 
-    #TODO balancing algorithmn
-    def balanceTree():
-        null
-
 
     #print tree
     def printTree(self, node, l=0):
