@@ -16,7 +16,7 @@
 #       - balanceing algorithmn
 #
 from node import Node
-
+numOfNodesPerLevel = []
 class BTree:
     def __init__(self, order):
         self.rootNode = Node(True)
@@ -142,11 +142,13 @@ class BTree:
 
     # function returns list for frontend which contains numbers of nodes per level
     
-    def getNumOfNodesPerLevel(self,node):
-        numOfNodesPerLevel = []
-        if node == self.rootNode:
-            numOfNodesPerLevel.insert(0, 1)
+    def getNumOfNodesPerLevel(self,node,l = 0):
+        l += 1
+        if len(node.children) > 0:
+            for i in node.children:
+                numOfNodesPerLevel.insert(l, 1)
+                self.getNumOfNodesPerLevel(i, l)
         else:
-            
+            numOfNodesPerLevel[l - 2] += 1
 
 
