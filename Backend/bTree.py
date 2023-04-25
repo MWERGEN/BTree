@@ -21,60 +21,81 @@ class BTree:
     def __init__(self, order):
         self.rootNode = Node(True)
         self.order = order
+    
 
-
-    #insert a key into Btree node. there are two cases which can occur:
+    # insert a key into Btree node. there are two cases which can occur:
     # 1. node is full -> split node and insert then 
     # 2. node is not full -> find right place to insert and insert 
     def insertKey(self,key):
         root = self.rootNode
         #case 1
-        if len(root.keys) == (2 * self.order ) - 1: #node can hold 2 * order keys
-            temp = Node() #new root node
-            temp.children.insert(0, root) #reference to child which will hold all smaller keys!
+        # node can hold 2 * order keys
+        if len(root.keys) == (2 * self.order ) - 1: 
+            # new root node
+            temp = Node()
+            # reference to child which will hold all smaller keys!
+            temp.children.insert(0, root) 
             self.rootNode = temp
-            self.splitNode(temp,0) #split the full node
+            # split the full node
+            self.splitNode(temp,0) 
             self.insertNotFull(temp,key)
-        #case2
+        # case2
         else:
             self.insertNotFull(root,key) #just insert key into node 
 
 
-    #split child node at index i of parent
-    #parent will have middle key of splitNode
-    #splitNode will have all keys which are smaller than parents
-    #newNode will have all keys which are greater than parents
+    # split child node at index i of parent
+    # parent will have middle key of splitNode
+    # splitNode will have all keys which are smaller than parents
+    # newNode will have all keys which are greater than parents
     def splitNode(self, parent, i):
         order = self.order
-        splitNode = parent.children[i] #node at index i will be splitted
-        newNode = Node(splitNode.leaf) #second node where are all keys which are greater than the parent key will go
-        parent.children.insert(i + 1, newNode) #add reference to node which holds all greater keys
-        parent.keys.insert(i, splitNode.keys[order - 1]) #fill parent with splitkey -> middle key
-        newNode.keys = splitNode.keys[order: (2 * order) - 1] #take all greater keys and insert them from order to 2 * order - 1
-        splitNode.keys = splitNode.keys[0: order - 1] #take all smaller keys and insert them from 0 to order - 1
+        # node at index i will be splitted
+        splitNode = parent.children[i] 
+        # second node where are all keys which are greater than the parent key will go
+        newNode = Node(splitNode.leaf) 
+        # add reference to node which holds all greater keys
+        parent.children.insert(i + 1, newNode) 
+        # fill parent with splitkey -> middle key
+        parent.keys.insert(i, splitNode.keys[order - 1]) 
+        # take all greater keys and insert them from order to 2 * order - 1
+        newNode.keys = splitNode.keys[order: (2 * order) - 1] 
+        # take all smaller keys and insert them from 0 to order - 1
+        splitNode.keys = splitNode.keys[0: order - 1] 
         if not splitNode.leaf:
-            newNode.children = splitNode.children[order: 2 * order] #give newNode with all greater keys all references to all greater children
-            splitNode.children = splitNode.children[0: order - 1] #updte references to only smaller children
+            # give newNode with all greater keys all references to all greater children
+            newNode.children = splitNode.children[order: 2 * order] 
+            # updte references to only smaller children
+            splitNode.children = splitNode.children[0: order - 1] 
 
 
-    #insert key into not full node
-    #there are two cases:
-    #1. if node is leaf -> find correct place to insert and insert
-    #2. if node is not a leaf -> find correct node 
+    # insert key into not full node
+    # there are two cases:
+    # 1. if node is leaf -> find correct place to insert and insert
+    # 2. if node is not a leaf -> find correct node 
     def insertNotFull(self, node, key):
-        i = len(node.keys) - 1 #size of the keys list
+        # size of the keys list
+        i = len(node.keys) - 1 
         if node.leaf: 
-            node.keys.append(None) #make space for one more key
-            while i >= 0 and key < node.keys[i]: #compare every node key to insertion key 
-                node.keys[i + 1] = node.keys[i] #shift key one place to the right
+            # make space for one more key
+            node.keys.append(None) 
+            # compare every node key to insertion key 
+            while i >= 0 and key < node.keys[i]: 
+                # shift key one place to the right
+                node.keys[i + 1] = node.keys[i] 
                 i -= 1
-            node.keys[i + 1] = key #insert key to correct place
+            # insert key to correct place
+            node.keys[i + 1] = key 
         else:
-            while i >= 0 and key < node.keys[i]: #loop until first key which is smaller 
+            # loop until first key which is smaller 
+            while i >= 0 and key < node.keys[i]: 
                 i -= 1
-            i += 1 # + 1 because insertion key must come after the first node key which is smaller
-            if len(node.children[i].keys) == (2 * self.order) - 1: #check if node where key should go is full -> children[i] means all keys in this node are smaller!
-                self.splitNode(node, i) #split node to make room for new key 
+            # + 1 because insertion key must come after the first node key which is smaller
+            i += 1 
+            # check if node where key should go is full -> children[i] means all keys in this node are smaller!
+            if len(node.children[i].keys) == (2 * self.order) - 1: 
+                # split node to make room for new key 
+                self.splitNode(node, i) 
                 if key > node.keys[i]:
                     i += 1
             self.insertNotFull(node.children[i], key)
@@ -85,25 +106,30 @@ class BTree:
     def deleteKey(key):
         null
 
-    #search key in node
-    #go through node and check if key is there
-    #if not and node has no children -> key is not in the tree
-    #if node has children go to child node with current index i
+    # search key in node
+    # go through node and check if key is there
+    # if not and node has no children -> key is not in the tree
+    # if node has children go to child node with current index i
     def searchKey(self, key, nextNode = None):
-        if nextNode is not None: #if function is called recursively
+        # if function is called recursively
+        if nextNode is not None: 
             i = 0
-            while i < len(nextNode.keys) and key > nextNode.keys[i]: #go through node and check at which point key is smaller
+            # go through node and check at which point key is smaller
+            while i < len(nextNode.keys) and key > nextNode.keys[i]: 
                 i += 1
             if i < len(nextNode.keys) and key == nextNode.keys[i]:
                 return nextNode
-            elif nextNode.leaf: #if keys is not found and node is a leaf -> key is not in the tree
+            # if keys is not found and node is a leaf -> key is not in the tree
+            elif nextNode.leaf: 
                 return None
-            return self.searchKey(key, nextNode.children[i]) #go to node in which key maybe is 
+            #go to node in which key maybe is 
+            return self.searchKey(key, nextNode.children[i]) 
         else:
-            self.searchKey(key,self.rootNode) #if function is called for the first time it goes from the root 
+            # if function is called for the first time it goes from the root 
+            self.searchKey(key,self.rootNode) 
 
 
-    #print tree
+    # print tree
     def printTree(self, node, l=0):
         print("Level ", l, " Anzahl Schlüssel ", len(node.keys))
         for i in node.keys:
@@ -113,5 +139,14 @@ class BTree:
         if len(node.children) > 0:
             for i in node.children:
                 self.printTree(i, l)
+
+    # function returns list for frontend which contains numbers of nodes per level
+    
+    def getNumOfNodesPerLevel(self,node):
+        numOfNodesPerLevel = []
+        if node == self.rootNode:
+            numOfNodesPerLevel.insert(0, 1)
+        else:
+            
 
 
