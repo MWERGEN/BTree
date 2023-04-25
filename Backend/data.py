@@ -15,8 +15,8 @@
 #
 from bTree import BTree
 
-#testing bTree in backend
-#tree with at least 3 keys and max 6 keys in each node!
+# testing bTree in backend
+# tree with at least 3 keys and max 6 keys in each node!
 testTree = BTree(2)
 
 for i in range(10):
@@ -24,4 +24,5 @@ for i in range(10):
 
 testTree.printTree(testTree.rootNode)
 
-print(testTree.searchKey(12))
+#print(testTree.searchKey(12))
+print(testTree.getNumOfNodesPerLevel(testTree.rootNode))
