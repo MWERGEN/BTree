@@ -23,7 +23,10 @@ for i in range(10):
     testTree.insertKey(i*3)
 
 testTree.printTree(testTree.rootNode)
-
+testTree.getNumOfLevels(testTree.rootNode)
+testTree.initNodeList()
+testTree.getNumOfNodesPerLevel(testTree.rootNode)
+print(testTree.levels)
+print(testTree.numOfNodesPerLevel)
 #print(testTree.searchKey(12))
-print(testTree.getNumOfLevels(testTree.rootNode))
 #print(testTree.getNumOfNodesPerLevel(testTree.rootNode))

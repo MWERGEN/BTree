@@ -21,7 +21,7 @@ class BTree:
         self.rootNode = Node(True)
         self.k = k
         self.numOfNodesPerLevel = []
-        self.numOfLevels = 0
+        self.levels = 0
     
 
     # insert a key into Btree node. there are two cases which can occur:
@@ -144,13 +144,24 @@ class BTree:
     # function returns list for frontend which contains numbers of nodes per level
     # 
     def getNumOfNodesPerLevel(self,node,level = 0):
-        return None
-    
-
-    def getNumOfLevels(self, node, level = 0):
+        self.numOfNodesPerLevel.insert(level, self.numOfNodesPerLevel[level] + 1 )
         if not node.leaf:
             level += 1
-            self.numOfLevels = level
             for i in node.children:
-                self.getNumOfLevels(i,level)
-        return self.numOfLevels
+                self.getNumOfNodesPerLevel(i,level)
+    
+
+    # function that counts the numbers of levels the tree has for the list which will be sent to the frontend
+    # level 1 -> root
+    def getNumOfLevels(self, node, level = 0):
+        self.levels += 1
+        if not node.leaf:
+            self.getNumOfLevels(node.children[0])
+
+    
+    # prepares the node list per level
+    # for each level it adds one index
+    def initNodeList(self):
+        for i in range(self.levels):
+            self.numOfNodesPerLevel.append(0)
+
