@@ -21,6 +21,7 @@ class BTree:
         self.rootNode = Node(True)
         self.k = k
         self.numOfNodesPerLevel = []
+        self.numOfLevels = 0
     
 
     # insert a key into Btree node. there are two cases which can occur:
@@ -130,7 +131,7 @@ class BTree:
 
 
     # print tree
-    def printTree(self, node, level=0):
+    def printTree(self, node, level = 0):
         print("Level ", level, " Anzahl Schlüssel ", len(node.keys))
         for i in node.keys:
             print(i)
@@ -144,6 +145,12 @@ class BTree:
     # 
     def getNumOfNodesPerLevel(self,node,level = 0):
         return None
+    
 
-
-
+    def getNumOfLevels(self, node, level = 0):
+        if not node.leaf:
+            level += 1
+            self.numOfLevels = level
+            for i in node.children:
+                self.getNumOfLevels(i,level)
+        return self.numOfLevels
