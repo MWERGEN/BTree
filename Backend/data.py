@@ -25,4 +25,5 @@ for i in range(10):
 testTree.printTree(testTree.rootNode)
 
 #print(testTree.searchKey(12))
-print(testTree.getNumOfNodesPerLevel(testTree.rootNode))
+print(testTree.getNumOfLevels(testTree.rootNode))
+#print(testTree.getNumOfNodesPerLevel(testTree.rootNode))
