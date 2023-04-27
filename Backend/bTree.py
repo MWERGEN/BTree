@@ -16,11 +16,11 @@
 #       - balanceing algorithmn
 #
 from node import Node
-numOfNodesPerLevel = []
 class BTree:
-    def __init__(self, order):
+    def __init__(self, k):
         self.rootNode = Node(True)
-        self.order = order
+        self.k = k
+        self.numOfNodesPerLevel = []
     
 
     # insert a key into Btree node. there are two cases which can occur:
@@ -30,7 +30,7 @@ class BTree:
         root = self.rootNode
         #case 1
         # node can hold 2 * order keys
-        if len(root.keys) == (2 * self.order ) - 1: 
+        if len(root.keys) == (2 * self.k ) - 1: 
             # new root node
             temp = Node()
             # reference to child which will hold all smaller keys!
@@ -49,7 +49,7 @@ class BTree:
     # splitNode will have all keys which are smaller than parents
     # newNode will have all keys which are greater than parents
     def splitNode(self, parent, i):
-        order = self.order
+        k = self.k
         # node at index i will be splitted
         splitNode = parent.children[i] 
         # second node where are all keys which are greater than the parent key will go
@@ -57,16 +57,16 @@ class BTree:
         # add reference to node which holds all greater keys
         parent.children.insert(i + 1, newNode) 
         # fill parent with splitkey -> middle key
-        parent.keys.insert(i, splitNode.keys[order - 1]) 
+        parent.keys.insert(i, splitNode.keys[k - 1]) 
         # take all greater keys and insert them from order to 2 * order - 1
-        newNode.keys = splitNode.keys[order: (2 * order) - 1] 
+        newNode.keys = splitNode.keys[k: (2 * k) - 1] 
         # take all smaller keys and insert them from 0 to order - 1
-        splitNode.keys = splitNode.keys[0: order - 1] 
+        splitNode.keys = splitNode.keys[0: k - 1] 
         if not splitNode.leaf:
             # give newNode with all greater keys all references to all greater children
-            newNode.children = splitNode.children[order: 2 * order] 
+            newNode.children = splitNode.children[k: 2 * k] 
             # updte references to only smaller children
-            splitNode.children = splitNode.children[0: order - 1] 
+            splitNode.children = splitNode.children[0: k - 1] 
 
 
     # insert key into not full node
@@ -93,7 +93,7 @@ class BTree:
             # + 1 because insertion key must come after the first node key which is smaller
             i += 1 
             # check if node where key should go is full -> children[i] means all keys in this node are smaller!
-            if len(node.children[i].keys) == (2 * self.order) - 1: 
+            if len(node.children[i].keys) == (2 * self.k) - 1: 
                 # split node to make room for new key 
                 self.splitNode(node, i) 
                 if key > node.keys[i]:
@@ -130,25 +130,20 @@ class BTree:
 
 
     # print tree
-    def printTree(self, node, l=0):
-        print("Level ", l, " Anzahl Schlüssel ", len(node.keys))
+    def printTree(self, node, level=0):
+        print("Level ", level, " Anzahl Schlüssel ", len(node.keys))
         for i in node.keys:
             print(i)
         print()
-        l += 1
+        level += 1
         if len(node.children) > 0:
             for i in node.children:
-                self.printTree(i, l)
+                self.printTree(i, level)
 
     # function returns list for frontend which contains numbers of nodes per level
-    
-    def getNumOfNodesPerLevel(self,node,l = 0):
-        l += 1
-        if len(node.children) > 0:
-            for i in node.children:
-                numOfNodesPerLevel.insert(l, 1)
-                self.getNumOfNodesPerLevel(i, l)
-        else:
-            numOfNodesPerLevel[l - 2] += 1
+    # 
+    def getNumOfNodesPerLevel(self,node,level = 0):
+        return None
+
 
 
