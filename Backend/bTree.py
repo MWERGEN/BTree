@@ -168,3 +168,9 @@ class BTree:
         for i in range(self.levels):
             self.numOfNodesPerLevel.append(0)
 
+
+    # frontend needs the node list with root at the last index
+    # function simply revereses the created node list so the root is at the last index
+    def prepareNodeList(self):
+        return self.numOfNodesPerLevel.reverse()
+

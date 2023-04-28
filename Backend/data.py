@@ -22,11 +22,19 @@ testTree = BTree(2)
 for i in range(10):
     testTree.insertKey(i*3)
 
+
 testTree.printTree(testTree.rootNode)
+
+#get number of levels for the curent tree
 testTree.getNumOfLevels(testTree.rootNode)
+# initialise list for frontend with the number of levels as indices
 testTree.initNodeList()
+# create a list for frontend with numbers of nodes per level where 0 is the root
 testTree.getNumOfNodesPerLevel(testTree.rootNode)
+
 print(testTree.levels)
 print(testTree.numOfNodesPerLevel)
-#print(testTree.searchKey(12))
-#print(testTree.getNumOfNodesPerLevel(testTree.rootNode))
+
+# frontend needs the list in reveresed order so reverse it
+testTree.prepareNodeList()
+print(testTree.numOfNodesPerLevel)
