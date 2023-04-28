@@ -13,7 +13,7 @@
 #   File description:
 #       - B-Tree which consists of edges and nodes
 #       - inserting, deleting and searching algorithm
-#       - balanceing algorithmn
+#       - preparing lists for frontend (num of nodes per level, keys per level and edges)
 #
 from node import Node
 class BTree:
@@ -22,6 +22,7 @@ class BTree:
         self.k = k
         self.numOfNodesPerLevel = []
         self.levels = 0
+        self.keysPerLevel = []
     
 
     # insert a key into Btree node. there are two cases which can occur:
@@ -173,4 +174,18 @@ class BTree:
     # function simply revereses the created node list so the root is at the last index
     def prepareNodeList(self):
         return self.numOfNodesPerLevel.reverse()
+    
+    # function that returns keys per level 
+    # useses Breadth-First Traversal 
+    def getKeysPerLevel(self):
+        # creating queue and inserting root 
+        queue = [self.rootNode]
+        while len(queue) != 0:
+            # get current node from queue 
+            currentNode = queue.pop(0)
+            # append keys of current node to keys list
+            self.keysPerLevel.append(currentNode.keys)
+            for i in currentNode.children:
+                # search every child node from current node from left to right 
+                queue.append(i)
 

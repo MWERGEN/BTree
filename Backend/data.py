@@ -17,7 +17,7 @@ from bTree import BTree
 
 # testing bTree in backend
 # tree with at least 3 keys and max 6 keys in each node!
-testTree = BTree(2)
+testTree = BTree(3)
 
 for i in range(10):
     testTree.insertKey(i*3)
@@ -32,9 +32,9 @@ testTree.initNodeList()
 # create a list for frontend with numbers of nodes per level where 0 is the root
 testTree.getNumOfNodesPerLevel(testTree.rootNode)
 
-print(testTree.levels)
-print(testTree.numOfNodesPerLevel)
-
 # frontend needs the list in reveresed order so reverse it
 testTree.prepareNodeList()
 print(testTree.numOfNodesPerLevel)
+
+testTree.getKeysPerLevel()
+print(testTree.keysPerLevel)
