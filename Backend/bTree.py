@@ -142,9 +142,12 @@ class BTree:
                 self.printTree(i, level)
 
     # function returns list for frontend which contains numbers of nodes per level
-    # 
+    # at index 0 -> root level, but the list has to be reveresed so the frontend can work with it
+    # this will be done in a different function
     def getNumOfNodesPerLevel(self,node,level = 0):
-        self.numOfNodesPerLevel.insert(level, self.numOfNodesPerLevel[level] + 1 )
+        # increment current node num py one at index of current level
+        self.numOfNodesPerLevel[level] = self.numOfNodesPerLevel[level] + 1
+        # if the node has children -> next level
         if not node.leaf:
             level += 1
             for i in node.children:
