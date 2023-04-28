@@ -25,10 +25,10 @@ class Gui:
 
     # function for testing draw-behaviour of graph
     def drawGraphTest(self):
-        # btree Visualization object (4 nodes, k = 3, key-width = 0.06)
-        self.GraphNodes = bt.BTreeVisualization(4, 3, 0.06)
+        # btree Visualization object (k = 3, key-width = 0.06, minNodeDistance = 0.1, nodesList[lowest level, ... , root])
+        self.GraphNodes = bt.BTreeVisualization(3, 0.06, 0.1, [10, 6, 3, 1])
         # predefine 4 nodes 
-        self.GraphNodes.addGNodeVis([0.82, 0, 0.82, 1.64], [0, -0.5, -0.5, -0.5])
+        self.GraphNodes.calcNodesPositions()
         # calc where the references will be inside the nodes
         self.GraphNodes.calcRefPositions()
         # calculate all graphs
