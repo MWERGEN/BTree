@@ -16,6 +16,7 @@
 
 import numpy as np
 import igraph as ig
+import itertools as it
 import matplotlib.pyplot as plt
 
 # configuration for subplot area in matplotlib-window:
@@ -26,19 +27,29 @@ import matplotlib.pyplot as plt
 #   -   wspace, hspace define the space between multiple subplots
 #           -> we just have one subplot so these values are irrelevant  
 plt.subplots_adjust(left=0, bottom=0, right=1, top=1, wspace=0, hspace=0)
+plt.figure(facecolor='black') 
 
 class BTreeVisualization:
 
     # constructor
-    def __init__(self, k, keyWidth, minNodeDistance, nodesList):
+    def __init__(self, k, keyWidth, refWidth, minNodeDistance, nodesList, keysList):
         # save list of how many nodes are on each level of the tree
         self.nodesList = nodesList
+        # save list of which keys are in which node
+        self.keysList = keysList
+        # generate a List with all Labels (key-Values)
+        # -> chaining all elements in the lists in keysList together
+        self.keyLabels = list(it.chain.from_iterable(self.keysList))
         # calculate how many nodes the Graph has
         self.numOfNodes = self.calcNumOfNodes(nodesList)
+        # calculate how many keys the Graph has
+        self.numOfKeys = self.calcNumOfKeys(keysList)
         # graph with Nodes (later surrounding keys and references of each node)
         self.gNodes = ig.Graph(self.numOfNodes)
         # graph with references inside the nodes
         self.gRefs = ig.Graph((2 * k + 1) * self.numOfNodes)
+        # graph with keys inside the nodes
+        self.gKeys = ig.Graph(self.numOfKeys)
         # x-Positions of Nodes' centers
         self.xGNodes = []
         # y-Positions of Nodes' centers
@@ -47,15 +58,20 @@ class BTreeVisualization:
         self.xGRefs = []
         # y-Positions of references
         self.yGRefs = []
+        # x-Positions of keys
+        self.xGKeys = []
+        # y-Positions of keys
+        self.yGKeys = []
         # tree's definition of k (= minimum number of keys in node)
         self.k = k
-        # key-width and 2 * ref-width
+        # key-width
         self.keyWidth = keyWidth
+        # ref-width
+        self.refWidth = refWidth
         # node width
-        #   = (2k nodes + 2k references + outer right reference)
-        #   = (2k * 1.5 + 0.5)    
-        #   (width of one key = width of 2 references)  
-        self.nodeWidth = (1.5 * self.k * 2 + 0.5) * self.keyWidth
+        #   = (2k keys + 2k references + outer right reference)
+        #   = (2k * (keyWidth + refWidth)) + refWidth
+        self.nodeWidth = self.k * 2 * (self.keyWidth + self.refWidth) + self.refWidth
         # horizontal distance between the tree's leafs
         # -> distances between other nodes are higher
         self.minNodeDistance = minNodeDistance
@@ -71,6 +87,17 @@ class BTreeVisualization:
             nodeCtr += i
         # return total number of nodes in nodesList
         return nodeCtr
+    
+    # calculates how many keys the keysList has combined
+    def calcNumOfKeys(self, keysList):
+        # counts number of keys
+        keyCtr = 0
+        # iterates over keysList
+        for i in keysList:
+            # add the number of keys in every node to the counter
+            keyCtr += len(i)
+        # return total number of keys
+        return keyCtr
 
     # calc the x and y positions of all nodes
     # we start on the lowest level (leafs) and work upwards
@@ -133,17 +160,6 @@ class BTreeVisualization:
             # -> so the level has to be incremented
             ctrLevel += 1
 
-    # define the x- and y-Positions for the Graph's Nodes
-    def assertValuesToGraphs(self):
-        # for Nodes x
-        self.gNodes.vs['x'] = self.xGNodes
-        # for Nodes y
-        self.gNodes.vs['y'] = self.yGNodes
-        # for Refs x
-        self.gRefs.vs['x'] = self.xGRefs
-        # for Refs y
-        self.gRefs.vs['y'] = self.yGRefs
-
     # calculates the x and y positions of all references
     def calcRefPositions(self):
         # iterate over all nodes' x positions 
@@ -152,11 +168,11 @@ class BTreeVisualization:
             ctr = (-1) * self.k
             # each node has 2k + 1 references (-k to k including 0)
             while ctr <= self.k:
-                # each ref has a width of 1/2 * keyWidth
+                # each ref has a predefined widht (self.keyWidth)
                 # adding k refs left from centre of node when i is negative
                 # adding k refs right from centre of node when i is positive
                 # adding 1 ref in the middle of the node
-                self.xGRefs.append(i + (1.5 * self.keyWidth * ctr))
+                self.xGRefs.append(i + ((self.refWidth + self.keyWidth) * ctr))
                 # increment counter each iteration
                 ctr += 1
         # iterate over all nodes' y positions
@@ -170,16 +186,68 @@ class BTreeVisualization:
                 # increment counter
                 ctr2 += 1
 
+    # calculates the x and y positions of all keys
+    def calcKeyPositions(self):
+        # counter which node is currently touched
+        ctrNodes = 0
+        # iterate over all nodes' x positions 
+        for i in self.xGNodes:
+            # the left outer key in a node is:
+            #   ->  the centre of the node (i)
+            #           minus (k - 1) key- and refWidths
+            #           minus 0.5 key- and refWidths
+            # this temp-variable will be raised by (keyWidth + refWidth) for the next key in the node
+            nextKeyXPosition = i - (self.k - 0.5) * (self.keyWidth + self.refWidth)
+            # iterate over all keys in the current node
+            for j in self.keysList[ctrNodes]:
+                # add the calculates x-Position for the key to the key-graph-list
+                self.xGKeys.append(nextKeyXPosition)
+                # the next key is one key-width and one ref-width right from the current x-position
+                nextKeyXPosition += (self.keyWidth + self.refWidth)
+            # increment node-counter because the next iteration of the for loop will be for the next node
+            ctrNodes += 1
+        # reset Node counter for the y-Positions
+        ctrNodes = 0
+        # iterate over all nodes' y positions
+        for k in self.yGNodes:
+            # add as many y positions as there are keys in one node
+            for l in self.keysList[ctrNodes]:
+                # y position of each key inside a specific node is equal to nodes y position
+                self.yGKeys.append(k)
+            # increment node-counter because the next iteration of the for loop will be for the next node
+            ctrNodes += 1
+    
+    # define the x- and y-Positions and potential labels for all Graphs
+    def assertValuesToGraphs(self):
+        # for Nodes x
+        self.gNodes.vs['x'] = self.xGNodes
+        # for Nodes y
+        self.gNodes.vs['y'] = self.yGNodes
+        # for Refs x
+        self.gRefs.vs['x'] = self.xGRefs
+        # for Refs y
+        self.gRefs.vs['y'] = self.yGRefs
+        # for Keys x
+        self.gKeys.vs['x'] = self.xGKeys
+        # for Keys y
+        self.gKeys.vs['y'] = self.yGKeys
+        # assert the labels (key-values) to the key-graph
+        self.gKeys.vs['label'] = self.keyLabels
+
     # draw whole tree including all part graphs
     def drawTree(self):
         # define automatic layout for Nodes Graph
         layoutNodes = self.gNodes.layout('auto')
         # define automatic layout for Refs Graph
         layoutRefs = self.gRefs.layout('auto')
+        # define automatic layout for Keys Graph
+        layoutKeys = self.gKeys.layout('auto')
         # simplify Nodes Graph
         self.gNodes.simplify()
         # simplify Refs Graph
         self.gRefs.simplify()
+        # simplify Keys Graph
+        self.gKeys.simplify()
         # define subplot
         ax = plt.subplot()
         # background color for subplot area
@@ -192,13 +260,13 @@ class BTreeVisualization:
             # nodes graph
             self.gNodes,
             # predefined layout
-            # layout = layoutNodes,
+            layout = layoutNodes,
             # targetted subplot
             target = ax,
             # node Width (calculation in constructor)     
             vertex_width = self.nodeWidth,
-            # choose height = width of one key to plot squares inside nodes
-            vertex_height = self.keyWidth,
+            # choose height = width of 2 refs
+            vertex_height = 2 * self.refWidth,
             # white color because nodes will be overlayed
             vertex_color = "white",
             # append style
@@ -213,13 +281,31 @@ class BTreeVisualization:
             # targetted subplot
             target = ax,
             # width of refs
-            vertex_width = 0.5 * self.keyWidth,
-            # height of refs
-            vertex_height = self.keyWidth,
+            vertex_width = self.refWidth,
+            # choose height = width of 2 refs
+            vertex_height = 2 * self.refWidth,
             # gray color emblematic of refs
             vertex_color = "gray",
             # append style
             **visual_style
+        )
+        # define Keys-plot
+        ig.plot(
+            # keys graph
+            self.gKeys,
+            # predefined layout
+            layout = layoutKeys,
+            label_color = "white",
+            # targetted subplot
+            target = ax,
+            # width of refs
+            vertex_width = self.keyWidth,
+            # choose height = width of 2 refs
+            vertex_height = 2 * self.refWidth,
+            # gray color emblematic of refs
+            vertex_color = "lightblue",
+            # append style
+            **visual_style, 
         )
         # plot graph
         plt.show()
