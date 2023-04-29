@@ -189,3 +189,17 @@ class BTree:
                 # search every child node from current node from left to right 
                 queue.append(i)
 
+    # frontend needs the keys per level list in different order
+    # index 0: last level node on the left, index 1: last level on node to the right, and so on
+    # so from last level left to right to the root
+    def setKeysPerLevelOrder(self):
+        newOrder = self.keysPerLevel.copy()
+        index = 0
+        listIndex = 0
+        for listItem in self.numOfNodesPerLevel:
+            for current in range(listItem,1, -1):
+                newOrder[index] = self.keysPerLevel[len(self.keysPerLevel) - current]
+                index += 1
+            listIndex += 1
+        return newOrder
+
