@@ -196,10 +196,12 @@ class BTree:
         newOrder = self.keysPerLevel.copy()
         index = 0
         listIndex = 0
+        offset = 0
         for listItem in self.numOfNodesPerLevel:
-            for current in range(listItem,1, -1):
-                newOrder[index] = self.keysPerLevel[len(self.keysPerLevel) - current]
+            for current in range(listItem ,0, -1):
+                newOrder[index] = self.keysPerLevel[len(self.keysPerLevel) - current - offset]
                 index += 1
             listIndex += 1
+            offset += listItem
         return newOrder
 
