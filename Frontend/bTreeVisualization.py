@@ -18,6 +18,7 @@ import numpy as np
 import igraph as ig
 import itertools as it
 import matplotlib.pyplot as plt
+import matplotlib.animation as animation
 
 # configuration for subplot area in matplotlib-window:
 #   -   left, bottom, right, top define where the edge of the subplot area is on the matplotlib-window
@@ -26,8 +27,11 @@ import matplotlib.pyplot as plt
 #              whereas the part of the window where the graph is plotted has a gray background
 #   -   wspace, hspace define the space between multiple subplots
 #           -> we just have one subplot so these values are irrelevant  
-plt.subplots_adjust(left=0, bottom=0, right=1, top=1, wspace=0, hspace=0)
-plt.figure(facecolor='black') 
+#plt.subplots_adjust(left=0, bottom=0, right=1, top=1, wspace=0, hspace=0)
+#plt.figure(facecolor='black') 
+fig, ax = plt.subplots(facecolor='black')
+fig.subplots_adjust(left=0, bottom=0, right=1, top=1, wspace=0, hspace=0)
+
 
 class BTreeVisualization:
 
@@ -75,6 +79,15 @@ class BTreeVisualization:
         # horizontal distance between the tree's leafs
         # -> distances between other nodes are higher
         self.minNodeDistance = minNodeDistance
+        # define automatic layout for Nodes Graph
+        self.layoutNodes = self.gNodes.layout_auto()
+        # define automatic layout for Refs Graph
+        self.layoutRefs = self.gRefs.layout_auto()
+        # define automatic layout for Keys Graph
+        self.layoutKeys = self.gKeys.layout_auto()
+        # set visual style
+        self.visual_style = {}
+        self.visual_style['vertex_shape'] = 'rectangle'
 
     # calculates how many nodes the nodesList has combined
     def calcNumOfNodes(self, nodesList):
@@ -234,33 +247,45 @@ class BTreeVisualization:
         # assert the labels (key-values) to the key-graph
         self.gKeys.vs['label'] = self.keyLabels
 
-    # draw whole tree including all part graphs
-    def drawTree(self):
-        # define automatic layout for Nodes Graph
-        layoutNodes = self.gNodes.layout('auto')
-        # define automatic layout for Refs Graph
-        layoutRefs = self.gRefs.layout('auto')
-        # define automatic layout for Keys Graph
-        layoutKeys = self.gKeys.layout('auto')
+    def initializeGraph(self):
         # simplify Nodes Graph
         self.gNodes.simplify()
         # simplify Refs Graph
         self.gRefs.simplify()
         # simplify Keys Graph
         self.gKeys.simplify()
-        # define subplot
-        ax = plt.subplot()
+
+    # draw whole tree including all part graphs
+    def _update_graph(self, frame):
+        # Remove plot elements from the previous frame
+        ax.clear()
         # background color for subplot area
         ax.set_facecolor('lightgray')
-        # set visual style
-        visual_style = {}
-        visual_style['vertex_shape'] = 'rectangle'
+
+        #if frame < 1000:
+            # Plot subgraph
+        #    gdNodes = self.gNodes.subgraph(range(frame))
+        #    gdRefs = self.gRefs.subgraph(range(frame))
+        #    gdKeys = self.gKeys.subgraph(range(frame))
+        #elif frame == 1000:
+        #    gdNodes = self.gNodes.copy()
+        #    gdRefs = self.gRefs.copy()
+        #    gdKeys = self.gKeys.copy()
+        #else:
+            # Last frame
+        #    gdNodes = self.gNodes
+        #    gdRefs = self.gRefs
+        #    gdKeys = self.gKeys
+            # increment root key by one 
+            #self.keyLabels[9][0] += 1
+            # update graph values
+            #self.assertValuesToGraphs()
+
         # define Nodes-plot
         ig.plot(
             # nodes graph
             self.gNodes,
             # predefined layout
-            layout = layoutNodes,
             # targetted subplot
             target = ax,
             # node Width (calculation in constructor)     
@@ -269,15 +294,14 @@ class BTreeVisualization:
             vertex_height = 2 * self.refWidth,
             # white color because nodes will be overlayed
             vertex_color = "white",
-            # append style
-            **visual_style
+            # appendself. style
+            **self.visual_style
         )
         # define Refs-plot
         ig.plot(
             # refs graph
             self.gRefs,
             # predefined layout
-            layout = layoutRefs,
             # targetted subplot
             target = ax,
             # width of refs
@@ -287,14 +311,13 @@ class BTreeVisualization:
             # gray color emblematic of refs
             vertex_color = "gray",
             # append style
-            **visual_style
+            **self.visual_style
         )
         # define Keys-plot
         ig.plot(
             # keys graph
             self.gKeys,
             # predefined layout
-            layout = layoutKeys,
             label_color = "white",
             # targetted subplot
             target = ax,
@@ -305,7 +328,17 @@ class BTreeVisualization:
             # gray color emblematic of refs
             vertex_color = "lightblue",
             # append style
-            **visual_style, 
+            **self.visual_style, 
         )
-        # plot graph
+        # Capture handles for blitting
+        #nhandles = 2*frame
+        #handles = ax.get_children()[:nhandles]
+        nhandles = 2 * len(self.keyLabels) + len(self.xGNodes) + len(self.xGRefs)
+        handles = ax.get_children()[:nhandles]
+        return handles
+        
+    
+    def runAnimation(self):
+        ani = animation.FuncAnimation(fig, self._update_graph, interval=50, blit=True)
+        #plt.ion()
         plt.show()
