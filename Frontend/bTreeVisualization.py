@@ -20,6 +20,9 @@ import itertools as it
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
+# initialize the subplots where the graph will be displayed
+# black background for design
+fig, ax = plt.subplots(facecolor='black')
 # configuration for subplot area in matplotlib-window:
 #   -   left, bottom, right, top define where the edge of the subplot area is on the matplotlib-window
 #           -> by this configuration, the graph is positioned on the border of the window
@@ -27,9 +30,6 @@ import matplotlib.animation as animation
 #              whereas the part of the window where the graph is plotted has a gray background
 #   -   wspace, hspace define the space between multiple subplots
 #           -> we just have one subplot so these values are irrelevant  
-#plt.subplots_adjust(left=0, bottom=0, right=1, top=1, wspace=0, hspace=0)
-#plt.figure(facecolor='black') 
-fig, ax = plt.subplots(facecolor='black')
 fig.subplots_adjust(left=0, bottom=0, right=1, top=1, wspace=0, hspace=0)
 
 
@@ -247,40 +247,12 @@ class BTreeVisualization:
         # assert the labels (key-values) to the key-graph
         self.gKeys.vs['label'] = self.keyLabels
 
-    def initializeGraph(self):
-        # simplify Nodes Graph
-        self.gNodes.simplify()
-        # simplify Refs Graph
-        self.gRefs.simplify()
-        # simplify Keys Graph
-        self.gKeys.simplify()
-
     # draw whole tree including all part graphs
     def _update_graph(self, frame):
         # Remove plot elements from the previous frame
         ax.clear()
         # background color for subplot area
         ax.set_facecolor('lightgray')
-
-        #if frame < 1000:
-            # Plot subgraph
-        #    gdNodes = self.gNodes.subgraph(range(frame))
-        #    gdRefs = self.gRefs.subgraph(range(frame))
-        #    gdKeys = self.gKeys.subgraph(range(frame))
-        #elif frame == 1000:
-        #    gdNodes = self.gNodes.copy()
-        #    gdRefs = self.gRefs.copy()
-        #    gdKeys = self.gKeys.copy()
-        #else:
-            # Last frame
-        #    gdNodes = self.gNodes
-        #    gdRefs = self.gRefs
-        #    gdKeys = self.gKeys
-            # increment root key by one 
-            #self.keyLabels[9][0] += 1
-            # update graph values
-            #self.assertValuesToGraphs()
-
         # define Nodes-plot
         ig.plot(
             # nodes graph
@@ -330,15 +302,19 @@ class BTreeVisualization:
             # append style
             **self.visual_style, 
         )
-        # Capture handles for blitting
-        #nhandles = 2*frame
-        #handles = ax.get_children()[:nhandles]
+        # count all elements of the graph
         nhandles = 2 * len(self.keyLabels) + len(self.xGNodes) + len(self.xGRefs)
+        # choose all children from the graph to display the whole graph
         handles = ax.get_children()[:nhandles]
+        # return elements to be displayed
         return handles
         
-    
+    # run the graph-animation
     def runAnimation(self):
+        # define animation
+        # animation on the figure
+        # updating function is _update_graph
+        # blitting (blit) improves the fading for the animation
         ani = animation.FuncAnimation(fig, self._update_graph, interval=50, blit=True)
-        #plt.ion()
+        # show the plot
         plt.show()

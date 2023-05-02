@@ -20,4 +20,4 @@ from Frontend import gui
 myGui = gui.Gui()
 
 # call a draw test
-myGui.drawGraphTest()
+myGui.drawGraph()
