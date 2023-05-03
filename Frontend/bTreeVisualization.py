@@ -53,6 +53,8 @@ class BTreeVisualization:
         # generate a List with all Labels (key-Values)
         # -> chaining all elements in the lists in keysList together
         self.keyLabels = list(it.chain.from_iterable(self.keysList))
+        # make labels bold
+        self.formatLabels()
         # calculate how many nodes the Graph has
         self.numOfNodes = self.calcNumOfNodes(nodesList)
         # calculate how many keys the Graph has
@@ -98,6 +100,18 @@ class BTreeVisualization:
         self.visual_style = {}
         # rectangular vertices
         self.visual_style['vertex_shape'] = 'rectangle'
+
+    # takes all labels and makes them bold
+    def formatLabels(self):
+        # list for temporarily saving the formatted labels
+        tempLabels = []
+        # iterate over all labels
+        for i in self.keyLabels:
+            # format each Label with a LaTex expression
+            # expression makes the label bold
+            tempLabels.append('$\\mathbf{' + str(i) + '}$')
+        # update the labels-list with the formatted labels
+        self.keyLabels = tempLabels
 
     # calculates how many nodes the nodesList has combined
     def calcNumOfNodes(self, nodesList):
@@ -209,7 +223,7 @@ class BTreeVisualization:
                 # y position of each ref inside a specific node is equal to nodes y position
                 self.yGRefs.append(j)
                 # y position is the bottom of the ref in order to force the edges to stick at the bottom of a ref
-                self.yGRefsAid.append(j - self.refWidth)
+                self.yGRefsAid.append(j - 2 * self.refWidth)
                 # increment counter
                 ctr2 += 1
 
@@ -317,7 +331,7 @@ class BTreeVisualization:
             # node Width (calculation in constructor)     
             vertex_width = self.nodeWidth,
             # choose height = width of 2 refs
-            vertex_height = 2 * self.refWidth,
+            vertex_height = 4 * self.refWidth,
             # white color because nodes will be overlayed
             vertex_color = "white",
             # appendself. style
@@ -348,7 +362,7 @@ class BTreeVisualization:
             # width of refs
             vertex_width = self.refWidth,
             # choose height = width of 2 refs
-            vertex_height = 2 * self.refWidth,
+            vertex_height = 4 * self.refWidth,
             # gray color emblematic of refs
             vertex_color = "gray",
             # append style
@@ -363,9 +377,10 @@ class BTreeVisualization:
             # width of refs
             vertex_width = self.keyWidth,
             # choose height = width of 2 refs
-            vertex_height = 2 * self.refWidth,
+            vertex_height = 4 * self.refWidth,
             # gray color emblematic of refs
             vertex_color = "lightblue",
+            vertex_label_size = 7,
             # append style
             **self.visual_style, 
         )
@@ -373,6 +388,7 @@ class BTreeVisualization:
         nhandles = 2 * len(self.keyLabels) + len(self.xGNodes) + len(self.xGRefs) + len(self.xGRefsAid) + len(self.edgesListTupel)
         # choose all children from the graph to display the whole graph
         handles = ax.get_children()[:nhandles]
+        print(fig.get_size_inches())
         # return elements to be displayed
         return handles
         
