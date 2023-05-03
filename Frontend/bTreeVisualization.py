@@ -17,6 +17,7 @@
 #
 
 import numpy as np
+import math
 import igraph as ig
 import itertools as it
 import matplotlib.pyplot as plt
@@ -318,6 +319,10 @@ class BTreeVisualization:
 
     # draw whole tree including all part graphs
     def _update_graph(self, frame):
+        # get the bounding box of the subplot in pixels
+        bbox = ax.get_window_extent().transformed(fig.dpi_scale_trans.inverted())
+        # get the width and height of the subplot in pixels
+        width, height = bbox.width, bbox.height
         # Remove plot elements from the previous frame
         ax.clear()
         # background color for subplot area
@@ -380,7 +385,9 @@ class BTreeVisualization:
             vertex_height = 4 * self.refWidth,
             # gray color emblematic of refs
             vertex_color = "lightblue",
-            vertex_label_size = 7,
+            # formula for dynamically resizing the labels, so they are perfectly fitting into the node
+            # width and height depend on the axes of the graph
+            vertex_label_size = 0.92 * math.sqrt(width) * math.sqrt(height),
             # append style
             **self.visual_style, 
         )
@@ -388,7 +395,6 @@ class BTreeVisualization:
         nhandles = 2 * len(self.keyLabels) + len(self.xGNodes) + len(self.xGRefs) + len(self.xGRefsAid) + len(self.edgesListTupel)
         # choose all children from the graph to display the whole graph
         handles = ax.get_children()[:nhandles]
-        print(fig.get_size_inches())
         # return elements to be displayed
         return handles
         
