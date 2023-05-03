@@ -17,6 +17,7 @@
 #
 
 import numpy as np
+import math
 import igraph as ig
 import itertools as it
 import matplotlib.pyplot as plt
@@ -53,6 +54,8 @@ class BTreeVisualization:
         # generate a List with all Labels (key-Values)
         # -> chaining all elements in the lists in keysList together
         self.keyLabels = list(it.chain.from_iterable(self.keysList))
+        # make labels bold
+        self.formatLabels()
         # calculate how many nodes the Graph has
         self.numOfNodes = self.calcNumOfNodes(nodesList)
         # calculate how many keys the Graph has
@@ -98,6 +101,18 @@ class BTreeVisualization:
         self.visual_style = {}
         # rectangular vertices
         self.visual_style['vertex_shape'] = 'rectangle'
+
+    # takes all labels and makes them bold
+    def formatLabels(self):
+        # list for temporarily saving the formatted labels
+        tempLabels = []
+        # iterate over all labels
+        for i in self.keyLabels:
+            # format each Label with a LaTex expression
+            # expression makes the label bold
+            tempLabels.append('$\\mathbf{' + str(i) + '}$')
+        # update the labels-list with the formatted labels
+        self.keyLabels = tempLabels
 
     # calculates how many nodes the nodesList has combined
     def calcNumOfNodes(self, nodesList):
@@ -209,7 +224,7 @@ class BTreeVisualization:
                 # y position of each ref inside a specific node is equal to nodes y position
                 self.yGRefs.append(j)
                 # y position is the bottom of the ref in order to force the edges to stick at the bottom of a ref
-                self.yGRefsAid.append(j - self.refWidth)
+                self.yGRefsAid.append(j - 2 * self.refWidth)
                 # increment counter
                 ctr2 += 1
 
@@ -304,6 +319,10 @@ class BTreeVisualization:
 
     # draw whole tree including all part graphs
     def _update_graph(self, frame):
+        # get the bounding box of the subplot in pixels
+        bbox = ax.get_window_extent().transformed(fig.dpi_scale_trans.inverted())
+        # get the width and height of the subplot in pixels
+        width, height = bbox.width, bbox.height
         # Remove plot elements from the previous frame
         ax.clear()
         # background color for subplot area
@@ -317,7 +336,7 @@ class BTreeVisualization:
             # node Width (calculation in constructor)     
             vertex_width = self.nodeWidth,
             # choose height = width of 2 refs
-            vertex_height = 2 * self.refWidth,
+            vertex_height = 4 * self.refWidth,
             # white color because nodes will be overlayed
             vertex_color = "white",
             # appendself. style
@@ -348,7 +367,7 @@ class BTreeVisualization:
             # width of refs
             vertex_width = self.refWidth,
             # choose height = width of 2 refs
-            vertex_height = 2 * self.refWidth,
+            vertex_height = 4 * self.refWidth,
             # gray color emblematic of refs
             vertex_color = "gray",
             # append style
@@ -363,9 +382,12 @@ class BTreeVisualization:
             # width of refs
             vertex_width = self.keyWidth,
             # choose height = width of 2 refs
-            vertex_height = 2 * self.refWidth,
+            vertex_height = 4 * self.refWidth,
             # gray color emblematic of refs
             vertex_color = "lightblue",
+            # formula for dynamically resizing the labels, so they are perfectly fitting into the node
+            # width and height depend on the axes of the graph
+            vertex_label_size = 0.92 * math.sqrt(width) * math.sqrt(height),
             # append style
             **self.visual_style, 
         )
