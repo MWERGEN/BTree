@@ -7,6 +7,8 @@
 #   Editors:
 #       1.  Tim Steiner on 10.04.23
 #       2.  Marius Wergen on 27.04.23
+#       3.  Marius Wergen on 02.05.23
+#       4.  Marius Wergen on 03.05.23
 #
 ###############################################
 #
@@ -36,11 +38,18 @@ fig.subplots_adjust(left=0, bottom=0, right=1, top=1, wspace=0, hspace=0)
 class BTreeVisualization:
 
     # constructor
-    def __init__(self, k, keyWidth, refWidth, minNodeDistance, nodesList, keysList):
+    def __init__(self, k, keyWidth, refWidth, minNodeDistance, nodesList, keysList, edgesList):
         # save list of how many nodes are on each level of the tree
         self.nodesList = nodesList
         # save list of which keys are in which node
         self.keysList = keysList
+        # safe edges in a List
+        # format:       [[],     [],     [0, 1], ...]
+        #   node         0       1         2
+        #   edge to    none    none     node 0 and 1
+        self.edgesList = edgesList
+        # list containing all edges as tupels
+        self.edgesListTupel = []
         # generate a List with all Labels (key-Values)
         # -> chaining all elements in the lists in keysList together
         self.keyLabels = list(it.chain.from_iterable(self.keysList))
@@ -52,6 +61,8 @@ class BTreeVisualization:
         self.gNodes = ig.Graph(self.numOfNodes)
         # graph with references inside the nodes
         self.gRefs = ig.Graph((2 * k + 1) * self.numOfNodes)
+        # graph with aid-structure for reference-edge-visualization
+        self.gRefsAid = ig.Graph((2 * k + 1) * self.numOfNodes)
         # graph with keys inside the nodes
         self.gKeys = ig.Graph(self.numOfKeys)
         # x-Positions of Nodes' centers
@@ -62,6 +73,10 @@ class BTreeVisualization:
         self.xGRefs = []
         # y-Positions of references
         self.yGRefs = []
+        # x-Positions of aid-structures for refs
+        self.xGRefsAid = []
+        # y-Positions of aid-structures for refs
+        self.yGRefsAid = []
         # x-Positions of keys
         self.xGKeys = []
         # y-Positions of keys
@@ -79,14 +94,9 @@ class BTreeVisualization:
         # horizontal distance between the tree's leafs
         # -> distances between other nodes are higher
         self.minNodeDistance = minNodeDistance
-        # define automatic layout for Nodes Graph
-        self.layoutNodes = self.gNodes.layout_auto()
-        # define automatic layout for Refs Graph
-        self.layoutRefs = self.gRefs.layout_auto()
-        # define automatic layout for Keys Graph
-        self.layoutKeys = self.gKeys.layout_auto()
-        # set visual style
+        # declare visual style
         self.visual_style = {}
+        # rectangular vertices
         self.visual_style['vertex_shape'] = 'rectangle'
 
     # calculates how many nodes the nodesList has combined
@@ -186,6 +196,8 @@ class BTreeVisualization:
                 # adding k refs right from centre of node when i is positive
                 # adding 1 ref in the middle of the node
                 self.xGRefs.append(i + ((self.refWidth + self.keyWidth) * ctr))
+                # edges should stick on the center x-Pos of a reference
+                self.xGRefsAid.append(i + ((self.refWidth + self.keyWidth) * ctr))
                 # increment counter each iteration
                 ctr += 1
         # iterate over all nodes' y positions
@@ -196,6 +208,8 @@ class BTreeVisualization:
             while ctr2 <= 2 * self.k:
                 # y position of each ref inside a specific node is equal to nodes y position
                 self.yGRefs.append(j)
+                # y position is the bottom of the ref in order to force the edges to stick at the bottom of a ref
+                self.yGRefsAid.append(j - self.refWidth)
                 # increment counter
                 ctr2 += 1
 
@@ -230,6 +244,43 @@ class BTreeVisualization:
             # increment node-counter because the next iteration of the for loop will be for the next node
             ctrNodes += 1
     
+    # calculates the ref to ref connection for all edges
+    def calcEdges(self):
+        # counter which node is worked on
+        ctrNode = 0
+        # iterate over all edges
+        for i in self.edgesList:
+            # only conside lists in edgesList that are not empty
+            # empty list in edgesList means no edges for this node
+            if i:
+                # counter which ref inside the node is worked on
+                ctrRef = 0
+                # iterate over all edges for the considered node
+                for j in i:
+                    # calculate parent ref
+                    #   the outer left reference in the bottom left node is ref 0
+                    #       now we have to calculate which index the outer left reference in our node has
+                    #       we are in node ctrNode with 2 * k + 1 refs per node
+                    #       so the index of the outer left ref is: ctrNode * (2 * k + 1)
+                    #   we have to add ctrRef to aim a specific reference in the node
+                    parent = ctrNode * (2 * self.k + 1) + ctrRef
+                    # calculate child ref
+                    #   the outer left reference in the bottom left node is ref 0
+                    #       now we have to calculate which index the outer left reference in the child node has
+                    #       the child node has index j with 2 * k + 1 refs per node
+                    #       so the index of the outer left ref is: j * (2 * k + 1)
+                    #   we have to add k to aim the center reference in the child-node
+                    child = j * (2 * self.k + 1) + self.k
+                    # add edge = (parentRef, childRef) to edgesListTupel
+                    self.edgesListTupel.append((parent, child))
+                    # increment ctrRef to aim for the right next ref in the node for the following iteration
+                    ctrRef += 1
+            # increment ctrNode to observe the next node in the next iteration
+            ctrNode += 1
+        # after calculating all edges' relationships, 
+        # add the edges to the graph of the references Aid structures
+        self.gRefsAid.add_edges(self.edgesListTupel)
+
     # define the x- and y-Positions and potential labels for all Graphs
     def assertValuesToGraphs(self):
         # for Nodes x
@@ -240,6 +291,10 @@ class BTreeVisualization:
         self.gRefs.vs['x'] = self.xGRefs
         # for Refs y
         self.gRefs.vs['y'] = self.yGRefs
+        # for aid x
+        self.gRefsAid.vs['x'] = self.xGRefsAid
+        # for aid y
+        self.gRefsAid.vs['y'] = self.yGRefsAid
         # for Keys x
         self.gKeys.vs['x'] = self.xGKeys
         # for Keys y
@@ -257,7 +312,6 @@ class BTreeVisualization:
         ig.plot(
             # nodes graph
             self.gNodes,
-            # predefined layout
             # targetted subplot
             target = ax,
             # node Width (calculation in constructor)     
@@ -269,11 +323,26 @@ class BTreeVisualization:
             # appendself. style
             **self.visual_style
         )
+        # define Refs-Aid-plot
+        ig.plot(
+            # refs graph
+            self.gRefsAid,
+            # targetted subplot
+            target = ax,
+            # width of refs aid = refWidth * 0.5
+            # -> edges really stick in the centre of a ref
+            vertex_width = 0.5 * self.refWidth,
+            # choose height very low to force the edge to stick at the bottom of a ref
+            vertex_height = 0.001 * self.refWidth,
+            # gray color emblematic of refs
+            vertex_color = "gray",
+            # append style
+            **self.visual_style
+        )
         # define Refs-plot
         ig.plot(
             # refs graph
             self.gRefs,
-            # predefined layout
             # targetted subplot
             target = ax,
             # width of refs
@@ -289,8 +358,6 @@ class BTreeVisualization:
         ig.plot(
             # keys graph
             self.gKeys,
-            # predefined layout
-            label_color = "white",
             # targetted subplot
             target = ax,
             # width of refs
@@ -303,7 +370,7 @@ class BTreeVisualization:
             **self.visual_style, 
         )
         # count all elements of the graph
-        nhandles = 2 * len(self.keyLabels) + len(self.xGNodes) + len(self.xGRefs)
+        nhandles = 2 * len(self.keyLabels) + len(self.xGNodes) + len(self.xGRefs) + len(self.xGRefsAid) + len(self.edgesListTupel)
         # choose all children from the graph to display the whole graph
         handles = ax.get_children()[:nhandles]
         # return elements to be displayed
