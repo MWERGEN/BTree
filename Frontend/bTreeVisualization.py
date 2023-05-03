@@ -35,11 +35,10 @@ fig, ax = plt.subplots(facecolor='black')
 #           -> we just have one subplot so these values are irrelevant  
 fig.subplots_adjust(left=0, bottom=0, right=1, top=1, wspace=0, hspace=0)
 
-
 class BTreeVisualization:
 
     # constructor
-    def __init__(self, k, keyWidth, refWidth, minNodeDistance, nodesList, keysList, edgesList):
+    def __init__(self, k, keyWidth, refWidth, minNodeDistance, nodesList, keysList, edgesList, currentAnimation):
         # save list of how many nodes are on each level of the tree
         self.nodesList = nodesList
         # save list of which keys are in which node
@@ -68,6 +67,8 @@ class BTreeVisualization:
         self.gRefsAid = ig.Graph((2 * k + 1) * self.numOfNodes)
         # graph with keys inside the nodes
         self.gKeys = ig.Graph(self.numOfKeys)
+        # key for moving animation
+        self.gMovingKey = ig.Graph(1)
         # x-Positions of Nodes' centers
         self.xGNodes = []
         # y-Positions of Nodes' centers
@@ -84,6 +85,10 @@ class BTreeVisualization:
         self.xGKeys = []
         # y-Positions of keys
         self.yGKeys = []
+        # x-Positions of moving keys
+        self.xGMovingKey = []
+        # y-Positions of moving keys
+        self.yGMovingKey = []
         # tree's definition of k (= minimum number of keys in node)
         self.k = k
         # key-width
@@ -101,6 +106,10 @@ class BTreeVisualization:
         self.visual_style = {}
         # rectangular vertices
         self.visual_style['vertex_shape'] = 'rectangle'
+        self.currentAnimation = currentAnimation
+        self.x = [0]
+        self.y = [1]
+        self.i = 69
 
     # takes all labels and makes them bold
     def formatLabels(self):
@@ -317,6 +326,32 @@ class BTreeVisualization:
         # assert the labels (key-values) to the key-graph
         self.gKeys.vs['label'] = self.keyLabels
 
+    def animation1(self, width, height):
+        self.x[0] += 0.005
+        self.y[0] += 0.005
+        self.gMovingKey.vs['x'] = self.x
+        self.gMovingKey.vs['y'] = self.y
+        self.gMovingKey.vs['label'] = ['$\\mathbf{' + str(self.i) + '}$']
+        ig.plot(
+            # keys graph
+            self.gMovingKey,
+            # targetted subplot
+            target = ax,
+            # width of refs
+            vertex_width = self.keyWidth,
+            # choose height = width of 2 refs
+            vertex_height = 4 * self.refWidth,
+            # gray color emblematic of refs
+            vertex_color = "lightblue",
+            # set color of moving vertex to red
+            vertex_frame_color="red",
+            # formula for dynamically resizing the labels, so they are perfectly fitting into the node
+            # width and height depend on the axes of the graph
+            vertex_label_size = 0.92 * math.sqrt(width) * math.sqrt(height),
+            # append style
+            **self.visual_style, 
+        )
+
     # draw whole tree including all part graphs
     def _update_graph(self, frame):
         # get the bounding box of the subplot in pixels
@@ -327,6 +362,8 @@ class BTreeVisualization:
         ax.clear()
         # background color for subplot area
         ax.set_facecolor('lightgray')
+        # transparent color for vertex
+        #vertex_color_transparent = [(0, 0, 0, 0) for i in range(self.gNodes.vcount())]
         # define Nodes-plot
         ig.plot(
             # nodes graph
@@ -338,7 +375,7 @@ class BTreeVisualization:
             # choose height = width of 2 refs
             vertex_height = 4 * self.refWidth,
             # white color because nodes will be overlayed
-            vertex_color = "white",
+            vertex_color = 'white',
             # appendself. style
             **self.visual_style
         )
@@ -391,8 +428,10 @@ class BTreeVisualization:
             # append style
             **self.visual_style, 
         )
+        if self.currentAnimation == 1:
+            self.animation1(width, height)
         # count all elements of the graph
-        nhandles = 2 * len(self.keyLabels) + len(self.xGNodes) + len(self.xGRefs) + len(self.xGRefsAid) + len(self.edgesListTupel)
+        nhandles = 2 * (len(self.keyLabels) + len(self.x)) + len(self.xGNodes) + len(self.xGRefs) + len(self.xGRefsAid) + len(self.edgesListTupel)
         # choose all children from the graph to display the whole graph
         handles = ax.get_children()[:nhandles]
         # return elements to be displayed
@@ -404,6 +443,6 @@ class BTreeVisualization:
         # animation on the figure
         # updating function is _update_graph
         # blitting (blit) improves the fading for the animation
-        ani = animation.FuncAnimation(fig, self._update_graph, interval=50, blit=True)
+        ani = animation.FuncAnimation(fig, self._update_graph, interval=1, blit=True)
         # show the plot
         plt.show()
