@@ -9,6 +9,7 @@
 #       2.  Marius Wergen on 27.04.23
 #       3.  Marius Wergen on 02.05.23
 #       4.  Marius Wergen on 03.05.23
+#       5.  Marius Wergen on 04.05.23
 #
 ###############################################
 #
@@ -16,12 +17,15 @@
 #       - visualization of the B-tree
 #
 
+import time
 import numpy as np
 import math
 import igraph as ig
 import itertools as it
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
+
+from Frontend import animation as ani
 
 # initialize the subplots where the graph will be displayed
 # black background for design
@@ -38,27 +42,32 @@ fig.subplots_adjust(left=0, bottom=0, right=1, top=1, wspace=0, hspace=0)
 class BTreeVisualization:
 
     # constructor
-    def __init__(self, k, keyWidth, refWidth, minNodeDistance, nodesList, keysList, edgesList, currentAnimation):
+    def __init__(self, k, keyWidth, refWidth, minNodeDistance, currentAnimation):
+        self.i = 0
+        # save passed animation for current animation
+        self.currentAnimation = currentAnimation
         # save list of how many nodes are on each level of the tree
-        self.nodesList = nodesList
+        self.nodesList = self.currentAnimation.nodesList
         # save list of which keys are in which node
-        self.keysList = keysList
+        self.keysList = self.currentAnimation.keysList
         # safe edges in a List
         # format:       [[],     [],     [0, 1], ...]
         #   node         0       1         2
         #   edge to    none    none     node 0 and 1
-        self.edgesList = edgesList
+        self.edgesList = self.currentAnimation.edgesList
         # list containing all edges as tupels
         self.edgesListTupel = []
         # generate a List with all Labels (key-Values)
         # -> chaining all elements in the lists in keysList together
         self.keyLabels = list(it.chain.from_iterable(self.keysList))
+        # formatted keys (bold)
+        self.keyLabelsFormatted = []
         # make labels bold
         self.formatLabels()
         # calculate how many nodes the Graph has
-        self.numOfNodes = self.calcNumOfNodes(nodesList)
+        self.numOfNodes = self.calcNumOfNodes(self.nodesList)
         # calculate how many keys the Graph has
-        self.numOfKeys = self.calcNumOfKeys(keysList)
+        self.numOfKeys = self.calcNumOfKeys(self.keysList)
         # graph with Nodes (later surrounding keys and references of each node)
         self.gNodes = ig.Graph(self.numOfNodes)
         # graph with references inside the nodes
@@ -102,26 +111,100 @@ class BTreeVisualization:
         # horizontal distance between the tree's leafs
         # -> distances between other nodes are higher
         self.minNodeDistance = minNodeDistance
+        # list containing the colors of each key
+        self.colorKeyList = []
+        # list containing the colors of each reference
+        self.colorRefList = []
         # declare visual style
         self.visual_style = {}
         # rectangular vertices
         self.visual_style['vertex_shape'] = 'rectangle'
-        self.currentAnimation = currentAnimation
-        self.x = [0]
-        self.y = [1]
-        self.i = 69
+
+    # resets all values of the graph in order to print it again in a different form
+    def updateGraph(self):
+        # graph's nodes
+        self.nodesList = self.currentAnimation.nodesList
+        # graph's keys
+        self.keysList = self.currentAnimation.keysList
+        # graph's edges
+        self.edgesList = self.currentAnimation.edgesList
+        # list containing all edges as tupels
+        self.edgesListTupel = []
+        # generate a List with all Labels (key-Values)
+        # -> chaining all elements in the lists in keysList together
+        self.keyLabels = list(it.chain.from_iterable(self.keysList))
+        # formatted keys (bold)
+        self.keyLabelsFormatted = []
+        # make labels bold
+        self.formatLabels()
+        # calculate how many nodes the Graph has
+        self.numOfNodes = self.calcNumOfNodes(self.nodesList)
+        # calculate how many keys the Graph has
+        self.numOfKeys = self.calcNumOfKeys(self.keysList)
+        # graph with Nodes (later surrounding keys and references of each node)
+        self.gNodes = ig.Graph(self.numOfNodes)
+        # graph with references inside the nodes
+        self.gRefs = ig.Graph((2 * self.k + 1) * self.numOfNodes)
+        # graph with aid-structure for reference-edge-visualization
+        self.gRefsAid = ig.Graph((2 * self.k + 1) * self.numOfNodes)
+        # graph with keys inside the nodes
+        self.gKeys = ig.Graph(self.numOfKeys)
+        # key for moving animation
+        self.gMovingKey = ig.Graph(1)
+        # x-Positions of Nodes' centers
+        self.xGNodes = []
+        # y-Positions of Nodes' centers
+        self.yGNodes = []
+        # x-Positions of references
+        self.xGRefs = []
+        # y-Positions of references
+        self.yGRefs = []
+        # x-Positions of aid-structures for refs
+        self.xGRefsAid = []
+        # y-Positions of aid-structures for refs
+        self.yGRefsAid = []
+        # x-Positions of keys
+        self.xGKeys = []
+        # y-Positions of keys
+        self.yGKeys = []
+        # list containing the colors of each key
+        self.colorKeyList = []
+        # list containing the colors of each reference
+        self.colorRefList = []
+        # predefine nodes
+        self.calcNodesPositions()
+        # calc where the references will be inside the nodes
+        self.calcRefPositions()
+        # calc where the keys will be inside the nodes
+        self.calcKeyPositions()
+        # calculate all graphs
+        self.assertValuesToGraphs()
+        # calculate the edges' relationships
+        self.calcEdges()
+
+    # initializes all keys with a lightblue background
+    def initializeColorKeyList(self):
+        self.colorKeyList = []
+        # for n keys, we need a list with n times the color
+        for i in self.xGKeys:
+            # add another instance of the lightblue
+            self.colorKeyList.append("lightblue")
+
+    # initializes all refs with a gray background
+    def initializeColorRefList(self):
+        self.colorRefList = []
+        # for n refs, we need a list with n times the color
+        for i in self.xGRefs:
+            # add another instance of the gray
+            self.colorRefList.append("gray")
 
     # takes all labels and makes them bold
     def formatLabels(self):
-        # list for temporarily saving the formatted labels
-        tempLabels = []
         # iterate over all labels
         for i in self.keyLabels:
             # format each Label with a LaTex expression
             # expression makes the label bold
-            tempLabels.append('$\\mathbf{' + str(i) + '}$')
-        # update the labels-list with the formatted labels
-        self.keyLabels = tempLabels
+            self.keyLabelsFormatted.append('$\\mathbf{' + str(i) + '}$')
 
     # calculates how many nodes the nodesList has combined
     def calcNumOfNodes(self, nodesList):
@@ -324,36 +407,227 @@ class BTreeVisualization:
         # for Keys y
         self.gKeys.vs['y'] = self.yGKeys
         # assert the labels (key-values) to the key-graph
-        self.gKeys.vs['label'] = self.keyLabels
+        self.gKeys.vs['label'] = self.keyLabelsFormatted
+        # generate a list with the colors for each node
+        self.initializeColorKeyList()
+        # generate a list with the colors for each ref
+        self.initializeColorRefList()
 
-    def animation1(self, width, height):
-        self.x[0] += 0.005
-        self.y[0] += 0.005
-        self.gMovingKey.vs['x'] = self.x
-        self.gMovingKey.vs['y'] = self.y
-        self.gMovingKey.vs['label'] = ['$\\mathbf{' + str(self.i) + '}$']
-        ig.plot(
-            # keys graph
-            self.gMovingKey,
-            # targetted subplot
-            target = ax,
-            # width of refs
-            vertex_width = self.keyWidth,
-            # choose height = width of 2 refs
-            vertex_height = 4 * self.refWidth,
-            # gray color emblematic of refs
-            vertex_color = "lightblue",
-            # set color of moving vertex to red
-            vertex_frame_color="red",
-            # formula for dynamically resizing the labels, so they are perfectly fitting into the node
-            # width and height depend on the axes of the graph
-            vertex_label_size = 0.92 * math.sqrt(width) * math.sqrt(height),
-            # append style
-            **self.visual_style, 
-        )
+    # animation of type 1
+    # moves a new key from one node to another
+    # width and height are w and h from the subplot
+    # -> used for custom font size
+    def animation1(self, width, height, frame):
+        # save current animation in temp anim
+        # used for better overview in complex code
+        anim = self.currentAnimation
+        # if the starting node is lower than the destination node
+        # -> means that the key should move upwards
+        if (anim.startingNode[anim.walkthrough] < anim.destinationNode[anim.walkthrough]):
+            anim.upwards = True
+        
+        if anim.upwards:
+            # calculates the x-Position where the key starts
+            # simply counts to the reference where the key starts and gets that x-value
+            anim.startingRefX = anim.currX[0]
+            # calculates the y-Position where the key starts
+            # simply counts to the reference where the key starts and gets that y-value
+            anim.startingRefY = anim.currY[0]
+            # calculates the x-Position where the key has to end
+            # simply counts to the center of the node where the key should end and gets that x-value
+            anim.destinationRefX = self.xGRefsAid[anim.destinationNode[anim.walkthrough] * (2 * self.k + 1) + self.k]
+            # calculates the y-Position where the key has to end
+            # simply counts to the center of the node where the key should end and gets that y-value
+            anim.destinationRefY = self.yGRefsAid[anim.destinationNode[anim.walkthrough] * (2 * self.k + 1) + self.k] + 7 * self.refWidth
+        else:
+            # calculates the x-Position where the key starts
+            # simply counts to the reference where the key starts and gets that x-value
+            anim.startingRefX = self.xGRefsAid[anim.startingNode[anim.walkthrough] * (2 * self.k + 1) + anim.refInsideStartingNode[anim.walkthrough]]
+            # calculates the y-Position where the key starts
+            # simply counts to the reference where the key starts and gets that y-value
+            anim.startingRefY = self.yGRefsAid[anim.startingNode[anim.walkthrough] * (2 * self.k + 1) + anim.refInsideStartingNode[anim.walkthrough]]
+            # calculates the x-Position where the key has to end
+            # simply counts to the center of the node where the key should end and gets that x-value
+            anim.destinationRefX = self.xGRefsAid[anim.destinationNode[anim.walkthrough] * (2 * self.k + 1) + self.k]
+            # calculates the y-Position where the key has to end
+            # simply counts to the center of the node where the key should end and gets that y-value
+            anim.destinationRefY = self.yGRefsAid[anim.destinationNode[anim.walkthrough] * (2 * self.k + 1) + self.k]
+        # case differentiation to avoid deviding by zero
+        if anim.startingNode[anim.walkthrough] != anim.destinationNode[anim.walkthrough]:
+            # calculate the gradient of the connecting edge between the startingNode and the destinationNode
+            # gradient g is relative to y: g(y) = x
+            #   -> the idea is that the moving node moves some pixels down and the corresponding pixels to the side
+            #   -> so all keys move at the same speed no matter the edge
+            anim.gradient = (anim.startingRefX - anim.destinationRefX) / (anim.startingRefY - anim.destinationRefY)
+        # only for first iteration
+        if anim.flagNoMove:
+            # only initialize starting point in the first iteration
+            # exceptional case for root
+            if anim.startingNode[anim.walkthrough] == anim.destinationNode[anim.walkthrough]:
+                # position moving node left beside the node: x-position
+                anim.currX[0] = anim.startingRefX - (anim.refInsideStartingNode[anim.walkthrough] + 2) * (self.keyWidth)
+                # position moving node left beside the node: x-position
+                anim.currY[0] = anim.startingRefY + 2 * self.refWidth
+            # for all other nodes
+            elif anim.currY[0] != (anim.destinationRefY  + 7 * self.refWidth):
+                # let the key begin at the starting point
+                # x
+                anim.currX[0] = anim.startingRefX
+                # y
+                anim.currY[0] = anim.startingRefY
+                # start moving the key
+                anim.flagNoMove = False
+        # during the animation
+        # -> repositioning the node
+        else:
+            if anim.upwards:
+                # if the key is not surpassing the destination node
+                if anim.currY[0] + anim.animationSpeed < anim.destinationRefY:
+                    # move one unit horizontally
+                    anim.currX[0] += anim.animationSpeed * anim.gradient
+                    # move one unit up
+                    anim.currY[0] += anim.animationSpeed
+                # if the key would surpass the destination node in the next iteration
+                else:
+                    # stop the key ahead of the destination node
+                    # y position exactly on edge
+                    anim.currY[0] = anim.destinationRefY
+                    # x position in the middle of the node if destinationRefX == center of node
+                    anim.currX[0] = anim.destinationRefX
+                    # end of animation reached means stop animation
+                    anim.flagNoMove = True
+            else:
+                # if the key is not surpassing the destination node
+                if anim.currY[0] - anim.animationSpeed > anim.destinationRefY + 7 * self.refWidth:
+                    # move one unit horizontally
+                    anim.currX[0] -= anim.animationSpeed * anim.gradient
+                    # move one unit down
+                    anim.currY[0] -= anim.animationSpeed
+                # if the key would surpass the destination node in the next iteration
+                else:
+                    # stop the key ahead of the destination node
+                    # y position exactly on edge
+                    anim.currY[0] = anim.destinationRefY + 7 * self.refWidth
+                    # x position exactly on edge
+                    anim.currX[0] = anim.startingRefX - (anim.startingRefY - anim.currY[0]) * anim.gradient
+                    # end of animation reached means stop animation
+                    anim.flagNoMove = True
+        # assert x-Position of moving Node to moving-Node-Graph
+        self.gMovingKey.vs['x'] = anim.currX
+        # assert y-Position of moving Node to moving-Node-Graph
+        self.gMovingKey.vs['y'] = anim.currY
+        # assert label of moving Node to moving-Node-Graph
+        self.gMovingKey.vs['label'] = anim.labelFormatted
+        # do the comparison animation if the moving key is ready 
+        # and the comparison animation is not ready yet
+        if not anim.flagOuterKeyReached and anim.flagNoMove:
+            # counter to find out which node has to be observed
+            ctrNode = 0
+            # index counts what's the index of the observed key inside the keys list
+            index = 0
+            # count the number of all keys together
+            while ctrNode < anim.destinationNode[anim.walkthrough]:
+                # add as many keys to index that are in the node at position ctrNode
+                index += len(self.keysList[ctrNode])
+                # next node
+                ctrNode += 1
+            # add to the index the rank of the ref inside the node
+            index += anim.highlightedKey
+            # paint the observed key red to indicate that it is being observed
+            self.colorKeyList[index] = "red"
+            # a key was found that is higher than the key that is going to be added
+            if self.keyLabels[index] > anim.label:
+                # stop the animation
+                anim.flagOuterKeyReached = True
+            # the key that is going to be added would be the highest key in the observed node
+            elif anim.highlightedKey == len(self.keysList[ctrNode]) - 1:
+                # stop the animation
+                anim.flagOuterKeyReached = True
+                # indicate that it would be the highest key inside the node
+                anim.flagNewKeyHighest = True
+            # observe one key for 30 frames
+            elif frame != 0 and frame % 30 == 0:
+                # after 30 frames, switch to the following key
+                anim.highlightedKey += 1
+        # make all keys lightblue again all 30 frames
+        if frame != 0 and frame % 30 == 0:
+            # set all keys to lightblue
+            self.initializeColorKeyList()
+            # if the comparison animation is over
+            if anim.flagOuterKeyReached:
+                # if the key would be the highest in the node
+                if anim.flagNewKeyHighest:
+                    # paint the outer right ref green 
+                    # = the found path
+                    self.colorRefList[anim.destinationNode[anim.walkthrough] * (2 * self.k + 1) + anim.highlightedKey + 1] = "green"
+                # if the key is not the highest in the node
+                else:
+                    # paint the ref left from the higher key green
+                    # = the found path
+                    self.colorRefList[anim.destinationNode[anim.walkthrough] * (2 * self.k + 1) + anim.highlightedKey] = "green"
+                # if there is still another part of the animation, trigger it
+                if (anim.walkthrough + 1) < len(anim.destinationNode):
+                    # switch to the next animation
+                    anim.walkthrough += 1
+                    # reset destination
+                    #anim.destinationRefY = 0
+                    # reset highlighted key
+                    anim.highlightedKey = 0
+                    # reset flags to default
+                    anim.flagOuterKeyReached = False
+                    anim.flagNewKeyHighest = False
+                    anim.label = anim.operands[3][anim.walkthrough]
+                    anim.setLabel(anim.label)
+                # wait a bit if there is no other animation left
+                # so the key stays ahead of his new node
+                # -> the user can observe the destination position 
+                elif frame % 40 == 0:
+                    # update the animation
+                    # sets the new type
+                    # -> so until a new animation comes in, just the graph is drawn
+                    anim.updateNewAnimation()
+                    # update the graph
+                    # -> needed for new, inserted key
+                    self.updateGraph()
+        # only plot moving node if the animation is still chosen
+        # this is needed because the animation type can be = 0 for one iteration
+        # without the if, the moving node would be drawn anywhere, which looks buggy
+        if anim.type == 1:
+            # define plot for moving key
+            ig.plot(
+                # moving key graph
+                self.gMovingKey,
+                # targetted subplot
+                target = ax,
+                # width of key
+                vertex_width = self.keyWidth,
+                # choose height = width of 4 refs
+                vertex_height = 4 * self.refWidth,
+                # lightblue means key node
+                vertex_color = "lightblue",
+                # set color of moving vertex to red
+                vertex_frame_color="red",
+                # formula for dynamically resizing the labels, so they are perfectly fitting into the node
+                # width and height depend on the axes of the graph
+                vertex_label_size = 0.92 * math.sqrt(width) * math.sqrt(height),
+                # append style
+                **self.visual_style, 
+            )
 
     # draw whole tree including all part graphs
     def _update_graph(self, frame):
+        #print(self.i)
+        self.i += 1
+
+#####################
+        # new insert
+        if self.i == 420:
+            animTypeList = [1, 1, 0]
+            treeList = [[[6, 3, 1], [[1, 2], [7, 8, 9], [7, 8, 10, 11], [33, 40], [50, 69, 70], [500], [4, 6, 12, 24], [41], [9999], [20, 25]], [[], [], [], [], [], [], [0, 1, 2], [3, 4], [5], [6, 7, 8]]], [[6, 3, 1], [[1, 2], [7, 8, 9], [7, 8, 10, 11], [33, 40], [50, 69, 70], [500], [4, 6, 12, 24], [41], [9999], [20, 25]], [[], [], [], [], [], [], [0, 1, 2], [3, 4], [5], [6, 7, 8]]], [[6, 3, 1], [[1, 2], [7, 8, 9], [7, 8, 10, 11], [33, 40], [50, 69, 70], [420, 500], [4, 6, 12, 24], [41], [9999], [20, 25]], [[], [], [], [], [], [], [0, 1, 2], [3, 4], [5], [6, 7, 8]]]]
+            animList = [[9, 9, 8], [9, 8, 5], [2, 2, 0], 420]
+            self.currentAnimation = ani.Animation(animTypeList, treeList, animList)
+#####################
+
         # get the bounding box of the subplot in pixels
         bbox = ax.get_window_extent().transformed(fig.dpi_scale_trans.inverted())
         # get the width and height of the subplot in pixels
@@ -406,7 +680,7 @@ class BTreeVisualization:
             # choose height = width of 2 refs
             vertex_height = 4 * self.refWidth,
             # gray color emblematic of refs
-            vertex_color = "gray",
+            vertex_color = self.colorRefList,
             # append style
             **self.visual_style
         )
@@ -421,17 +695,17 @@ class BTreeVisualization:
             # choose height = width of 2 refs
             vertex_height = 4 * self.refWidth,
             # gray color emblematic of refs
-            vertex_color = "lightblue",
+            vertex_color = self.colorKeyList,
             # formula for dynamically resizing the labels, so they are perfectly fitting into the node
             # width and height depend on the axes of the graph
             vertex_label_size = 0.92 * math.sqrt(width) * math.sqrt(height),
             # append style
             **self.visual_style, 
         )
-        if self.currentAnimation == 1:
-            self.animation1(width, height)
+        if self.currentAnimation.type == 1:
+            self.animation1(width, height, frame)
         # count all elements of the graph
-        nhandles = 2 * (len(self.keyLabels) + len(self.x)) + len(self.xGNodes) + len(self.xGRefs) + len(self.xGRefsAid) + len(self.edgesListTupel)
+        nhandles = 2 + 2 * len(self.keyLabels) + len(self.xGNodes) + len(self.xGRefs) + len(self.xGRefsAid) + len(self.edgesListTupel)
         # choose all children from the graph to display the whole graph
         handles = ax.get_children()[:nhandles]
         # return elements to be displayed
