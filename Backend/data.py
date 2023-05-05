@@ -36,8 +36,10 @@ testTree.getNumOfNodesPerLevel(testTree.rootNode)
 testTree.prepareNodeList()
 print(testTree.numOfNodesPerLevel)
 
+# set keys per level from lowest level left to right
 testTree.getKeysPerLevel()
 print(testTree.keysPerLevel)
 
-print(testTree.setKeysPerLevelOrder())
+# give each node from lowest level left to right ids
+# leftest child -> id = 0
 testTree.updateNodeIds(testTree.rootNode)
