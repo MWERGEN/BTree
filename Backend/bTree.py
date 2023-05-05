@@ -180,34 +180,31 @@ class BTree:
         return self.numOfNodesPerLevel.reverse()
     
     # function that returns keys per level 
-    # useses Breadth-First Traversal 
+    # useses reverse level order traversal of the tree
     def getKeysPerLevel(self):
-        # creating queue and inserting root 
-        queue = [self.rootNode]
-        while len(queue) != 0:
-            # get current node from queue 
-            currentNode = queue.pop(0)
-            # append keys of current node to keys list
+        if self.rootNode is None:
+            return
+        # create an empty queue and enqueue the root node
+        queue = deque()
+        queue.append(self.rootNode)
+        # create a stack to reverse level order nodes
+        stack = deque()
+        # loop till queue is empty
+        while queue:
+            # process each node in the queue and enqueue their children
+            curr = queue.popleft()
+            # push the current node into the stack
+            stack.append(curr)
+            # it is important to process the right node before the left node
+            for child in reversed(curr.children):
+                queue.append(child)
+        # pop all nodes from the stack and print them
+        while stack:
+            currentNode = stack.pop()
             self.keysPerLevel.append(currentNode.keys)
             for i in currentNode.children:
                 # search every child node from current node from left to right 
                 queue.append(i)
-
-    # frontend needs the keys per level list in different order
-    # index 0: last level node on the left, index 1: last level on node to the right, and so on
-    # so from last level left to right to the root
-    def setKeysPerLevelOrder(self):
-        newOrder = self.keysPerLevel.copy()
-        index = 0
-        listIndex = 0
-        offset = 0
-        for listItem in self.numOfNodesPerLevel:
-            for current in range(listItem ,0, -1):
-                newOrder[index] = self.keysPerLevel[len(self.keysPerLevel) - current - offset]
-                index += 1
-            listIndex += 1
-            offset += listItem
-        return newOrder
     
 
     # nodes have an ID, frontend needs from lowest level left to right upwards the IDs incremented
