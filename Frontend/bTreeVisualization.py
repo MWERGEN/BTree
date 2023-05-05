@@ -200,6 +200,7 @@ class BTreeVisualization:
 
     # takes all labels and makes them bold
     def formatLabels(self):
+        self.keyLabelsFormatted = []
         # iterate over all labels
         for i in self.keyLabels:
             # format each Label with a LaTex expression
@@ -576,8 +577,15 @@ class BTreeVisualization:
                     # reset flags to default
                     anim.flagOuterKeyReached = False
                     anim.flagNewKeyHighest = False
-                    anim.label = anim.operands[3][anim.walkthrough]
-                    anim.setLabel(anim.label)
+
+        #########
+                    #anim.label = anim.operands[3][anim.walkthrough]
+                    #anim.setLabel(anim.label)
+                    #self.keyLabels = list(it.chain.from_iterable(anim.tree[anim.walkthrough][1]))
+                    #self.formatLabels()
+                    #self.gKeys.vs['label'] = self.keyLabelsFormatted
+        #############
+        
                 # wait a bit if there is no other animation left
                 # so the key stays ahead of his new node
                 # -> the user can observe the destination position 
@@ -624,7 +632,7 @@ class BTreeVisualization:
         if self.i == 420:
             animTypeList = [1, 1, 0]
             treeList = [[[6, 3, 1], [[1, 2], [7, 8, 9], [7, 8, 10, 11], [33, 40], [50, 69, 70], [500], [4, 6, 12, 24], [41], [9999], [20, 25]], [[], [], [], [], [], [], [0, 1, 2], [3, 4], [5], [6, 7, 8]]], [[6, 3, 1], [[1, 2], [7, 8, 9], [7, 8, 10, 11], [33, 40], [50, 69, 70], [500], [4, 6, 12, 24], [41], [9999], [20, 25]], [[], [], [], [], [], [], [0, 1, 2], [3, 4], [5], [6, 7, 8]]], [[6, 3, 1], [[1, 2], [7, 8, 9], [7, 8, 10, 11], [33, 40], [50, 69, 70], [420, 500], [4, 6, 12, 24], [41], [9999], [20, 25]], [[], [], [], [], [], [], [0, 1, 2], [3, 4], [5], [6, 7, 8]]]]
-            animList = [[9, 9, 8], [9, 8, 5], [2, 2, 0], 420]
+            animList = [[9, 9, 8], [9, 8, 5], [2, 2, 0], [420, 420, 420]]
             self.currentAnimation = ani.Animation(animTypeList, treeList, animList)
 #####################
 
