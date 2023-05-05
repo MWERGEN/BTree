@@ -16,6 +16,8 @@
 #       - preparing lists for frontend (num of nodes per level, keys per level and edges)
 #
 from node import Node
+from collections import deque
+
 class BTree:
     def __init__(self, k):
         self.rootNode = Node(True)
@@ -23,6 +25,7 @@ class BTree:
         self.numOfNodesPerLevel = []
         self.levels = 0
         self.keysPerLevel = []
+        self.nodeIds = []
     
 
     # insert a key into Btree node. there are two cases which can occur:
@@ -43,7 +46,8 @@ class BTree:
             self.insertNotFull(temp,key)
         # case2
         else:
-            self.insertNotFull(root,key) #just insert key into node 
+            # just insert key into node 
+            self.insertNotFull(root,key) 
 
 
     # split child node at index i of parent
@@ -204,4 +208,35 @@ class BTree:
             listIndex += 1
             offset += listItem
         return newOrder
+    
 
+    # nodes have an ID, frontend needs from lowest level left to right upwards the IDs incremented
+    # -> leftest leaf of the tree has ID 0, node right to it 1 and so on
+    # this function updates the node IDs
+    # it useses reverse level order traversal
+    def updateNodeIds(self, node):
+        # variable for id
+        i = 0
+        if self.rootNode is None:
+            return
+        # create an empty queue and enqueue the root node
+        queue = deque()
+        queue.append(self.rootNode)
+        # create a stack to reverse level order nodes
+        stack = deque()
+        # loop till queue is empty
+        while queue:
+            # process each node in the queue and enqueue their children
+            curr = queue.popleft()
+            # push the current node into the stack
+            stack.append(curr)
+            # it is important to process the right node before the left node
+            for child in reversed(curr.children):
+                queue.append(child)
+        # pop all nodes from the stack and print them
+        while stack:
+            #print(stack.pop(), end=' ')
+            currentNode = stack.pop()
+            currentNode.id = i
+            i += 1
+            self.nodeIds.append(currentNode.id)

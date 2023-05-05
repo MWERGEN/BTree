@@ -16,5 +16,6 @@
 class Node:
     def __init__(self, leaf = False):
         self.keys = []
+        self.id = 0
         self.children = []
         self.leaf = leaf
