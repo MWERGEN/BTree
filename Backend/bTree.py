@@ -26,7 +26,7 @@ class BTree:
         self.levels = 0
         self.keysPerLevel = []
         self.nodeIds = []
-    
+        self.edgeList = []
 
     # insert a key into Btree node. there are two cases which can occur:
     # 1. node is full -> split node and insert then 
@@ -237,3 +237,14 @@ class BTree:
             currentNode.id = i
             i += 1
             self.nodeIds.append(currentNode.id)
+
+    def setEdgeList(self, node):
+        res = []
+        if node is not None:
+            for child in node.children:
+                res.append(node.id)
+                res.append(child.id)
+                self.edgeList.append(res.copy())
+                res.clear()
+                self.setEdgeList(child)
+
