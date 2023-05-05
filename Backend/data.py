@@ -40,3 +40,4 @@ testTree.getKeysPerLevel()
 print(testTree.keysPerLevel)
 
 print(testTree.setKeysPerLevelOrder())
+testTree.updateNodeIds(testTree.rootNode)
