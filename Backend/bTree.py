@@ -27,15 +27,18 @@ class BTree:
         self.keysPerLevel = []
         self.nodeIds = []
         self.edgeList = []
+        self.animationList = []
 
     # insert a key into Btree node. there are two cases which can occur:
     # 1. node is full -> split node and insert then 
     # 2. node is not full -> find right place to insert and insert 
     def insertKey(self,key):
         root = self.rootNode
+        # new key -> new animation
+        self.animationList = []
         #case 1
         # node can hold 2 * order keys
-        if len(root.keys) == 2 * self.k : 
+        if len(root.keys) == 2 * self.k: 
             # new root node
             temp = Node()
             # reference to child which will hold all smaller keys!
@@ -44,10 +47,14 @@ class BTree:
             # split the full node
             self.splitNode(temp,0) 
             self.insertNotFull(temp,key)
+            # key is inserted so animation is over -> 0
+            self.animationList.append(0)
         # case2
         else:
             # just insert key into node 
             self.insertNotFull(root,key) 
+            # key is inserted so animation is over -> 0
+            self.animationList.append(0)
 
 
     # split child node at index i of parent
@@ -91,8 +98,12 @@ class BTree:
                 node.keys[i + 1] = node.keys[i] 
                 i -= 1
             # insert key to correct place
-            node.keys[i + 1] = key 
+            node.keys[i + 1] = key
+            # animation for comparing 
+            self.animationList.append(1)
         else:
+            # animation for traversing + comparing
+            self.animationList.append(1)
             # loop until first key which is smaller 
             while i >= 0 and key < node.keys[i]: 
                 i -= 1
