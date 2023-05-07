@@ -41,6 +41,7 @@ testTree.insertKey(6)
 testTree.insertKey(200)
 testTree.insertKey(203)
 testTree.insertKey(14)
+testTree.insertKey(1)
 
 
 testTree.printTree(testTree.rootNode)
@@ -62,7 +63,7 @@ print(testTree.keysPerLevel)
 
 # give each node from lowest level left to right ids
 # leftest child -> id = 0
-testTree.updateNodeIds(testTree.rootNode)
+#testTree.updateNodeIds(testTree.rootNode)
 
 testTree.setEdgeList(testTree.rootNode)
 print(testTree.edgeList)
