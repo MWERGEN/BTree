@@ -28,6 +28,7 @@ class BTree:
         self.nodeIds = []
         self.edgeList = []
         self.animationList = []
+        self.visitiedNodes = []
 
     # insert a key into Btree node. there are two cases which can occur:
     # 1. node is full -> split node and insert then 
@@ -36,6 +37,7 @@ class BTree:
         root = self.rootNode
         # new key -> new animation
         self.animationList = []
+        self.visitiedNodes = []
         #case 1
         # node can hold 2 * order keys
         if len(root.keys) == 2 * self.k: 
@@ -49,6 +51,9 @@ class BTree:
             self.insertNotFull(temp,key)
             # key is inserted so animation is over -> 0
             self.animationList.append(0)
+            # there is a new node in the tree so update the ids of the nodes
+            # this ensures that at every operation the node ids are correct
+            self.updateNodeIds(self.rootNode)
         # case2
         else:
             # just insert key into node 
@@ -109,6 +114,7 @@ class BTree:
                 i -= 1
             # + 1 because insertion key must come after the first node key which is smaller
             i += 1 
+            self.visitiedNodes.append([node.id,node.children[i].id])
             # check if node where key should go is full -> children[i] means all keys in this node are smaller!
             if len(node.children[i].keys) == (2 * self.k): 
                 # split node to make room for new key 
