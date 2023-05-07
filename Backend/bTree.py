@@ -35,7 +35,7 @@ class BTree:
         root = self.rootNode
         #case 1
         # node can hold 2 * order keys
-        if len(root.keys) == (2 * self.k ) - 1: 
+        if len(root.keys) == 2 * self.k : 
             # new root node
             temp = Node()
             # reference to child which will hold all smaller keys!
@@ -99,7 +99,7 @@ class BTree:
             # + 1 because insertion key must come after the first node key which is smaller
             i += 1 
             # check if node where key should go is full -> children[i] means all keys in this node are smaller!
-            if len(node.children[i].keys) == (2 * self.k) - 1: 
+            if len(node.children[i].keys) == (2 * self.k): 
                 # split node to make room for new key 
                 self.splitNode(node, i) 
                 if key > node.keys[i]:
