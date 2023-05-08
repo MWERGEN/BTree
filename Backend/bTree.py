@@ -21,13 +21,21 @@ from collections import deque
 class BTree:
     def __init__(self, k):
         self.rootNode = Node(True)
+        # num of keys is min k and max 2 * k
         self.k = k
+        # how many nodes per level starting from the bottom -> last item always 1 means root
         self.numOfNodesPerLevel = []
+        # depth of btree 0 is root level 
         self.levels = 0
+        # keys per level in reversed level order from left to right
         self.keysPerLevel = []
+        # ids from each node in reversed level order from left to right
         self.nodeIds = []
+        # all edges represented with node id first item is from second is to
         self.edgeList = []
+        # what kind of animations should be displayed
         self.animationList = []
+        # holds the nodes which are visited while the animation first list is source second list is target 
         self.visitiedNodes = []
 
     # insert a key into Btree node. there are two cases which can occur:
@@ -38,6 +46,14 @@ class BTree:
         # new key -> new animation
         self.animationList = []
         self.visitiedNodes = []
+        # temp lists to fill visited nodes
+        source = []
+        target = []
+        # first step of every insertion animation is from root to root
+        source.append(self.rootNode.id)
+        target.append(self.rootNode.id)
+        self.visitiedNodes.append(source.copy())
+        self.visitiedNodes.append(target.copy())
         #case 1
         # node can hold 2 * order keys
         if len(root.keys) == 2 * self.k: 
@@ -113,8 +129,14 @@ class BTree:
             while i >= 0 and key < node.keys[i]: 
                 i -= 1
             # + 1 because insertion key must come after the first node key which is smaller
-            i += 1 
-            self.visitiedNodes.append([node.id,node.children[i].id])
+            i += 1
+            # temp lists to store where key is from and goes to
+            source = []
+            target = []
+            source.append(node.id)
+            target.append(node.children[i].id)
+            self.visitiedNodes.append(source.copy())
+            self.visitiedNodes.append(target.copy())
             # check if node where key should go is full -> children[i] means all keys in this node are smaller!
             if len(node.children[i].keys) == (2 * self.k): 
                 # split node to make room for new key 
