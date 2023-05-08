@@ -150,7 +150,7 @@ class BTreeVisualization:
         # graph with keys inside the nodes
         self.gKeys = ig.Graph(self.numOfKeys)
         # key for moving animation
-        self.gMovingKey = ig.Graph(1)
+        #self.gMovingKey = ig.Graph(1)
         # x-Positions of Nodes' centers
         self.xGNodes = []
         # y-Positions of Nodes' centers
@@ -427,6 +427,7 @@ class BTreeVisualization:
         if (anim.startingNode[anim.walkthrough] < anim.destinationNode[anim.walkthrough]):
             anim.upwards = True
         
+        # moving node is going up
         if anim.upwards:
             # calculates the x-Position where the key starts
             # simply counts to the reference where the key starts and gets that x-value
@@ -440,6 +441,7 @@ class BTreeVisualization:
             # calculates the y-Position where the key has to end
             # simply counts to the center of the node where the key should end and gets that y-value
             anim.destinationRefY = self.yGRefsAid[anim.destinationNode[anim.walkthrough] * (2 * self.k + 1) + self.k] + 7 * self.refWidth
+        # moving node is going down
         else:
             # calculates the x-Position where the key starts
             # simply counts to the reference where the key starts and gets that x-value
@@ -454,7 +456,7 @@ class BTreeVisualization:
             # simply counts to the center of the node where the key should end and gets that y-value
             anim.destinationRefY = self.yGRefsAid[anim.destinationNode[anim.walkthrough] * (2 * self.k + 1) + self.k]
         # case differentiation to avoid deviding by zero
-        if anim.startingNode[anim.walkthrough] != anim.destinationNode[anim.walkthrough]:
+        if (anim.startingRefY - anim.destinationRefY) != 0:
             # calculate the gradient of the connecting edge between the startingNode and the destinationNode
             # gradient g is relative to y: g(y) = x
             #   -> the idea is that the moving node moves some pixels down and the corresponding pixels to the side
@@ -481,6 +483,7 @@ class BTreeVisualization:
         # during the animation
         # -> repositioning the node
         else:
+            # moving node is going upwards
             if anim.upwards:
                 # if the key is not surpassing the destination node
                 if anim.currY[0] + anim.animationSpeed < anim.destinationRefY:
@@ -556,16 +559,6 @@ class BTreeVisualization:
             self.initializeColorKeyList()
             # if the comparison animation is over
             if anim.flagOuterKeyReached:
-                # if the key would be the highest in the node
-                if anim.flagNewKeyHighest:
-                    # paint the outer right ref green 
-                    # = the found path
-                    self.colorRefList[anim.destinationNode[anim.walkthrough] * (2 * self.k + 1) + anim.highlightedKey + 1] = "green"
-                # if the key is not the highest in the node
-                else:
-                    # paint the ref left from the higher key green
-                    # = the found path
-                    self.colorRefList[anim.destinationNode[anim.walkthrough] * (2 * self.k + 1) + anim.highlightedKey] = "green"
                 # if there is still another part of the animation, trigger it
                 if (anim.walkthrough + 1) < len(anim.destinationNode):
                     # switch to the next animation
@@ -573,23 +566,39 @@ class BTreeVisualization:
                     # reset destination
                     #anim.destinationRefY = 0
                     # reset highlighted key
-                    anim.highlightedKey = 0
+                    #anim.highlightedKey = 0
                     # reset flags to default
                     anim.flagOuterKeyReached = False
                     anim.flagNewKeyHighest = False
-
-        #########
-                    #anim.label = anim.operands[3][anim.walkthrough]
-                    #anim.setLabel(anim.label)
-                    #self.keyLabels = list(it.chain.from_iterable(anim.tree[anim.walkthrough][1]))
-                    #self.formatLabels()
-                    #self.gKeys.vs['label'] = self.keyLabelsFormatted
-        #############
-        
+                    # updates label
+                    # -> is needed for a moving node going up (maybe with a different label)
+                    anim.label = anim.operands[3][anim.walkthrough]
+                    # apply changes
+                    anim.setLabel(anim.label)
+                    anim.updateNewAnimation()
+                    self.updateGraph()
+                    # ref-coloring
+                    # first check if the walkthrough is not the first one
+                    # first one is root comparison
+                    if anim.walkthrough > 0:
+                        # only color the ref green if the node is going down in the next part-animation
+                        if (anim.startingNode[anim.walkthrough + 1] < anim.destinationNode[anim.walkthrough + 1]):
+                            # if the key would be the highest in the node
+                            if anim.flagNewKeyHighest:
+                                # paint the outer right ref green 
+                                # = the found path
+                                self.colorRefList[anim.destinationNode[anim.walkthrough - 1] * (2 * self.k + 1) + anim.highlightedKey + 1] = "green"
+                            # if the key is not the highest in the node
+                            else:
+                                # paint the ref left from the higher key green
+                                # = the found path
+                                self.colorRefList[anim.destinationNode[anim.walkthrough - 1] * (2 * self.k + 1) + anim.highlightedKey] = "green"
+                    # reset highlighted key
+                    anim.highlightedKey = 0        
                 # wait a bit if there is no other animation left
                 # so the key stays ahead of his new node
                 # -> the user can observe the destination position 
-                elif frame % 40 == 0:
+                else:
                     # update the animation
                     # sets the new type
                     # -> so until a new animation comes in, just the graph is drawn
@@ -597,6 +606,7 @@ class BTreeVisualization:
                     # update the graph
                     # -> needed for new, inserted key
                     self.updateGraph()
+                    self.initializeColorRefList()
         # only plot moving node if the animation is still chosen
         # this is needed because the animation type can be = 0 for one iteration
         # without the if, the moving node would be drawn anywhere, which looks buggy
@@ -629,11 +639,11 @@ class BTreeVisualization:
 
 #####################
         # new insert
-        if self.i == 420:
-            animTypeList = [1, 1, 0]
-            treeList = [[[6, 3, 1], [[1, 2], [7, 8, 9], [7, 8, 10, 11], [33, 40], [50, 69, 70], [500], [4, 6, 12, 24], [41], [9999], [20, 25]], [[], [], [], [], [], [], [0, 1, 2], [3, 4], [5], [6, 7, 8]]], [[6, 3, 1], [[1, 2], [7, 8, 9], [7, 8, 10, 11], [33, 40], [50, 69, 70], [500], [4, 6, 12, 24], [41], [9999], [20, 25]], [[], [], [], [], [], [], [0, 1, 2], [3, 4], [5], [6, 7, 8]]], [[6, 3, 1], [[1, 2], [7, 8, 9], [7, 8, 10, 11], [33, 40], [50, 69, 70], [420, 500], [4, 6, 12, 24], [41], [9999], [20, 25]], [[], [], [], [], [], [], [0, 1, 2], [3, 4], [5], [6, 7, 8]]]]
-            animList = [[9, 9, 8], [9, 8, 5], [2, 2, 0], [420, 420, 420]]
-            self.currentAnimation = ani.Animation(animTypeList, treeList, animList)
+        #if self.i == 420:
+        #    animTypeList = [1, 1, 0]
+        #    treeList = [[[6, 3, 1], [[1, 2], [7, 8, 9], [7, 8, 10, 11], [33, 40], [50, 69, 70], [500], [4, 6, 12, 24], [41], [9999], [20, 25]], [[], [], [], [], [], [], [0, 1, 2], [3, 4], [5], [6, 7, 8]]], [[6, 3, 1], [[1, 2], [7, 8, 9], [7, 8, 10, 11], [33, 40], [50, 69, 70], [500], [4, 6, 12, 24], [41], [9999], [20, 25]], [[], [], [], [], [], [], [0, 1, 2], [3, 4], [5], [6, 7, 8]]], [[6, 3, 1], [[1, 2], [7, 8, 9], [7, 8, 10, 11], [33, 40], [50, 69, 70], [420, 500], [4, 6, 12, 24], [41], [9999], [20, 25]], [[], [], [], [], [], [], [0, 1, 2], [3, 4], [5], [6, 7, 8]]]]
+        #    animList = [[9, 9, 8], [9, 8, 5], [2, 2, 0], [420, 420, 420]]
+        #    self.currentAnimation = ani.Animation(animTypeList, treeList, animList)
 #####################
 
         # get the bounding box of the subplot in pixels
