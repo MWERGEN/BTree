@@ -522,6 +522,10 @@ class BTreeVisualization:
         self.gMovingKey.vs['y'] = anim.currY
         # assert label of moving Node to moving-Node-Graph
         self.gMovingKey.vs['label'] = anim.labelFormatted
+        
+        if len(anim.keysList[len(anim.keysList) - 1]) == 0:
+            anim.flagOuterKeyReached = True
+            
         # do the comparison animation if the moving key is ready 
         # and the comparison animation is not ready yet
         if not anim.flagOuterKeyReached and anim.flagNoMove:
@@ -580,7 +584,7 @@ class BTreeVisualization:
                     # ref-coloring
                     # first check if the walkthrough is not the first one
                     # first one is root comparison
-                    if anim.walkthrough > 0:
+                    if anim.walkthrough < len(anim.startingNode) - 1:
                         # only color the ref green if the node is going down in the next part-animation
                         if (anim.startingNode[anim.walkthrough + 1] < anim.destinationNode[anim.walkthrough + 1]):
                             # if the key would be the highest in the node
