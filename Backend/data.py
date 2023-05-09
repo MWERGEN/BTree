@@ -15,55 +15,37 @@
 #
 from bTree import BTree
 
-# testing bTree in backend
-# tree with at least 3 keys and max 6 keys in each node!
-testTree = BTree(2)
+class Backend:
+    def __init__(self, k):
+        self.btree = BTree(k)
+        self.treeNodesPerLevel = None
+        self.treeKeysPerLevel = None
+        self.sourceDestination = None
 
-#for i in range(20):
-#    testTree.insertKey(i*3)
-
-testTree.insertKey(5)
-testTree.insertKey(7)
-testTree.insertKey(2)
-testTree.insertKey(8)
-testTree.insertKey(0)
-testTree.insertKey(3)
-testTree.insertKey(11)
-testTree.insertKey(58)
-testTree.insertKey(44)
-testTree.insertKey(32)
-testTree.insertKey(96)
-testTree.insertKey(8)
-testTree.insertKey(9)
-testTree.insertKey(10)
-testTree.insertKey(103)
-testTree.insertKey(6)
-testTree.insertKey(200)
-testTree.insertKey(203)
-testTree.insertKey(14)
-testTree.insertKey(1)
+    def insertKeyIntoTree(self, key):
+        self.treeNodesPerLevel = []
+        self.treeKeysPerLevel = []
+        self.sourceDestination = []
+        # call function which inserts key into tree
+        self.btree.insertKey(key)
+        # prepare nodes per level list for frontend
+        self.btree.initNodeList()
+        self.btree.getKeysPerLevel()
+        self.btree.prepareNodeList()
+        self.treeNodesPerLevel = self.btree.numOfNodesPerLevel
+        # prepare keys per level for frontend
+        self.treeKeysPerLevel = self.btree.keysPerLevel
+        # set source destination for key insertion
+        self.sourceDestination = self.btree.visitiedNodes
 
 
-testTree.printTree(testTree.rootNode)
 
-#get number of levels for the curent tree
-testTree.getNumOfLevels(testTree.rootNode)
-# initialise list for frontend with the number of levels as indices
-testTree.initNodeList()
-# create a list for frontend with numbers of nodes per level where 0 is the root
-testTree.getNumOfNodesPerLevel(testTree.rootNode)
-
-# frontend needs the list in reveresed order so reverse it
-testTree.prepareNodeList()
-print(testTree.numOfNodesPerLevel)
-
-# set keys per level from lowest level left to right
-testTree.getKeysPerLevel()
-print(testTree.keysPerLevel)
-
-# give each node from lowest level left to right ids
-# leftest child -> id = 0
-#testTree.updateNodeIds(testTree.rootNode)
-
-testTree.setEdgeList(testTree.rootNode)
-print(testTree.edgeList)
+testData = Backend(2)
+testData.insertKeyIntoTree(3)
+testData.insertKeyIntoTree(4)
+testData.insertKeyIntoTree(5)
+testData.insertKeyIntoTree(7)
+testData.insertKeyIntoTree(1)
+testData.insertKeyIntoTree(8)
+testData.insertKeyIntoTree(19)
+print(testData)
