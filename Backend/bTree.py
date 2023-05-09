@@ -43,17 +43,17 @@ class BTree:
     # 2. node is not full -> find right place to insert and insert 
     def insertKey(self,key):
         root = self.rootNode
+        # give root id 0
+        self.updateNodeIds(self.rootNode)
         # new key -> new animation
         self.animationList = []
         self.visitiedNodes = []
-        # temp lists to fill visited nodes
+        # temp lists to fill visited nodes will be filled while inserting 
         source = []
         target = []
         # first step of every insertion animation is from root to root
         source.append(self.rootNode.id)
         target.append(self.rootNode.id)
-        self.visitiedNodes.append(source.copy())
-        self.visitiedNodes.append(target.copy())
         #case 1
         # node can hold 2 * order keys
         if len(root.keys) == 2 * self.k: 
@@ -64,7 +64,7 @@ class BTree:
             self.rootNode = temp
             # split the full node
             self.splitNode(temp,0) 
-            self.insertNotFull(temp,key)
+            self.insertNotFull(temp,key, source, target)
             # key is inserted so animation is over -> 0
             self.animationList.append(0)
             # there is a new node in the tree so update the ids of the nodes
@@ -73,7 +73,7 @@ class BTree:
         # case2
         else:
             # just insert key into node 
-            self.insertNotFull(root,key) 
+            self.insertNotFull(root,key, source, target) 
             # key is inserted so animation is over -> 0
             self.animationList.append(0)
 
@@ -107,7 +107,7 @@ class BTree:
     # there are two cases:
     # 1. if node is leaf -> find correct place to insert and insert
     # 2. if node is not a leaf -> find correct node 
-    def insertNotFull(self, node, key):
+    def insertNotFull(self, node, key, source, target):
         # size of the keys list
         i = len(node.keys) - 1 
         if node.leaf: 
@@ -131,19 +131,19 @@ class BTree:
             # + 1 because insertion key must come after the first node key which is smaller
             i += 1
             # temp lists to store where key is from and goes to
-            source = []
-            target = []
             source.append(node.id)
             target.append(node.children[i].id)
-            self.visitiedNodes.append(source.copy())
-            self.visitiedNodes.append(target.copy())
             # check if node where key should go is full -> children[i] means all keys in this node are smaller!
             if len(node.children[i].keys) == (2 * self.k): 
                 # split node to make room for new key 
                 self.splitNode(node, i) 
                 if key > node.keys[i]:
                     i += 1
-            self.insertNotFull(node.children[i], key)
+            self.insertNotFull(node.children[i], key, source, target)
+        # append source and target to visited nodes but only one time!
+        if len(self.visitiedNodes) < 2:
+            self.visitiedNodes.append(source.copy())
+            self.visitiedNodes.append(target.copy())
 
 
 
