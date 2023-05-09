@@ -26,14 +26,15 @@ class Backend:
         self.treeNodesPerLevel = []
         self.treeKeysPerLevel = []
         self.sourceDestination = []
+        self.btree.keysPerLevel = []
         # call function which inserts key into tree
         self.btree.insertKey(key)
         # prepare nodes per level list for frontend
-        self.btree.initNodeList()
-        self.btree.getKeysPerLevel()
-        self.btree.prepareNodeList()
+        self.btree.getNumOfNodesPerLevel()
+        print(self.btree.numOfNodesPerLevel)
         self.treeNodesPerLevel = self.btree.numOfNodesPerLevel
         # prepare keys per level for frontend
+        self.btree.getKeysPerLevel()
         self.treeKeysPerLevel = self.btree.keysPerLevel
         # set source destination for key insertion
         self.sourceDestination = self.btree.visitiedNodes
@@ -44,8 +45,9 @@ testData = Backend(2)
 testData.insertKeyIntoTree(3)
 testData.insertKeyIntoTree(4)
 testData.insertKeyIntoTree(5)
-testData.insertKeyIntoTree(7)
 testData.insertKeyIntoTree(1)
-testData.insertKeyIntoTree(8)
-testData.insertKeyIntoTree(19)
+testData.insertKeyIntoTree(2)
+testData.insertKeyIntoTree(7)
+testData.insertKeyIntoTree(99)
+testData.insertKeyIntoTree(12)
 print(testData)
