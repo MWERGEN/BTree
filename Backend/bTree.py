@@ -63,8 +63,8 @@ class BTree:
             temp.children.insert(0, root) 
             self.rootNode = temp
             # split the full node
-            self.splitNode(temp,0) 
-            self.insertNotFull(temp,key, source, target)
+            self.splitNode(temp, key,0) 
+            #self.insertNotFull(temp,key, source, target)
             # key is inserted so animation is over -> 0
             self.animationList.append(0)
             # there is a new node in the tree so update the ids of the nodes
@@ -82,20 +82,32 @@ class BTree:
     # parent will have middle key of splitNode
     # splitNode will have all keys which are smaller than parents
     # newNode will have all keys which are greater than parents
-    def splitNode(self, parent, i):
+    def splitNode(self, parent, key, index):
         k = self.k
-        # node at index i will be splitted
-        splitNode = parent.children[i] 
-        # second node where are all keys which are greater than the parent key will go
+        # full node
+        splitNode = parent.children[index]
+        # second node where are all keys which are greater than the middle key will go
         newNode = Node(splitNode.leaf) 
+        i = len(splitNode.keys) - 1
+        # make space for one more key
+        splitNode.keys.append(None) 
+        # compare every node key to insertion key 
+        while i >= 0 and key < splitNode.keys[i]: 
+        # shift key one place to the right
+            splitNode.keys[i + 1] = splitNode.keys[i] 
+            i -= 1
+            # insert key to correct place
+            splitNode.keys[i + 1] = key
+        middleIndex = int(len(splitNode.keys) / 2)
         # add reference to node which holds all greater keys
-        parent.children.insert(i + 1, newNode) 
+        parent.children.insert(index + 1, newNode) 
         # fill parent with splitkey -> middle key
-        parent.keys.insert(i, splitNode.keys[k - 1]) 
+        parent.keys.insert(0, splitNode.keys[middleIndex]) 
+        del splitNode.keys[middleIndex]
         # take all greater keys and insert them from order to 2 * order - 1
-        newNode.keys = splitNode.keys[k: (2 * k) - 1] 
+        newNode.keys = splitNode.keys[middleIndex: 2 * k] 
         # take all smaller keys and insert them from 0 to order - 1
-        splitNode.keys = splitNode.keys[0: k - 1] 
+        splitNode.keys = splitNode.keys[0: middleIndex] 
         if not splitNode.leaf:
             # give newNode with all greater keys all references to all greater children
             newNode.children = splitNode.children[k: 2 * k] 
@@ -136,7 +148,7 @@ class BTree:
             # check if node where key should go is full -> children[i] means all keys in this node are smaller!
             if len(node.children[i].keys) == (2 * self.k): 
                 # split node to make room for new key 
-                self.splitNode(node, i) 
+                self.splitNode(node, key,i) 
                 if key > node.keys[i]:
                     i += 1
             self.insertNotFull(node.children[i], key, source, target)
