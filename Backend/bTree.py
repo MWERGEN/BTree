@@ -122,54 +122,58 @@ class BTree:
     # 1. if node is leaf -> find correct place to insert and insert
     # 2. if node is not a leaf -> find correct node 
     def insertNotFull(self, node, key, source, target, fromSplit):
-        if fromSplit:
-            node.keys.append(key)
-        # size of the keys list
-        # if new split node -> node is empty
-        else:
+            test = False
+            emptyNode = False
             if len(node.keys) == 0:
                 i = 0
+                emptyNode = True
             else:
                 i = len(node.keys) - 1 
-            if node.leaf:
-                # make space for one more key
-                node.keys.append(None)
-                if i == 0 and node.keys[0] == None:
-                    node.keys[0] = key
+            if node.leaf or fromSplit:
+                if emptyNode:
+                    node.keys.append(key)
                 else:
-                    # compare every node key to insertion key 
-                    while i >= 0 and key < node.keys[i]: 
-                        # shift key one place to the right
-                        node.keys[i + 1] = node.keys[i] 
-                        i -= 1
-                    # insert key to correct place
-                    node.keys[i + 1] = key
-                # animation for comparing 
-                self.animationList.append(1)
+                    # make space for one more key
+                    node.keys.append(None)
+                    if i == 0 and node.keys[0] == None:
+                        node.keys[0] = key
+                    else:
+                        # compare every node key to insertion key 
+                        while i >= 0 and key < node.keys[i]: 
+                            # shift key one place to the right
+                            node.keys[i + 1] = node.keys[i] 
+                            i -= 1
+                        # insert key to correct place
+                        node.keys[i + 1] = key
+                    # animation for comparing 
+                    self.animationList.append(1)
             else:
                 # animation for traversing + comparing
                 self.animationList.append(1)
-                # loop until first key which is smaller 
-                while i >= 0 and key < node.keys[i]: 
-                    i -= 1
-                # + 1 because insertion key must come after the first node key which is smaller
-                i += 1
-                # temp lists to store where key is from and goes to
-                source.append(node.id)
-                target.append(node.children[i].id)
-                # check if node where key should go is full -> children[i] means all keys in this node are smaller!
-                if len(node.children[i].keys) == (2 * self.k): 
-                    # split node to make room for new key 
-                    self.splitNode(node, key,i) 
-                    if key > node.keys[i]:
-                        i += 1
+                if not node.keys:
+                    node.keys.append(key)
                 else:
-                    self.insertNotFull(node.children[i], key, source, target, False)
+                    # loop until first key which is smaller 
+                    while i >= 0 and key < node.keys[i]: 
+                        i -= 1
+                    # + 1 because insertion key must come after the first node key which is smaller
+                    i += 1
+                    # temp lists to store where key is from and goes to
+                    source.append(node.id)
+                    target.append(node.children[i].id)
+                    # check if node where key should go is full -> children[i] means all keys in this node are smaller!
+                    if len(node.children[i].keys) == (2 * self.k): 
+                        # split node to make room for new key 
+                        self.splitNode(node, key,i) 
+                        test = True
+                        if key > node.keys[i]:
+                            i += 1
+                    if not test:
+                        self.insertNotFull(node.children[i], key, source, target, False)
             # append source and target to visited nodes but only one time!
             if len(self.visitiedNodes) < 2:
                 self.visitiedNodes.append(source.copy())
                 self.visitiedNodes.append(target.copy())
-
 
 
     #TODO implement deleting key
