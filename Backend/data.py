@@ -17,7 +17,7 @@ from bTree import BTree
 
 # testing bTree in backend
 # tree with at least 3 keys and max 6 keys in each node!
-testTree = BTree(2)
+testTree = BTree(3)
 
 #for i in range(20):
 #    testTree.insertKey(i*3)
@@ -51,6 +51,15 @@ testTree.insertKey(50)
 testTree.insertKey(201)
 testTree.insertKey(202)
 testTree.insertKey(205)
+testTree.insertKey(206)
+testTree.insertKey(207)
+testTree.insertKey(208)
+testTree.insertKey(209)
+testTree.insertKey(210)
+testTree.insertKey(211)
+testTree.insertKey(212)
+testTree.insertKey(213)
+testTree.insertKey(214)
 testTree.getKeysPerLevel()
 
 
