@@ -136,19 +136,33 @@ class BTree:
             # updte references to only smaller children
             splitNode.children = splitNode.children[0: k - 1]
         if len(parent.keys) == (2 * self.k ) + 1:
-            # new root node
-            temp = Node()
-            # reference to child which will hold all smaller keys!
-            temp.children.insert(0, parent) 
-            self.rootNode = temp
-            # split the full node
-            self.splitRoot(temp,0) 
-            #self.insertNotFull(temp,key, source, target)
-            # key is inserted so animation is over -> 0
-            self.animationList.append(0)
-            # there is a new node in the tree so update the ids of the nodes
-            # this ensures that at every operation the node ids are correct
-            self.updateNodeIds(self.rootNode)
+            # root is full -> new root
+            if parent is self.rootNode:
+                # new root node
+                temp = Node()
+                # reference to child which will hold all smaller keys!
+                temp.children.insert(0, parent) 
+                self.rootNode = temp
+                # split the full node
+                self.splitRoot(temp,0) 
+                #self.insertNotFull(temp,key, source, target)
+                # key is inserted so animation is over -> 0
+                self.animationList.append(0)
+                # there is a new node in the tree so update the ids of the nodes
+                # this ensures that at every operation the node ids are correct
+                self.updateNodeIds(self.rootNode)
+            # parent is full
+            else:
+                rootOfParent = self.getParent(parent, self.rootNode)
+                loopIndex = 0
+                indexOfSplit = 0
+                for i in rootOfParent.children:
+                    loopIndex += 1
+                    if i == parent:
+                        indexOfSplit = loopIndex
+                indexOfSplit -= 1
+                self.splitRoot(rootOfParent,indexOfSplit)
+
 
     def splitRoot(self, parent, index):
         source = []
@@ -173,6 +187,16 @@ class BTree:
         newNode.children = splitNode.children[k + 1: 2 * k + 2] 
         # updte references to only smaller children
         splitNode.children = splitNode.children[0: k + 1]
+
+    def getParent(self, searchNode, rootNode):
+        if searchNode in rootNode.children:
+            return rootNode
+        if len(rootNode.children) > 0:
+            for i in rootNode.children:
+                self.getParent(searchNode,i)
+        else:
+            return None
+        
 
 
     # insert key into not full node
@@ -220,12 +244,13 @@ class BTree:
                     source.append(node.id)
                     #target.append(node.children[i].id)
                     # check if node where key should go is full -> children[i] means all keys in this node are smaller!
-                    if len(node.children[i].keys) == (2 * self.k): 
-                        # split node to make room for new key 
-                        self.splitNode(node, key,i) 
-                        test = True
-                        if key > node.keys[i]:
-                            i += 1
+                    if not node.children[i].children:
+                        if len(node.children[i].keys) == (2 * self.k): 
+                            # split node to make room for new key 
+                            self.splitNode(node, key,i) 
+                            test = True
+                            #if key > node.keys[i]:
+                             #   i += 1
                     if not test:
                         self.insertNotFull(node.children[i], key, source, target, False)
             # append source and target to visited nodes but only one time!
