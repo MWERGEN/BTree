@@ -42,6 +42,7 @@ class BTree:
     # 1. node is full -> split node and insert then 
     # 2. node is not full -> find right place to insert and insert 
     def insertKey(self,key):
+        test = False
         root = self.rootNode
         # give root id 0
         self.updateNodeIds(self.rootNode)
@@ -56,20 +57,39 @@ class BTree:
         target.append(self.rootNode.id)
         #case 1
         # node can hold 2 * order keys
-        if len(root.keys) == 2 * self.k: 
-            # new root node
-            temp = Node()
-            # reference to child which will hold all smaller keys!
-            temp.children.insert(0, root) 
-            self.rootNode = temp
-            # split the full node
-            self.splitNode(temp, key,0) 
-            #self.insertNotFull(temp,key, source, target)
-            # key is inserted so animation is over -> 0
-            self.animationList.append(0)
-            # there is a new node in the tree so update the ids of the nodes
-            # this ensures that at every operation the node ids are correct
-            self.updateNodeIds(self.rootNode)
+        if len(root.keys) == 2 * self.k:
+            # check if root has children
+            if not root.children: 
+                # new root node
+                temp = Node()
+                # reference to child which will hold all smaller keys!
+                temp.children.insert(0, root) 
+                self.rootNode = temp
+                # split the full node
+                self.splitNode(temp, key,0) 
+                #self.insertNotFull(temp,key, source, target)
+                # key is inserted so animation is over -> 0
+                self.animationList.append(0)
+                # there is a new node in the tree so update the ids of the nodes
+                # this ensures that at every operation the node ids are correct
+                self.updateNodeIds(self.rootNode)
+            else:
+                # root has children where key can be inserted
+                i = len(root.keys) - 1
+                # loop until first key which is smaller 
+                while i >= 0 and key < root.keys[i]: 
+                    i -= 1
+                # + 1 because insertion key must come after the first node key which is smaller
+                i += 1
+                # check if node where key should go is full -> children[i] means all keys in this node are smaller!
+                if len(root.children[i].keys) == (2 * self.k): 
+                    # split node to make room for new key 
+                    self.splitNode(root, key,i) 
+                    test = True
+                    if key > root.keys[i]:
+                        i += 1
+                if not test:
+                    self.insertNotFull(root.children[i], key, source, target, False)
         # case2
         else:
             # just insert key into node 
