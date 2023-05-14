@@ -62,7 +62,7 @@ testTree.insertKey(213)
 testTree.insertKey(214)
 testTree.getKeysPerLevel()
 
-
+print(testTree.searchKey(215,testTree.rootNode))
 testTree.printTree(testTree.rootNode)
 
 #get number of levels for the curent tree
