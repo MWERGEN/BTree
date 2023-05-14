@@ -40,6 +40,20 @@ class Animation:
         #   operands initialization depending on animation type
         #######################################################
 
+        # for type = 1 or 2:
+        if self.type == 1 or self.type == 2:
+
+            # number which key inside an observed node is looked at
+            self.highlightedKey = 0
+            # a key > label was found or the last key in observed node is lower than the label
+            self.flagOuterKeyReached = False
+            # label would be the highest in the observed node
+            self.flagNewKeyHighest = False
+            # indicates what part of the animation is triggered
+            self.walkthrough = 0
+            # helps scheduling the animation
+            self.resetted = False
+            
         # for type = 1:
         if self.type == 1:
 
@@ -49,8 +63,6 @@ class Animation:
 
             # key moves upwards
             self.upwards = False
-            # indicates what part of the animation is triggered
-            self.walkthrough = 0
             self.operands = operands
             # node where moving node starts
             self.startingNode = operands[0]
@@ -79,23 +91,26 @@ class Animation:
             # the speed with which the node moves
             # means node-height descends by animationSpeed every frame
             # new x-position will be calculated with the gradient
-            self.animationSpeed = 0.01
+            self.animationSpeed = 0.02
             # flag for indicating that the node should not move at the moment
             self.flagNoMove = True
+            self.newRoot = False
 
-            #####################################
-            # comparison inside destination node
-            #####################################
+        # for type = 2:
+        if self.type == 2:
 
-            # number which key inside an observed node is looked at
-            self.highlightedKey = 0
-            # a key > label was found or the last key in observed node is lower than the label
-            self.flagOuterKeyReached = False
-            # label would be the highest in the observed node
-            self.flagNewKeyHighest = False
+            ##############
+            # search node
+            ##############
+
+            self.searchKey = operands[0]
+            self.checkNodes = operands[1]
+            self.found = operands[2]
+
     
     def updateNewAnimation(self):
-        self.type = self.types[self.walkthrough]
+        if self.type == 1:
+            self.type = self.types[self.walkthrough]
         self.nodesList = self.tree[self.walkthrough][0]
         self.keysList = self.tree[self.walkthrough][1]
         self.edgesList = self.tree[self.walkthrough][2]
