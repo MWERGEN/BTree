@@ -268,22 +268,17 @@ class BTree:
     # if not and node has no children -> key is not in the tree
     # if node has children go to child node with current index i
     def searchKey(self, key, nextNode = None):
-        # if function is called recursively
-        if nextNode is not None: 
-            i = 0
-            # go through node and check at which point key is smaller
-            while i < len(nextNode.keys) and key > nextNode.keys[i]: 
-                i += 1
-            if i < len(nextNode.keys) and key == nextNode.keys[i]:
-                return nextNode
-            # if keys is not found and node is a leaf -> key is not in the tree
-            elif nextNode.leaf: 
-                return None
-            #go to node in which key maybe is 
-            return self.searchKey(key, nextNode.children[i]) 
-        else:
-            # if function is called for the first time it goes from the root 
-            self.searchKey(key,self.rootNode) 
+        i = 0
+        # go through node and check at which point key is smaller
+        while i < len(nextNode.keys) and key > nextNode.keys[i]: 
+            i += 1
+        if i < len(nextNode.keys) and key == nextNode.keys[i]:
+            return nextNode
+        # if keys is not found and node is a leaf -> key is not in the tree
+        elif nextNode.leaf: 
+            return 'not in tree'
+        #go to node in which key maybe is 
+        return self.searchKey(key, nextNode.children[i]) 
 
 
     # print tree
