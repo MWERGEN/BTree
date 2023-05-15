@@ -295,15 +295,31 @@ class BTree:
     # function returns list for frontend which contains numbers of nodes per level
     # at index 0 -> root level, but the list has to be reveresed so the frontend can work with it
     # this will be done in a different function
-    def getNumOfNodesPerLevel(self,node,level = 0):
-        # increment current node num py one at index of current level
-        self.numOfNodesPerLevel[level] = self.numOfNodesPerLevel[level] + 1
-        # if the node has children -> next level
-        if not node.leaf:
-            level += 1
-            for i in node.children:
-                self.getNumOfNodesPerLevel(i,level)
-    
+    def getNumOfNodesPerLevel(self):
+        self.numOfNodesPerLevel = []
+        if self.rootNode is None:
+            return
+        # create an empty queue and enqueue the root node
+        queue = deque()
+        queue.append(self.rootNode)
+        # create a stack to reverse level order nodes
+        stack = deque()
+        # loop till queue is empty
+        while queue:
+            # process each node in the queue and enqueue their children
+            curr = queue.popleft()
+            # push the current node into the stack
+            stack.append(curr)
+            # it is important to process the right node before the left node
+            for child in reversed(curr.children):
+                queue.append(child)
+        # pop all nodes from the stack and print them
+        while stack:
+            currentNode = stack.pop()
+            self.numOfNodesPerLevel.append(currentNode.keys)
+            for i in currentNode.children:
+                # search every child node from current node from left to right 
+                queue.append(i)
 
     # function that counts the numbers of levels the tree has for the list which will be sent to the frontend
     # level 1 -> root
@@ -328,6 +344,7 @@ class BTree:
     # function that returns keys per level 
     # useses reverse level order traversal of the tree
     def getKeysPerLevel(self):
+        self.keysPerLevel = []
         if self.rootNode is None:
             return
         # create an empty queue and enqueue the root node
