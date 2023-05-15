@@ -46,6 +46,8 @@ class BTree:
         self.visitiedNodes = []
         # list of uses references 
         self.usedReferences = []
+        # list of used keys for animation
+        self.usedKeys = []
 
 
 
@@ -74,6 +76,8 @@ class BTree:
         target = []
         # reset used references
         self.usedReferences = []
+        # reset used keys
+        self.usedKeys = []
         # first step of every insertion animation is from root to root
         source.append(self.rootNode.id)
         target.append(self.rootNode.id)
@@ -90,6 +94,8 @@ class BTree:
         # num of nodes list copy
         nodePerLevelBefore = self.countNodesPerLevel()
         self.numOfNodesPerLevelCopies.append(nodePerLevelBefore)
+        # used key is inserted key
+        self.usedKeys.append(key)
         #case 1
         # node can hold 2 * order keys
         if len(root.keys) == 2 * self.k:
@@ -263,6 +269,7 @@ class BTree:
                     # get the current keys per level of the tree
                     nodePerLevelBefore = self.countNodesPerLevel()
                     self.numOfNodesPerLevelCopies.append(nodePerLevelBefore)
+                    self.usedKeys.append(key)
                     if not fromSplit:
                         # edge list copy
                         self.setEdgeList(self.rootNode)
@@ -297,9 +304,24 @@ class BTree:
                     self.setEdgeList(self.rootNode)
                     edgeListBeforeInsert = self.edgeList[:]
                     self.edgeListCopies.append([list(l) for l in edgeListBeforeInsert])
+                    # used keys update
+                    self.usedKeys.append(key)
             else:
                 # animation for traversing + comparing
                 self.animationList.append(1)
+                # get the current keys per level of the tree
+                self.getKeysPerLevel()
+                keysPerLevelBeforeInsert = self.keysPerLevel[:]
+                self.keysPerLevelCopies.append([list(l) for l in keysPerLevelBeforeInsert])
+                # get current nodes per level
+                nodePerLevelBefore = self.countNodesPerLevel()
+                self.numOfNodesPerLevelCopies.append(nodePerLevelBefore)
+                # edge list copy
+                self.setEdgeList(self.rootNode)
+                edgeListBeforeInsert = self.edgeList[:]
+                self.edgeListCopies.append([list(l) for l in edgeListBeforeInsert])
+                # used keys update
+                self.usedKeys.append(key)
                 if not node.keys:
                     node.keys.append(key)
                 else:

@@ -22,6 +22,7 @@ class Backend:
         self.sourceDestination = None
         self.animationList = []
         self.references = []
+        self.usedKeys =[]
 
     def insertKeyIntoTree(self, key):
         # reset all parameters of backend object
@@ -53,6 +54,8 @@ class Backend:
         self.edgeLists = self.btree.edgeListCopies
         # set references 
         self.references = self.btree.usedReferences
+        #set used keys
+        self.usedKeys = self.btree.usedKeys
 
 
 
