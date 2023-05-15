@@ -2,7 +2,7 @@
 #
 #   Creator: Tim Steiner
 #
-#   Task: 
+#   Task: Nodes for the B-tree to store keys
 #
 #   Editors:
 #       1.  Tim Steiner on 10.04.23
@@ -13,3 +13,9 @@
 #   File description:
 #       - Nodes for the B-tree to store keys
 #
+class Node:
+    def __init__(self, leaf = False):
+        self.keys = []
+        self.id = 0
+        self.children = []
+        self.leaf = leaf
