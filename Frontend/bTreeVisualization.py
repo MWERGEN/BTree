@@ -201,8 +201,10 @@ class BTreeVisualization:
         # initialize the counter
         self.root.counter = 0
         self.canvas = FigureCanvasTkAgg(self.fig, master=self.root)
+        self.canvas.draw()
         self.speed = 1
         self.scale = 0
+        self.temp = 0
 
     def countNext10Milliseconds(self):
         # check if 10 seconds have passed
@@ -217,34 +219,37 @@ class BTreeVisualization:
     def initializeTK(self):
         # schedule the first call to my_function in 1 second
         self.root.after(10, self.countNext10Milliseconds)
-        self.root.geometry("700x400")
+        #self.root.geometry("700x400")
 
         label = Tk.Label(self.root,text="B-Tree control elements").grid(column=0, row=0)
 
+        button0 = Tk.Button(self.root, text='insert 1 2 3 4 5', command=self.insert12345_button_clicked)
+        button0.grid(column=0, row=1)
+
         button1 = Tk.Button(self.root, text='search 5', command=self.search_button_clicked)
-        button1.grid(column=0, row=1)
+        button1.grid(column=0, row=2)
 
         button2 = Tk.Button(self.root, text='insert 17', command=self.insert17_button_clicked)
-        button2.grid(column=0, row=2)
-
-        button2 = Tk.Button(self.root, text='insert 65', command=self.insert65_button_clicked)
         button2.grid(column=0, row=3)
 
+        button2 = Tk.Button(self.root, text='insert 65', command=self.insert65_button_clicked)
+        button2.grid(column=0, row=4)
+
         button3 = Tk.Button(self.root, text='delete 2 pt.1', command=self.delete_button_clicked)
-        button3.grid(column=0, row=4)
+        button3.grid(column=0, row=5)
 
         button4 = Tk.Button(self.root, text='delete 2 pt.2', command=self.delete2_button_clicked)
-        button4.grid(column=0, row=5)
+        button4.grid(column=0, row=6)
 
         # create a scale widget for selecting the number
         self.scale = Tk.Scale(self.root, from_=1, to=10, orient=Tk.HORIZONTAL)
-        self.scale.grid(column=0, row=6)
+        self.scale.grid(column=0, row=7)
 
-        label = Tk.Label(self.root,text="B-Tree visualization").grid(column=0, row=7)
+        label = Tk.Label(self.root,text="B-Tree visualization").grid(column=0, row=8)
         
-        self.canvas.get_tk_widget().grid(column=0,row=8, sticky='nsew')
+        self.canvas.get_tk_widget().grid(column=0,row=9, sticky='nsew')
         self.root.columnconfigure(0, weight=1)
-        self.root.rowconfigure(8, weight=1)
+        self.root.rowconfigure(9, weight=1)
 
         # Bind the resize event to the tkinter window
         self.root.bind('<Configure>', self.on_resize)
@@ -266,6 +271,34 @@ class BTreeVisualization:
         #                       wenn Type = 0:              einfach 0
         # bis hier
                                 # das hier würde ich zurück bekommen
+        self.currentAnimation = ani.Animation(animTypeList, treeList, operands)
+
+    def insert12345_button_clicked(self):
+        self.temp += 1
+        if self.temp == 1:
+            animTypeList = [1, 0]
+            treeList = [[[1], [[]], [[]]], [[1], [[1]], [[]]]]
+            operands = [[0, 0], [0, 0], [0, 0], [1, 1]]
+        elif self.temp == 2:
+            animTypeList = [1, 0]
+            treeList = [[[1], [[1]], [[]]], [[1], [[1, 2]], [[]]]]
+            operands = [[0, 0], [0, 0], [0, 0], [2, 2]]
+        elif self.temp == 3:
+            animTypeList = [1, 0]
+            treeList = [[[1], [[1, 2]], [[]]], [[1], [[1, 2, 3]], [[]]]]
+            operands = [[0, 0], [0, 0], [0, 0], [3, 3]]
+        elif self.temp == 4:
+            animTypeList = [1, 0]
+            treeList = [[[1], [[1, 2, 3]], [[]]], [[1], [[1, 2, 3, 4]], [[]]]]
+            operands = [[0, 0], [0, 0], [0, 0], [4, 4]]
+        elif self.temp == 5:
+            animTypeList = [1, 1, 0]
+            treeList = [[[1], [[1, 2, 3, 4]], [[]]], [[1, 1], [[1, 2, 3, 4], []], [[], []]], [[2, 1], [[1, 2], [4, 5], [3]], [[], [], [0, 1]]]]
+            operands = [[0, 0, 0], [0, 1, 0], [0, 0, 0], [5, 3, 3]]
+        else:
+            animTypeList = [0]
+            treeList = [[[2, 1], [[1, 2], [4, 5], [3]], [[], [], [0, 1]]]]
+            operands = []
         self.currentAnimation = ani.Animation(animTypeList, treeList, operands)
 
     def insert65_button_clicked(self):
@@ -317,7 +350,7 @@ class BTreeVisualization:
         # get current width
         width = event.width
         # get current height
-        height = event.height
+        height = 0.7 * event.height
         self.canvas.figure.set_size_inches(width/100, height/100)
         self.canvas.draw()
 
@@ -688,7 +721,6 @@ class BTreeVisualization:
                 anim.currY[0] = anim.startingRefY + 2 * self.refWidth
             # for all other nodes
             elif not anim.upwards and anim.currY[0] != (anim.destinationRefY  + 7 * self.refWidth) or anim.upwards and anim.currY[0] != (anim.destinationRefY):
-                print("ye")
                 # let the key begin at the starting point
                 # x
                 anim.currX[0] = anim.startingRefX
