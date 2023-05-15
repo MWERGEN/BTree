@@ -14,6 +14,10 @@
 #       - main file
 #
 
+from Frontend import gui
 
-print("Gumo")
-print("GitHub ftw")
+# gui object
+myGui = gui.Gui()
+
+# call a draw test
+myGui.drawGraph()
