@@ -14,7 +14,6 @@
 #       - user data from the GUI
 #
 from bTree import BTree
-
 class Backend:
     def __init__(self, k):
         self.btree = BTree(k)
