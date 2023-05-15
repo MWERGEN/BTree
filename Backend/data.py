@@ -62,9 +62,12 @@ class Backend:
         iterations = len(self.animationList)
         # big tree list for frontend which contains of 1. num of nodes per level 2. keys per level 3. edgelist
         for i in range(iterations):
-            self.treeList.append(self.treeKeysPerLevel[i])
-            self.treeList.append(self.treeKeysPerLevel[i])
-            self.treeList.append(self.edgeLists[i])
+            temp = []
+            temp.append(self.treeNodesPerLevel[i])
+            temp.append(self.treeKeysPerLevel[i])
+            temp.append(self.edgeLists[i])
+            self.treeList.append(temp)
+            print('test')
 
 
 
