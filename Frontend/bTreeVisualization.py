@@ -240,15 +240,34 @@ class BTreeVisualization:
         self.root.bind('<Configure>', self.on_resize)
 
     def insert_button_clicked(self):
+        # self.currentAnimation = self.backendObj.insert(17)
+
+        # die erstellst du
         animTypeList = [1, 1, 1, 1, 0]
+        # für jeden Eintrag in animTypeList ein Baum
+        # heißt:    len(animTypeList) = len(treeList)
+        #           -- ein Baum ----------------------------------------------------------------------------------------------------------------------------
+        #            -NpL-   - Keys per Level (KpL)-----------------------------------------------------------------   - edgeList ------------------------  
         treeList = [[[5, 1], [[1, 2], [4, 5, 6], [8, 10, 15, 20], [40, 50, 60, 700], [100, 200, 420], [3, 7, 30, 80]], [[], [], [], [], [], [0, 1, 2, 3, 4]]], [[5, 1], [[1, 2], [4, 5, 6], [8, 10, 15, 20], [40, 50, 60, 700], [100, 200, 420], [3, 7, 30, 80]], [[], [], [], [], [], [0, 1, 2, 3, 4]]], [[5, 1], [[1, 2], [4, 5, 6], [8, 10, 17, 20], [40, 50, 60, 700], [100, 200, 420], [3, 7, 30, 80]], [[], [], [], [], [], [0, 1, 2, 3, 4]]], [[5, 1, 1], [[1, 2], [4, 5, 6], [8, 10, 17, 20], [40, 50, 60, 700], [100, 200, 420], [3, 7, 30, 80], []], [[], [], [], [], [], [0, 1, 2, 3, 4], []]], [[6, 2, 1], [[1, 2], [4, 5, 6], [8, 10], [17, 20], [40, 50, 60, 70], [100, 200, 420], [3, 7], [30, 80], [15]], [[], [], [], [], [], [], [0, 1, 2], [3, 4, 5], [6, 7]]]]
+        #           -- source ----   ---- target --   -- refs * ----   -- labels ---------
         operands = [[5, 5, 2, 5, 6], [5, 2, 5, 6, 6], [0, 2, 3, 2, 0], [17, 17, 15, 15, 15]]
+        # * zu den references:  wenn Knoten runter geht:    Referenz des Startknotens auf Zielknoten (wievielter)
+        #                       wenn Knoten hoch geht:      einfach 0
+        #                       wenn Type = 0:              einfach 0
+        # bis hier
+                                # das hier würde ich zurück bekommen
         self.currentAnimation = ani.Animation(animTypeList, treeList, operands)
 
     def search_button_clicked(self):
+        # type 2 heißt suchen (bzw. löschen)
         animTypeList = [2, 0]
-        treeList = [[[5, 1], [[1, 2], [4, 5, 6], [9, 10, 15, 20], [40, 50, 60, 700], [100, 200, 420], [3, 7, 30, 80]], [[], [], [], [], [], [0, 1, 2, 3, 4]]], [[5, 1], [[1, 2], [4, 5, 6], [9, 10, 15, 20], [40, 50, 60, 700], [100, 200, 420], [3, 7, 30, 80]], [[], [], [], [], [], [0, 1, 2, 3, 4]]]]
-        operands = [5, [5, 1], True]
+        # zwei Bäume, da zwei Animationen
+        treeList = [[[5, 1], [[1, 2], [4, 5, 6], [9, 10, 15, 20], [40, 50, 60, 700], [100, 200, 420], [3, 8, 30, 80]], [[], [], [], [], [], [0, 1, 2, 3, 4]]], [[5, 1], [[1, 2], [4, 5, 6], [9, 10, 15, 20], [40, 50, 60, 700], [100, 200, 420], [3, 8, 30, 80]], [[], [], [], [], [], [0, 1, 2, 3, 4]]]]
+        #           1.   2.      3.
+        # 1.:   welchen Key suchen wir?
+        # 2.:   welche Knoten haben wir abgesucht?
+        # 3.:   Key gefunden?
+        operands = [7, [5, 1], True]
         self.currentAnimation = ani.Animation(animTypeList, treeList, operands)
 
     def delete_button_clicked(self):
