@@ -22,8 +22,10 @@ class Backend:
         self.treeKeysPerLevel = None
         self.sourceDestination = None
         self.animationList = []
+        self.references = []
 
     def insertKeyIntoTree(self, key):
+        # reset all parameters of backend object
         self.treeNodesPerLevel = []
         self.treeKeysPerLevel = []
         self.sourceDestination = []
@@ -32,6 +34,7 @@ class Backend:
         self.btree.animationList = []
         self.edgeLists = []
         self.treeNodesPerLevel = []
+        self.references = []
         # call function which inserts key into tree
         self.btree.insertKey(key)
         # prepare nodes per level list for frontend
@@ -49,6 +52,8 @@ class Backend:
         # set animation list 
         self.animationList = self.btree.animationList
         self.edgeLists = self.btree.edgeListCopies
+        # set references 
+        self.references = self.btree.usedReferences
 
 
 

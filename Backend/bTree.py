@@ -44,6 +44,8 @@ class BTree:
         self.animationList = []
         # holds the nodes which are visited while the animation first list is source second list is target 
         self.visitiedNodes = []
+        # list of uses references 
+        self.usedReferences = []
 
 
 
@@ -70,6 +72,8 @@ class BTree:
         # temp lists to fill visited nodes will be filled while inserting 
         source = []
         target = []
+        # reset used references
+        self.usedReferences = []
         # first step of every insertion animation is from root to root
         source.append(self.rootNode.id)
         target.append(self.rootNode.id)
@@ -136,6 +140,7 @@ class BTree:
             self.insertNotFull(root,key, source, target,False) 
             # key is inserted so animation is over -> 0
             self.animationList.append(0)
+            self.usedReferences.append(0)
 
 
     # split child node at index i of parent
@@ -263,6 +268,7 @@ class BTree:
                         self.setEdgeList(self.rootNode)
                         edgeListBeforeInsert = self.edgeList[:]
                         self.edgeListCopies.append([list(l) for l in edgeListBeforeInsert])
+                        self.usedReferences.append(0)
                 else:
                     # make space for one more key
                     node.keys.append(None)
