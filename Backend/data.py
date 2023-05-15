@@ -20,6 +20,7 @@ class Backend:
         self.treeNodesPerLevel = None
         self.treeKeysPerLevel = None
         self.sourceDestination = None
+        self.animationList = []
 
     def insertKeyIntoTree(self, key):
         self.treeNodesPerLevel = []
@@ -27,11 +28,10 @@ class Backend:
         self.sourceDestination = []
         self.btree.keysPerLevel = []
         self.btree.nodeIds = []
+        self.btree.animationList = []
         # call function which inserts key into tree
         self.btree.insertKey(key)
         # prepare nodes per level list for frontend
-        #self.btree.getNumOfNodesPerLevel()
-        #print(self.btree.numOfNodesPerLevel)
         self.treeNodesPerLevel = self.btree.numOfNodesPerLevel
         # prepare keys per level for frontend
         self.btree.getKeysPerLevel()
@@ -43,6 +43,11 @@ class Backend:
         levels = self.btree.countNodesPerLevel()
         self.btree.numOfNodesPerLevel = levels.copy()
         self.treeNodesPerLevel = levels
+        # set animation list 
+        self.animationList = self.btree.animationList
+        self.sourceDestination[0].append(0)
+        self.sourceDestination[1].append(0)
+
 
 
 
