@@ -5,11 +5,18 @@
 #   Tasks:  MBT-6
 #
 #   Editors:
-#       1.  Tim Steiner on 10.04.23
-#       2.  Marius Wergen on 27.04.23
-#       3.  Marius Wergen on 02.05.23
-#       4.  Marius Wergen on 03.05.23
-#       5.  Marius Wergen on 04.05.23
+#       1.      Tim Steiner on 10.04.23
+#       2.      Marius Wergen on 27.04.23
+#       3.      Marius Wergen on 02.05.23
+#       4.      Marius Wergen on 03.05.23
+#       5.      Marius Wergen on 04.05.23
+#       6.      Marius Wergen on 07.05.23 
+#       7.      Marius Wergen on 08.05.23
+#       8.      Marius Wergen on 10.05.23
+#       9.      Marius Wergen on 11.05.23
+#       10.     Marius Wergen on 12.05.23
+#       11.     Marius Wergen on 13.05.23
+#       12.     Marius Wergen on 14.05.23
 #
 ###############################################
 #
@@ -217,29 +224,32 @@ class BTreeVisualization:
         button1 = Tk.Button(self.root, text='search 5', command=self.search_button_clicked)
         button1.grid(column=0, row=1)
 
-        button2 = Tk.Button(self.root, text='insert 17', command=self.insert_button_clicked)
+        button2 = Tk.Button(self.root, text='insert 17', command=self.insert17_button_clicked)
         button2.grid(column=0, row=2)
 
+        button2 = Tk.Button(self.root, text='insert 65', command=self.insert65_button_clicked)
+        button2.grid(column=0, row=3)
+
         button3 = Tk.Button(self.root, text='delete 2 pt.1', command=self.delete_button_clicked)
-        button3.grid(column=0, row=3)
+        button3.grid(column=0, row=4)
 
         button4 = Tk.Button(self.root, text='delete 2 pt.2', command=self.delete2_button_clicked)
-        button4.grid(column=0, row=4)
+        button4.grid(column=0, row=5)
 
         # create a scale widget for selecting the number
         self.scale = Tk.Scale(self.root, from_=1, to=10, orient=Tk.HORIZONTAL)
-        self.scale.grid(column=0, row=5)
+        self.scale.grid(column=0, row=6)
 
-        label = Tk.Label(self.root,text="B-Tree visualization").grid(column=0, row=6)
+        label = Tk.Label(self.root,text="B-Tree visualization").grid(column=0, row=7)
         
-        self.canvas.get_tk_widget().grid(column=0,row=7, sticky='nsew')
+        self.canvas.get_tk_widget().grid(column=0,row=8, sticky='nsew')
         self.root.columnconfigure(0, weight=1)
-        self.root.rowconfigure(7, weight=1)
+        self.root.rowconfigure(8, weight=1)
 
         # Bind the resize event to the tkinter window
         self.root.bind('<Configure>', self.on_resize)
 
-    def insert_button_clicked(self):
+    def insert17_button_clicked(self):
         # self.currentAnimation = self.backendObj.insert(17)
 
         # die erstellst du
@@ -251,6 +261,25 @@ class BTreeVisualization:
         treeList = [[[5, 1], [[1, 2], [4, 5, 6], [8, 10, 15, 20], [40, 50, 60, 700], [100, 200, 420], [3, 7, 30, 80]], [[], [], [], [], [], [0, 1, 2, 3, 4]]], [[5, 1], [[1, 2], [4, 5, 6], [8, 10, 15, 20], [40, 50, 60, 700], [100, 200, 420], [3, 7, 30, 80]], [[], [], [], [], [], [0, 1, 2, 3, 4]]], [[5, 1], [[1, 2], [4, 5, 6], [8, 10, 17, 20], [40, 50, 60, 700], [100, 200, 420], [3, 7, 30, 80]], [[], [], [], [], [], [0, 1, 2, 3, 4]]], [[5, 1, 1], [[1, 2], [4, 5, 6], [8, 10, 17, 20], [40, 50, 60, 700], [100, 200, 420], [3, 7, 30, 80], []], [[], [], [], [], [], [0, 1, 2, 3, 4], []]], [[6, 2, 1], [[1, 2], [4, 5, 6], [8, 10], [17, 20], [40, 50, 60, 70], [100, 200, 420], [3, 7], [30, 80], [15]], [[], [], [], [], [], [], [0, 1, 2], [3, 4, 5], [6, 7]]]]
         #           -- source ----   ---- target --   -- refs * ----   -- labels ---------
         operands = [[5, 5, 2, 5, 6], [5, 2, 5, 6, 6], [0, 2, 3, 2, 0], [17, 17, 15, 15, 15]]
+        # * zu den references:  wenn Knoten runter geht:    Referenz des Startknotens auf Zielknoten (wievielter)
+        #                       wenn Knoten hoch geht:      einfach 0
+        #                       wenn Type = 0:              einfach 0
+        # bis hier
+                                # das hier würde ich zurück bekommen
+        self.currentAnimation = ani.Animation(animTypeList, treeList, operands)
+
+    def insert65_button_clicked(self):
+        # self.currentAnimation = self.backendObj.insert(17)
+
+        # die erstellst du
+        animTypeList = [1, 1, 1, 1, 0]
+        # für jeden Eintrag in animTypeList ein Baum
+        # heißt:    len(animTypeList) = len(treeList)
+        #           -- ein Baum ----------------------------------------------------------------------------------------------------------------------------
+        #            -NpL-   - Keys per Level (KpL)-----------------------------------------------------------------   - edgeList ------------------------  
+        treeList = [[[5, 1], [[1, 2], [4, 5, 6], [8, 10, 15, 20], [40, 50, 60, 700], [100, 200, 420], [3, 7, 30, 80]], [[], [], [], [], [], [0, 1, 2, 3, 4]]], [[5, 1], [[1, 2], [4, 5, 6], [8, 10, 15, 20], [40, 50, 60, 700], [100, 200, 420], [3, 7, 30, 80]], [[], [], [], [], [], [0, 1, 2, 3, 4]]], [[5, 1], [[1, 2], [4, 5, 6], [8, 10, 15, 20], [40, 50, 65, 700], [100, 200, 420], [3, 7, 30, 80]], [[], [], [], [], [], [0, 1, 2, 3, 4]]], [[5, 1, 1], [[1, 2], [4, 5, 6], [8, 10, 15, 20], [40, 50, 60, 700], [100, 200, 420], [3, 7, 60, 80], []], [[], [], [], [], [], [0, 1, 2, 3, 4], []]], [[6, 2, 1], [[1, 2], [4, 5, 6], [8, 10, 15, 20], [40, 50], [65, 70], [100, 200, 420], [3, 7], [60, 80], [30]], [[], [], [], [], [], [], [0, 1, 2], [3, 4, 5], [6, 7]]]]
+        #           -- source ----   ---- target --   -- refs * ----   -- labels ---------
+        operands = [[5, 5, 3, 5, 6], [5, 3, 5, 6, 6], [0, 3, 0, 0, 0], [65, 65, 60, 30, 30]]
         # * zu den references:  wenn Knoten runter geht:    Referenz des Startknotens auf Zielknoten (wievielter)
         #                       wenn Knoten hoch geht:      einfach 0
         #                       wenn Type = 0:              einfach 0
@@ -278,8 +307,8 @@ class BTreeVisualization:
 
     def delete2_button_clicked(self):
         animTypeList = [1, 1, 0]
-        treeList = [[[5, 1], [[1], [5, 6], [9, 10, 15, 20], [40, 50, 60, 700], [100, 200, 420], [3, 7, 30, 80]], [[], [], [], [], [], [0, 1, 2, 3, 4]]], [[5, 1], [[1], [5, 6], [9, 10, 15, 20], [40, 50, 60, 700], [100, 200, 420], [5, 7, 30, 80]], [[], [], [], [], [], [0, 1, 2, 3, 4]]], [[5, 1], [[1, 3], [5, 6], [9, 10, 15, 20], [40, 50, 60, 700], [100, 200, 420], [4, 7, 30, 80]], [[], [], [], [], [], [0, 1, 2, 3, 4]]]] 
-        operands = [[1, 5, 0], [5, 0, 0], [0, 1, 0], [4, 3, 3]]
+        treeList = [[[5, 1], [[1], [5, 6], [9, 10, 15, 20], [40, 50, 60, 700], [100, 200, 420], [3, 7, 30, 80]], [[], [], [], [], [], [0, 1, 2, 3, 4]]], [[5, 1], [[1], [5, 6], [9, 10, 15, 20], [40, 50, 60, 700], [100, 200, 420], [4, 7, 30, 80]], [[], [], [], [], [], [0, 1, 2, 3, 4]]], [[5, 1], [[1, 3], [5, 6], [9, 10, 15, 20], [40, 50, 60, 700], [100, 200, 420], [4, 7, 30, 80]], [[], [], [], [], [], [0, 1, 2, 3, 4]]]] 
+        operands = [[1, 5, 0], [5, 0, 0], [0, 0, 0], [4, 3, 3]]
         self.currentAnimation = ani.Animation(animTypeList, treeList, operands)
 
     # define a function to handle the resize event
@@ -600,27 +629,33 @@ class BTreeVisualization:
             self.root.counter = 0
             # prevent counter to be resetted every iteration
             anim.resetted = True
-            #anim.updateNewAnimation()                                   ### !!!!!!!!!!!!!!!!!!!!
-            #self.updateGraph()
+            anim.updateNewAnimation()                                   ### !!!!!!!!!!!!!!!!!!!!
+            self.updateGraph()
         # if the starting node is lower than the destination node
         # -> means that the key should move upwards
         if (anim.startingNode[anim.walkthrough] < anim.destinationNode[anim.walkthrough]):
             anim.upwards = True
+        else:
+            anim.upwards = False
         
         # moving node is going up
         if anim.upwards:
-            # calculates the x-Position where the key starts
-            # simply counts to the reference where the key starts and gets that x-value
-            anim.startingRefX = anim.currX[0]
-            # calculates the y-Position where the key starts
-            # simply counts to the reference where the key starts and gets that y-value
-            anim.startingRefY = anim.currY[0]
+            if anim.walkthrough == 0:
+                anim.startingRefX = self.xGRefsAid[anim.startingNode[anim.walkthrough] * (2 * self.k + 1) + self.k]
+                anim.startingRefY = self.yGRefsAid[anim.startingNode[anim.walkthrough] * (2 * self.k + 1) + self.k] + 7 * self.refWidth
+            else:
+                # calculates the x-Position where the key starts
+                # simply counts to the reference where the key starts and gets that x-value
+                anim.startingRefX = anim.currX[0]
+                # calculates the y-Position where the key starts
+                # simply counts to the reference where the key starts and gets that y-value
+                anim.startingRefY = anim.currY[0]
             # calculates the x-Position where the key has to end
             # simply counts to the center of the node where the key should end and gets that x-value
             anim.destinationRefX = self.xGRefsAid[anim.destinationNode[anim.walkthrough] * (2 * self.k + 1) + self.k]
             # calculates the y-Position where the key has to end
             # simply counts to the center of the node where the key should end and gets that y-value
-            anim.destinationRefY = self.yGRefsAid[anim.destinationNode[anim.walkthrough] * (2 * self.k + 1) + self.k]
+            anim.destinationRefY = self.yGRefsAid[anim.destinationNode[anim.walkthrough] * (2 * self.k + 1) + self.k] + 7 * self.refWidth
         # moving node is going down
         else:
             # calculates the x-Position where the key starts
@@ -652,7 +687,8 @@ class BTreeVisualization:
                 # position moving node left beside the node: x-position
                 anim.currY[0] = anim.startingRefY + 2 * self.refWidth
             # for all other nodes
-            elif anim.currY[0] != (anim.destinationRefY  + 7 * self.refWidth):
+            elif not anim.upwards and anim.currY[0] != (anim.destinationRefY  + 7 * self.refWidth) or anim.upwards and anim.currY[0] != (anim.destinationRefY):
+                print("ye")
                 # let the key begin at the starting point
                 # x
                 anim.currX[0] = anim.startingRefX
@@ -666,7 +702,7 @@ class BTreeVisualization:
             # moving node is going upwards
             if anim.upwards:
                 # if the key is not surpassing the destination node
-                if anim.currY[0] + anim.animationSpeed < anim.destinationRefY + 7 * self.refWidth:
+                if anim.currY[0] + anim.animationSpeed < anim.destinationRefY:
                     # move one unit horizontally
                     anim.currX[0] += anim.animationSpeed * anim.gradient
                     # move one unit up
@@ -677,7 +713,7 @@ class BTreeVisualization:
                     self.root.counter = 0
                     # stop the key ahead of the destination node
                     # y position exactly on edge
-                    anim.currY[0] = anim.destinationRefY + 7 * self.refWidth
+                    anim.currY[0] = anim.destinationRefY
                     # x position in the middle of the node if destinationRefX == center of node
                     anim.currX[0] = anim.destinationRefX
                     # end of animation reached means stop animation
@@ -746,7 +782,7 @@ class BTreeVisualization:
         # make all keys lightblue again all 50 to 500 milliseconds (depending on users selection)
         if self.root.counter != 0 and self.root.counter % round(50 / self.speed) == 0:
             # reset counter for next part of animation
-            anim.resetted = False
+            #anim.resetted = False
             # set all keys to lightblue
             self.initializeColorKeyList()
             # if the comparison animation is over
