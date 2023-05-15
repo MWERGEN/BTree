@@ -262,12 +262,12 @@ class BTreeVisualization:
         # type 2 heißt suchen (bzw. löschen)
         animTypeList = [2, 0]
         # zwei Bäume, da zwei Animationen
-        treeList = [[[5, 1], [[1, 2], [4, 5, 6], [9, 10, 15, 20], [40, 50, 60, 700], [100, 200, 420], [3, 8, 30, 80]], [[], [], [], [], [], [0, 1, 2, 3, 4]]], [[5, 1], [[1, 2], [4, 5, 6], [9, 10, 15, 20], [40, 50, 60, 700], [100, 200, 420], [3, 8, 30, 80]], [[], [], [], [], [], [0, 1, 2, 3, 4]]]]
+        treeList = [[[5, 1], [[1, 2], [4, 5, 6], [9, 10, 15, 20], [40, 50, 60, 700], [100, 200, 420], [3, 7, 30, 80]], [[], [], [], [], [], [0, 1, 2, 3, 4]]], [[5, 1], [[1, 2], [4, 5, 6], [9, 10, 15, 20], [40, 50, 60, 700], [100, 200, 420], [3, 7, 30, 80]], [[], [], [], [], [], [0, 1, 2, 3, 4]]]]
         #           1.   2.      3.
         # 1.:   welchen Key suchen wir?
         # 2.:   welche Knoten haben wir abgesucht?
         # 3.:   Key gefunden?
-        operands = [7, [5, 1], True]
+        operands = [5, [5, 1], True]
         self.currentAnimation = ani.Animation(animTypeList, treeList, operands)
 
     def delete_button_clicked(self):
@@ -600,15 +600,12 @@ class BTreeVisualization:
             self.root.counter = 0
             # prevent counter to be resetted every iteration
             anim.resetted = True
-            anim.updateNewAnimation()                                   ### !!!!!!!!!!!!!!!!!!!!
-            self.updateGraph()
+            #anim.updateNewAnimation()                                   ### !!!!!!!!!!!!!!!!!!!!
+            #self.updateGraph()
         # if the starting node is lower than the destination node
         # -> means that the key should move upwards
         if (anim.startingNode[anim.walkthrough] < anim.destinationNode[anim.walkthrough]):
             anim.upwards = True
-        
-        print("ctr: " + str(self.root.counter))
-        print("mod: " + str(round(50 / self.speed)))
         
         # moving node is going up
         if anim.upwards:
@@ -623,7 +620,7 @@ class BTreeVisualization:
             anim.destinationRefX = self.xGRefsAid[anim.destinationNode[anim.walkthrough] * (2 * self.k + 1) + self.k]
             # calculates the y-Position where the key has to end
             # simply counts to the center of the node where the key should end and gets that y-value
-            anim.destinationRefY = self.yGRefsAid[anim.destinationNode[anim.walkthrough] * (2 * self.k + 1) + self.k] + 7 * self.refWidth
+            anim.destinationRefY = self.yGRefsAid[anim.destinationNode[anim.walkthrough] * (2 * self.k + 1) + self.k]
         # moving node is going down
         else:
             # calculates the x-Position where the key starts
@@ -669,16 +666,18 @@ class BTreeVisualization:
             # moving node is going upwards
             if anim.upwards:
                 # if the key is not surpassing the destination node
-                if anim.currY[0] + anim.animationSpeed < anim.destinationRefY:
+                if anim.currY[0] + anim.animationSpeed < anim.destinationRefY + 7 * self.refWidth:
                     # move one unit horizontally
                     anim.currX[0] += anim.animationSpeed * anim.gradient
                     # move one unit up
                     anim.currY[0] += anim.animationSpeed
                 # if the key would surpass the destination node in the next iteration
                 else:
+                    # reset the counter if the comparison will start
+                    self.root.counter = 0
                     # stop the key ahead of the destination node
                     # y position exactly on edge
-                    anim.currY[0] = anim.destinationRefY
+                    anim.currY[0] = anim.destinationRefY + 7 * self.refWidth
                     # x position in the middle of the node if destinationRefX == center of node
                     anim.currX[0] = anim.destinationRefX
                     # end of animation reached means stop animation
@@ -691,7 +690,9 @@ class BTreeVisualization:
                     # move one unit down
                     anim.currY[0] -= anim.animationSpeed
                 # if the key would surpass the destination node in the next iteration
-                else:
+                else:          
+                    # reset the counter if the comparison will start
+                    self.root.counter = 0     
                     # stop the key ahead of the destination node
                     # y position exactly on edge
                     anim.currY[0] = anim.destinationRefY + 7 * self.refWidth
