@@ -218,6 +218,7 @@ class BTree:
             if node.leaf or fromSplit:
                 if emptyNode:
                     node.keys.append(key)
+                    self.animationList.append(1)
                 else:
                     # make space for one more key
                     node.keys.append(None)
