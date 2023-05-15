@@ -220,15 +220,21 @@ class BTreeVisualization:
         button2 = Tk.Button(self.root, text='insert 17', command=self.insert_button_clicked)
         button2.grid(column=0, row=2)
 
+        button3 = Tk.Button(self.root, text='delete 2 pt.1', command=self.delete_button_clicked)
+        button3.grid(column=0, row=3)
+
+        button4 = Tk.Button(self.root, text='delete 2 pt.2', command=self.delete2_button_clicked)
+        button4.grid(column=0, row=4)
+
         # create a scale widget for selecting the number
         self.scale = Tk.Scale(self.root, from_=1, to=10, orient=Tk.HORIZONTAL)
-        self.scale.grid(column=0, row=3)
+        self.scale.grid(column=0, row=5)
 
-        label = Tk.Label(self.root,text="B-Tree visualization").grid(column=0, row=4)
+        label = Tk.Label(self.root,text="B-Tree visualization").grid(column=0, row=6)
         
-        self.canvas.get_tk_widget().grid(column=0,row=5, sticky='nsew')
+        self.canvas.get_tk_widget().grid(column=0,row=7, sticky='nsew')
         self.root.columnconfigure(0, weight=1)
-        self.root.rowconfigure(5, weight=1)
+        self.root.rowconfigure(7, weight=1)
 
         # Bind the resize event to the tkinter window
         self.root.bind('<Configure>', self.on_resize)
@@ -241,8 +247,20 @@ class BTreeVisualization:
 
     def search_button_clicked(self):
         animTypeList = [2, 0]
-        treeList = [[[5, 1], [[1, 2], [4, 5, 6], [9, 10, 15, 20], [40, 50, 60, 700], [100, 200, 420], [3, 8, 30, 80]], [[], [], [], [], [], [0, 1, 2, 3, 4]]], [[5, 1], [[1, 2], [4, 5, 6], [9, 10, 15, 20], [40, 50, 60, 700], [100, 200, 420], [3, 8, 30, 80]], [[], [], [], [], [], [0, 1, 2, 3, 4]]]]
+        treeList = [[[5, 1], [[1, 2], [4, 5, 6], [9, 10, 15, 20], [40, 50, 60, 700], [100, 200, 420], [3, 7, 30, 80]], [[], [], [], [], [], [0, 1, 2, 3, 4]]], [[5, 1], [[1, 2], [4, 5, 6], [9, 10, 15, 20], [40, 50, 60, 700], [100, 200, 420], [3, 7, 30, 80]], [[], [], [], [], [], [0, 1, 2, 3, 4]]]]
         operands = [5, [5, 1], True]
+        self.currentAnimation = ani.Animation(animTypeList, treeList, operands)
+
+    def delete_button_clicked(self):
+        animTypeList = [2, 0]
+        treeList = [[[5, 1], [[1, 2], [4, 5, 6], [9, 10, 15, 20], [40, 50, 60, 700], [100, 200, 420], [3, 7, 30, 80]], [[], [], [], [], [], [0, 1, 2, 3, 4]]], [[5, 1], [[1], [4, 5, 6], [9, 10, 15, 20], [40, 50, 60, 700], [100, 200, 420], [3, 7, 30, 80]], [[], [], [], [], [], [0, 1, 2, 3, 4]]]]
+        operands = [2, [5, 0], True]
+        self.currentAnimation = ani.Animation(animTypeList, treeList, operands)
+
+    def delete2_button_clicked(self):
+        animTypeList = [1, 1, 0]
+        treeList = [[[5, 1], [[1], [5, 6], [9, 10, 15, 20], [40, 50, 60, 700], [100, 200, 420], [3, 7, 30, 80]], [[], [], [], [], [], [0, 1, 2, 3, 4]]], [[5, 1], [[1], [5, 6], [9, 10, 15, 20], [40, 50, 60, 700], [100, 200, 420], [5, 7, 30, 80]], [[], [], [], [], [], [0, 1, 2, 3, 4]]], [[5, 1], [[1, 3], [5, 6], [9, 10, 15, 20], [40, 50, 60, 700], [100, 200, 420], [4, 7, 30, 80]], [[], [], [], [], [], [0, 1, 2, 3, 4]]]] 
+        operands = [[1, 5, 0], [5, 0, 0], [0, 1, 0], [4, 3, 3]]
         self.currentAnimation = ani.Animation(animTypeList, treeList, operands)
 
     # define a function to handle the resize event
@@ -563,6 +581,8 @@ class BTreeVisualization:
             self.root.counter = 0
             # prevent counter to be resetted every iteration
             anim.resetted = True
+            anim.updateNewAnimation()                                   ### !!!!!!!!!!!!!!!!!!!!
+            self.updateGraph()
         # if the starting node is lower than the destination node
         # -> means that the key should move upwards
         if (anim.startingNode[anim.walkthrough] < anim.destinationNode[anim.walkthrough]):
@@ -844,10 +864,8 @@ class BTreeVisualization:
                 # if there is still another part of the animation, trigger it
                 if (anim.walkthrough + 1) < len(anim.checkNodes):
                     # switch to the next animation = next node
-                    anim.walkthrough += 1
-                    # update graph and animation
-                    anim.updateNewAnimation()
-                    self.updateGraph()
+                    anim.walkthrough += 1                ##'########## !!!!!!!!!!!!!!!!!!!!!!!!!!
+                    print(anim.walkthrough)
                     # ref-coloring
                     # if the key would be the highest in the node
                     if anim.flagNewKeyHighest:
@@ -868,7 +886,7 @@ class BTreeVisualization:
                 else:
                     # update the graph
                     # -> needed for key
-                    anim.type = anim.types[anim.walkthrough]
+                    anim.updateNewAnimation()
                     self.updateGraph()
                     self.initializeColorRefList()
 

@@ -109,8 +109,7 @@ class Animation:
 
     
     def updateNewAnimation(self):
-        if self.type == 1:
-            self.type = self.types[self.walkthrough]
+        self.type = self.types[self.walkthrough]
         self.nodesList = self.tree[self.walkthrough][0]
         self.keysList = self.tree[self.walkthrough][1]
         self.edgesList = self.tree[self.walkthrough][2]
