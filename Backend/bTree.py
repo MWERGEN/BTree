@@ -37,6 +37,7 @@ class BTree:
         self.animationList = []
         # holds the nodes which are visited while the animation first list is source second list is target 
         self.visitiedNodes = []
+        self.keysPerLevelCopies = []
 
     # insert a key into Btree node. there are two cases which can occur:
     # 1. node is full -> split node and insert then 
@@ -49,6 +50,9 @@ class BTree:
         # new key -> new animation
         self.animationList = []
         self.visitiedNodes = []
+        # for every step of the animation frontend needs the keys per level
+        self.keysPerLevelCopies = []
+        self.keysPerLevel = []
         # temp lists to fill visited nodes will be filled while inserting 
         source = []
         target = []
@@ -57,6 +61,9 @@ class BTree:
         target.append(self.rootNode.id)
         self.visitiedNodes.append(source)
         self.visitiedNodes.append(target)
+        self.getKeysPerLevel()
+        keysPerLevelBeforeInsert = self.keysPerLevel[:]
+        self.keysPerLevelCopies.append([list(l) for l in keysPerLevelBeforeInsert])
         #case 1
         # node can hold 2 * order keys
         if len(root.keys) == 2 * self.k:
@@ -77,6 +84,8 @@ class BTree:
                 self.updateNodeIds(self.rootNode)
                 source.append(temp.children[0].id)
                 target.append(temp.id)
+                self.getKeysPerLevel()
+                self.keysPerLevelCopies.append(self.keysPerLevel.copy())
             else:
                 # root has children where key can be inserted
                 i = len(root.keys) - 1
@@ -100,6 +109,9 @@ class BTree:
             self.insertNotFull(root,key, source, target,False) 
             # key is inserted so animation is over -> 0
             self.animationList.append(0)
+            # get the current keys per level of the tree
+            self.getKeysPerLevel()
+            self.keysPerLevelCopies.append(self.keysPerLevel.copy())
 
 
     # split child node at index i of parent
@@ -236,6 +248,10 @@ class BTree:
                         target.append(node.id)
                     # animation for comparing 
                     self.animationList.append(1)
+                    # get the current keys per level of the tree
+                    self.getKeysPerLevel()
+                    keysPerLevelBeforeInsert = self.keysPerLevel[:]
+                    self.keysPerLevelCopies.append([list(l) for l in keysPerLevelBeforeInsert])
             else:
                 # animation for traversing + comparing
                 self.animationList.append(1)
@@ -389,12 +405,30 @@ class BTree:
             self.nodeIds.append(currentNode.id)
 
     def setEdgeList(self, node):
+        # empty list for edge conncection
         res = []
-        if node is not None:
-            for child in node.children:
+        edgeList = []
+        # Base Case
+        if node is None:
+            return
+        # Create an empty queue
+        # for level order traversal
+        queue = []
+        # Enqueue Root and initialize height
+        queue.append(node)
+        while(len(queue) > 0):
+            currNode = queue.pop(0)
+            # also add leafes to edge list
+            if currNode.leaf:
+                edgeList.append(res.copy())
+            # Enqueue children
+            for child in currNode.children:
                 res.append(node.id)
                 res.append(child.id)
-                self.edgeList.append(res.copy())
-                res.clear()
-                self.setEdgeList(child)
+                edgeList.append(res.copy())
+                res = []
+                queue.append(child)
+        # frontend needs the edge list is in reverse level order, so just reverse the list
+        edgeList.reverse()
+        self.edgeList.append(edgeList.copy())
 
