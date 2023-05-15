@@ -270,6 +270,10 @@ class BTree:
                     nodePerLevelBefore = self.countNodesPerLevel()
                     self.numOfNodesPerLevelCopies.append(nodePerLevelBefore)
                     self.usedKeys.append(key)
+                    # get the current keys per level of the tree
+                    self.getKeysPerLevel()
+                    keysPerLevelBeforeInsert = self.keysPerLevel[:]
+                    self.keysPerLevelCopies.append([list(l) for l in keysPerLevelBeforeInsert])
                     if not fromSplit:
                         # edge list copy
                         self.setEdgeList(self.rootNode)
