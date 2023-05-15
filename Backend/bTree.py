@@ -55,6 +55,8 @@ class BTree:
         # first step of every insertion animation is from root to root
         source.append(self.rootNode.id)
         target.append(self.rootNode.id)
+        self.visitiedNodes.append(source)
+        self.visitiedNodes.append(target)
         #case 1
         # node can hold 2 * order keys
         if len(root.keys) == 2 * self.k:
@@ -73,6 +75,8 @@ class BTree:
                 # there is a new node in the tree so update the ids of the nodes
                 # this ensures that at every operation the node ids are correct
                 self.updateNodeIds(self.rootNode)
+                source.append(temp.children[0].id)
+                target.append(temp.id)
             else:
                 # root has children where key can be inserted
                 i = len(root.keys) - 1
@@ -227,6 +231,8 @@ class BTree:
                             i -= 1
                         # insert key to correct place
                         node.keys[i + 1] = key
+                        source.append(source[0])
+                        target.append(node.id)
                     # animation for comparing 
                     self.animationList.append(1)
             else:
@@ -240,9 +246,6 @@ class BTree:
                         i -= 1
                     # + 1 because insertion key must come after the first node key which is smaller
                     i += 1
-                    # temp lists to store where key is from and goes to
-                    source.append(node.id)
-                    #target.append(node.children[i].id)
                     # check if node where key should go is full -> children[i] means all keys in this node are smaller!
                     if not node.children[i].children:
                         if len(node.children[i].keys) == (2 * self.k): 
@@ -253,10 +256,6 @@ class BTree:
                              #   i += 1
                     if not test:
                         self.insertNotFull(node.children[i], key, source, target, False)
-            # append source and target to visited nodes but only one time!
-            if len(self.visitiedNodes) < 2:
-                self.visitiedNodes.append(source.copy())
-                self.visitiedNodes.append(target.copy())
 
 
     #TODO implement deleting key
@@ -294,32 +293,19 @@ class BTree:
 
     # function returns list for frontend which contains numbers of nodes per level
     # at index 0 -> root level, but the list has to be reveresed so the frontend can work with it
-    # this will be done in a different function
-    def getNumOfNodesPerLevel(self):
-        self.numOfNodesPerLevel = []
-        if self.rootNode is None:
-            return
-        # create an empty queue and enqueue the root node
-        queue = deque()
-        queue.append(self.rootNode)
-        # create a stack to reverse level order nodes
-        stack = deque()
-        # loop till queue is empty
-        while queue:
-            # process each node in the queue and enqueue their children
-            curr = queue.popleft()
-            # push the current node into the stack
-            stack.append(curr)
-            # it is important to process the right node before the left node
-            for child in reversed(curr.children):
-                queue.append(child)
-        # pop all nodes from the stack and print them
-        while stack:
-            currentNode = stack.pop()
-            self.numOfNodesPerLevel.append(currentNode.keys)
-            for i in currentNode.children:
-                # search every child node from current node from left to right 
-                queue.append(i)
+    def countNodesPerLevel(self):
+        levels = []
+        self.countNodesPerLevelHelp(self.rootNode, 0, levels)
+        levels.reverse()
+        return levels
+
+    def countNodesPerLevelHelp(self, node, level, levels):
+        if level == len(levels):
+            levels.append(0)
+        levels[level] += 1
+        for child in node.children:
+            self.countNodesPerLevelHelp(child, level + 1, levels)
+
 
     # function that counts the numbers of levels the tree has for the list which will be sent to the frontend
     # level 1 -> root
