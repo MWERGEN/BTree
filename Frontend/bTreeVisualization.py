@@ -299,7 +299,7 @@ class BTreeVisualization:
             #animTypeList = [1, 0]
             #treeList = [[[1], [[1]], [[]]], [[1], [[1, 2]], [[]]]]
             #operands = [[0, 0], [0, 0], [0, 0], [2, 2]]
-            self.backend.insertKeyIntoTree(2)
+            self.backend.insertKeyIntoTree(9999)
             animationList = self.backend.animationList
             treeList = self.backend.treeList
             operands = self.backend.operands
