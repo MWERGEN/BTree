@@ -1,54 +1,34 @@
-"""
-===============
-Embedding in Tk
-===============
+import tkinter as tk
+from tkinter import ttk
 
-"""
+# Create a tkinter window
+window = tk.Tk()
 
-import tkinter
+# Create a canvas
+canvas = tk.Canvas(window)
+canvas.grid(row=0, column=0, sticky="nsew")
 
-from matplotlib.backends.backend_tkagg import (
-    FigureCanvasTkAgg, NavigationToolbar2Tk)
-# Implement the default Matplotlib key bindings.
-from matplotlib.backend_bases import key_press_handler
-from matplotlib.figure import Figure
+# Create a frame inside the canvas to hold the content
+frame = ttk.Frame(canvas)
+canvas.create_window(0, 0, anchor='nw', window=frame)
 
-import numpy as np
+# Create a scrollbar
+scrollbar = ttk.Scrollbar(window, orient=tk.VERTICAL, command=canvas.yview)
+scrollbar.grid(row=0, column=1, sticky="ns")
+canvas.configure(yscrollcommand=scrollbar.set)
 
+# Configure grid weights to allow resizing
+window.grid_rowconfigure(0, weight=1)
+window.grid_columnconfigure(0, weight=1)
 
-root = tkinter.Tk()
-root.wm_title("Embedding in Tk")
+# Update the scrollable region when the canvas size changes
+def update_scroll_region(event):
+    canvas.configure(scrollregion=canvas.bbox("all"))
 
-fig = Figure(figsize=(5, 4), dpi=100)
-t = np.arange(0, 3, .01)
-fig.add_subplot(111).plot(t, 2 * np.sin(2 * np.pi * t))
+canvas.bind("<Configure>", update_scroll_region)
 
-canvas = FigureCanvasTkAgg(fig, master=root)  # A tk.DrawingArea.
-canvas.draw()
-canvas.get_tk_widget().pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=1)
+# Add your content to the frame
+# ...
 
-toolbar = NavigationToolbar2Tk(canvas, root)
-toolbar.update()
-canvas.get_tk_widget().pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=1)
-
-
-def on_key_press(event):
-    print("you pressed {}".format(event.key))
-    key_press_handler(event, canvas, toolbar)
-
-
-canvas.mpl_connect("key_press_event", on_key_press)
-
-
-def _quit():
-    root.quit()     # stops mainloop
-    root.destroy()  # this is necessary on Windows to prevent
-                    # Fatal Python Error: PyEval_RestoreThread: NULL tstate
-
-
-button = tkinter.Button(master=root, text="Quit", command=_quit)
-button.pack(side=tkinter.BOTTOM)
-
-tkinter.mainloop()
-# If you put root.destroy() here, it will cause an error if the window is
-# closed with the window manager.
+# Start the tkinter event loop
+window.mainloop()
