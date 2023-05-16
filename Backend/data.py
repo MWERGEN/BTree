@@ -80,13 +80,13 @@ class Backend:
 
 
 testData = Backend(2)
+testData.insertKeyIntoTree(1)
+testData.insertKeyIntoTree(2)
 testData.insertKeyIntoTree(3)
 testData.insertKeyIntoTree(4)
 testData.insertKeyIntoTree(5)
-testData.insertKeyIntoTree(1)
-testData.insertKeyIntoTree(2)
+testData.insertKeyIntoTree(6)
 testData.insertKeyIntoTree(7)
-testData.insertKeyIntoTree(99)
 testData.insertKeyIntoTree(12)
 testData.insertKeyIntoTree(18)
 testData.insertKeyIntoTree(24)
