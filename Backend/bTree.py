@@ -303,6 +303,7 @@ class BTree:
                         self.visitiedNodes[0].append(0)
                         self.visitiedNodes[1].append(0)
                 else:
+                    self.usedReferences.append(0)
                     # make space for one more key
                     node.keys.append(None)
                     if i == 0 and node.keys[0] == None:
@@ -315,7 +316,6 @@ class BTree:
                             i -= 1
                         # insert key to correct place
                         node.keys[i + 1] = key
-                        self.usedReferences.append(i + 1)
                         if fromSplit:
                             source = node.children[0].id
                             target = node.id 
@@ -364,6 +364,7 @@ class BTree:
                         i -= 1
                     # + 1 because insertion key must come after the first node key which is smaller
                     i += 1
+                    self.usedReferences.append(i)
                     # check if node where key should go is full -> children[i] means all keys in this node are smaller!
                     if not node.children[i].children:
                         if len(node.children[i].keys) == (2 * self.k): 
