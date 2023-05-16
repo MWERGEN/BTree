@@ -313,8 +313,15 @@ class BTree:
                             i -= 1
                         # insert key to correct place
                         node.keys[i + 1] = key
-                        source.append(source[0])
-                        target.append(node.id)
+                        if fromSplit:
+                            source = node.children[0].id
+                            target = node.id 
+                            self.visitiedNodes[0].append(source)
+                            self.visitiedNodes[1].append(target)
+                        else:
+                            currentPos = source[0]
+                            source.append(currentPos)
+                            target.append(node.id)
                     # animation for comparing 
                     self.animationList.append(1)
                     # get the current keys per level of the tree
