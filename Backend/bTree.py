@@ -190,13 +190,18 @@ class BTree:
         splitNode.keys[i + 1] = key
         self.animationList.append(1)
         middleIndex = int(len(splitNode.keys) / 2)
-        # add reference to node which holds all greater keys
-        parent.children.insert(index + 1, newNode) 
-        # fill parent with splitkey -> middle key
-        self.insertNotFull(parent,splitNode.keys[middleIndex], source, target, True)
         # used key is inserted key
         self.usedKeys.append(splitNode.keys[middleIndex])
-        del splitNode.keys[middleIndex]
+        copyOfSplitKey = splitNode.keys[middleIndex]
+        del splitNode.keys[middleIndex] 
+        # set keys per level list -> has to be copy of list because every key list can be different!
+        self.getKeysPerLevel()
+        keysPerLevelBeforeSplit = self.keysPerLevel[:]
+        self.keysPerLevelCopies.append([list(l) for l in keysPerLevelBeforeSplit])
+        # add reference to node which holds all greater keys
+        parent.children.insert(index + 1, newNode)
+        # fill parent with splitkey -> middle key
+        self.insertNotFull(parent,copyOfSplitKey, source, target, True)
         # take all greater keys and insert them from order to 2 * order - 1
         newNode.keys = splitNode.keys[middleIndex: 2 * k] 
         # take all smaller keys and insert them from 0 to order - 1
@@ -327,10 +332,11 @@ class BTree:
                             target.append(node.id)
                     # animation for comparing 
                     self.animationList.append(1)
-                    # get the current keys per level of the tree
-                    self.getKeysPerLevel()
-                    keysPerLevelBeforeInsert = self.keysPerLevel[:]
-                    self.keysPerLevelCopies.append([list(l) for l in keysPerLevelBeforeInsert])
+                    if not fromSplit:
+                        # get the current keys per level of the tree
+                        self.getKeysPerLevel()
+                        keysPerLevelBeforeInsert = self.keysPerLevel[:]
+                        self.keysPerLevelCopies.append([list(l) for l in keysPerLevelBeforeInsert])
                     # get current nodes per level
                     nodePerLevelBefore = self.countNodesPerLevel()
                     self.numOfNodesPerLevelCopies.append(nodePerLevelBefore)
@@ -365,12 +371,19 @@ class BTree:
                     # + 1 because insertion key must come after the first node key which is smaller
                     i += 1
                     self.usedReferences.append(i)
+                    # get the current keys per level of the tree
+                    nodePerLevelBeforeSplit = self.countNodesPerLevel()
+                    self.numOfNodesPerLevelCopies.append(nodePerLevelBeforeSplit)
                     # check if node where key should go is full -> children[i] means all keys in this node are smaller!
                     if not node.children[i].children:
                         if len(node.children[i].keys) == (2 * self.k): 
                             # split node to make room for new key 
                             self.splitNode(node, key,i) 
                             test = True
+                            # get the current keys per level of the tree
+                            self.getKeysPerLevel()
+                            keysPerLevelBeforeInsert = self.keysPerLevel[:]
+                            self.keysPerLevelCopies.append([list(l) for l in keysPerLevelBeforeInsert])
                             #if key > node.keys[i]:
                              #   i += 1
                     if not test:
