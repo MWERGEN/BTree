@@ -15,12 +15,12 @@
 #       - inserting, deleting and searching algorithm
 #       - preparing lists for frontend (num of nodes per level, keys per level and edges)
 #
-from node import Node
+from Backend import node
 from collections import deque
 
 class BTree:
     def __init__(self, k):
-        self.rootNode = Node(True)
+        self.rootNode = node.Node(True)
         # num of keys is min k and max 2 * k
         self.k = k
         # how many nodes per level starting from the bottom -> last item always 1 means root
@@ -96,13 +96,15 @@ class BTree:
         self.numOfNodesPerLevelCopies.append(nodePerLevelBefore)
         # used key is inserted key
         self.usedKeys.append(key)
+        # every animation starts with a zero reference
+        self.usedReferences.append(0)
         #case 1
         # node can hold 2 * order keys
         if len(root.keys) == 2 * self.k:
             # check if root has children
             if not root.children: 
                 # new root node
-                temp = Node()
+                temp = node.Node()
                  # edge list copy
                 self.setEdgeList(self.rootNode)
                 edgeListBeforeInsert = self.edgeList[:]
@@ -177,7 +179,7 @@ class BTree:
         # full node
         splitNode = parent.children[index]
         # second node where are all keys which are greater than the middle key will go
-        newNode = Node(splitNode.leaf) 
+        newNode = node.Node(splitNode.leaf) 
         i = len(splitNode.keys) - 1
         # make space for one more key
         splitNode.keys.append(None) 
@@ -210,7 +212,7 @@ class BTree:
             # root is full -> new root
             if parent is self.rootNode:
                 # new root node
-                temp = Node()
+                temp = node.Node()
                 # reference to child which will hold all smaller keys!
                 temp.children.insert(0, parent) 
                 self.rootNode = temp
@@ -242,7 +244,7 @@ class BTree:
         # full node
         splitNode = parent.children[index]
         # second node where are all keys which are greater than the middle key will go
-        newNode = Node(splitNode.leaf) 
+        newNode = node.Node(splitNode.leaf) 
         i = len(splitNode.keys) - 1
         middleIndex = int(len(splitNode.keys) / 2)
         # add reference to node which holds all greater keys
@@ -295,7 +297,6 @@ class BTree:
                         self.setEdgeList(self.rootNode)
                         edgeListBeforeInsert = self.edgeList[:]
                         self.edgeListCopies.append([list(l) for l in edgeListBeforeInsert])
-                        self.usedReferences.append(0)
                         # get the current keys per level of the tree
                         self.getKeysPerLevel()
                         keysPerLevelBeforeInsert = self.keysPerLevel[:]
@@ -323,6 +324,8 @@ class BTree:
                             self.visitiedNodes[1].append(target)
                         else:
                             currentPos = source[0]
+                            source.append(currentPos)
+                            target.append(node.id)
                             source.append(currentPos)
                             target.append(node.id)
                     # animation for comparing 
@@ -377,8 +380,8 @@ class BTree:
 
 
     #TODO implement deleting key
-    def deleteKey(key):
-        null
+    #def deleteKey(key):
+    #    null
 
     # search key in node
     # go through node and check if key is there
