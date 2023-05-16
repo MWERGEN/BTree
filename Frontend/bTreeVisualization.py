@@ -38,6 +38,7 @@ from matplotlib.backends.backend_tkagg import (
 from matplotlib.backend_bases import key_press_handler
 
 from Frontend import anim as ani
+from Backend import data
 
 #root = tkinter.Tk()
 #root.wm_title("Embedding in Tk")
@@ -206,6 +207,7 @@ class BTreeVisualization:
         self.speed = 1
         self.scale = 0
         self.temp = 0
+        self.backend = data.Backend(2)
 
     def countNext10Milliseconds(self):
         # check if 10 seconds have passed
@@ -286,30 +288,70 @@ class BTreeVisualization:
     def insert12345_button_clicked(self):
         self.temp += 1
         if self.temp == 1:
-            animTypeList = [1, 0]
-            treeList = [[[1], [[]], [[]]], [[1], [[1]], [[]]]]
-            operands = [[0, 0], [0, 0], [0, 0], [1, 1]]
+            #animTypeList = [1, 0]
+            #treeList = [[[1], [[]], [[]]], [[1], [[1]], [[]]]]
+            #operands = [[0, 0], [0, 0], [0, 0], [1, 1]]
+            self.backend.insertKeyIntoTree(1)
+            animationList = self.backend.animationList
+            treeList = self.backend.treeList
+            operands = self.backend.operands
         elif self.temp == 2:
-            animTypeList = [1, 0]
-            treeList = [[[1], [[1]], [[]]], [[1], [[1, 2]], [[]]]]
-            operands = [[0, 0], [0, 0], [0, 0], [2, 2]]
+            #animTypeList = [1, 0]
+            #treeList = [[[1], [[1]], [[]]], [[1], [[1, 2]], [[]]]]
+            #operands = [[0, 0], [0, 0], [0, 0], [2, 2]]
+            self.backend.insertKeyIntoTree(2)
+            animationList = self.backend.animationList
+            treeList = self.backend.treeList
+            operands = self.backend.operands
         elif self.temp == 3:
-            animTypeList = [1, 0]
-            treeList = [[[1], [[1, 2]], [[]]], [[1], [[1, 2, 3]], [[]]]]
-            operands = [[0, 0], [0, 0], [0, 0], [3, 3]]
+            #animTypeList = [1, 0]
+            #treeList = [[[1], [[1, 2]], [[]]], [[1], [[1, 2, 3]], [[]]]]
+            #operands = [[0, 0], [0, 0], [0, 0], [3, 3]]
+            self.backend.insertKeyIntoTree(3)
+            animationList = self.backend.animationList
+            treeList = self.backend.treeList
+            operands = self.backend.operands
         elif self.temp == 4:
-            animTypeList = [1, 0]
-            treeList = [[[1], [[1, 2, 3]], [[]]], [[1], [[1, 2, 3, 4]], [[]]]]
-            operands = [[0, 0], [0, 0], [0, 0], [4, 4]]
+            #animTypeList = [1, 0]
+            #treeList = [[[1], [[1, 2, 3]], [[]]], [[1], [[1, 2, 3, 4]], [[]]]]
+            #operands = [[0, 0], [0, 0], [0, 0], [4, 4]]
+            self.backend.insertKeyIntoTree(4)
+            animationList = self.backend.animationList
+            treeList = self.backend.treeList
+            operands = self.backend.operands
         elif self.temp == 5:
-            animTypeList = [1, 1, 0]
-            treeList = [[[1], [[1, 2, 3, 4]], [[]]], [[1, 1], [[1, 2, 3, 4], []], [[], []]], [[2, 1], [[1, 2], [4, 5], [3]], [[], [], [0, 1]]]]
-            operands = [[0, 0, 0], [0, 1, 0], [0, 0, 0], [5, 3, 3]]
+            #animTypeList = [1, 1, 0]
+            #treeList = [[[1], [[1, 2, 3, 4]], [[]]], [[1, 1], [[1, 2, 3, 4], []], [[], []]], [[2, 1], [[1, 2], [4, 5], [3]], [[], [], [0, 1]]]]
+            #operands = [[0, 0, 0], [0, 1, 0], [0, 0, 0], [5, 3, 3]]
+            self.backend.insertKeyIntoTree(5)
+            animationList = self.backend.animationList
+            treeList = self.backend.treeList
+            operands = self.backend.operands
+        elif self.temp == 6:
+            #animTypeList = [1, 1, 0]
+            #treeList = [[[1], [[1, 2, 3, 4]], [[]]], [[1, 1], [[1, 2, 3, 4], []], [[], []]], [[2, 1], [[1, 2], [4, 5], [3]], [[], [], [0, 1]]]]
+            #operands = [[0, 0, 0], [0, 1, 0], [0, 0, 0], [5, 3, 3]]
+            self.backend.insertKeyIntoTree(6)
+            animationList = self.backend.animationList
+            treeList = self.backend.treeList
+            operands = self.backend.operands
+        elif self.temp == 7:
+            #animTypeList = [1, 1, 0]
+            #treeList = [[[1], [[1, 2, 3, 4]], [[]]], [[1, 1], [[1, 2, 3, 4], []], [[], []]], [[2, 1], [[1, 2], [4, 5], [3]], [[], [], [0, 1]]]]
+            #operands = [[0, 0, 0], [0, 1, 0], [0, 0, 0], [5, 3, 3]]
+            self.backend.insertKeyIntoTree(7)
+            animationList = self.backend.animationList
+            treeList = self.backend.treeList
+            operands = self.backend.operands
         else:
-            animTypeList = [0]
-            treeList = [[[2, 1], [[1, 2], [4, 5], [3]], [[], [], [0, 1]]]]
+            animationList = [0]
+            treeList = [[[1], [[]], [[], [], []]]]
             operands = []
-        self.currentAnimation = ani.Animation(animTypeList, treeList, operands)
+
+        print(animationList)
+        print(treeList)
+        print(operands)
+        self.currentAnimation = ani.Animation(animationList, treeList, operands)
 
     def insert65_button_clicked(self):
         # self.currentAnimation = self.backendObj.insert(17)
