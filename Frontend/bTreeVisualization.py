@@ -28,6 +28,7 @@ import time
 import numpy as np
 import math
 import tkinter as Tk
+from tkinter import ttk
 import igraph as ig
 import itertools as it
 import matplotlib.pyplot as plt
@@ -251,8 +252,17 @@ class BTreeVisualization:
         self.root.columnconfigure(0, weight=1)
         self.root.rowconfigure(9, weight=1)
 
+        # Create a frame inside the canvas to hold the content
+        #frame = ttk.Frame(self.canvas)
+        #self.canvas.create_window(0, 0, anchor='nw', window=frame)
+
+        # Create a scrollbar
+        scrollbar = ttk.Scrollbar(self.root, orient=Tk.VERTICAL, command=self.canvas.get_tk_widget().yview)
+        scrollbar.grid(row=9, column=1, sticky="ns")
+        self.canvas.get_tk_widget().configure(yscrollcommand=scrollbar.set)
+
+        self.root.bind("<Configure>", self.update_scroll_region)
         # Bind the resize event to the tkinter window
-        self.root.bind('<Configure>', self.on_resize)
 
     def insert17_button_clicked(self):
         # self.currentAnimation = self.backendObj.insert(17)
@@ -344,15 +354,21 @@ class BTreeVisualization:
         operands = [[1, 5, 0], [5, 0, 0], [0, 0, 0], [4, 3, 3]]
         self.currentAnimation = ani.Animation(animTypeList, treeList, operands)
 
-    # define a function to handle the resize event
-    def on_resize(self, event):
-        # Resize the Matplotlib figure to match the tkinter canvas size
-        # get current width
-        width = event.width
-        # get current height
-        height = 0.7 * event.height
-        self.canvas.figure.set_size_inches(width/100, height/100)
-        self.canvas.draw()
+    def get_row_height(self, widget, row):
+        # Get the number of rows and columns in the grid
+        num_rows = widget.grid_size()[1]
+        # Check if the specified row is within the valid range
+        if row >= num_rows:
+            raise IndexError("Row index out of range")
+        # Get the bounding box information of the specified row
+        bbox = widget.grid_bbox(row, 0)
+        # Calculate the height of the row
+        height = bbox[3] - bbox[1]
+        return height
+
+    # Update the scrollable region when the canvas size changes
+    def update_scroll_region(self, event):
+        self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 
     # resets all values of the graph in order to print it again in a different form
     def updateGraph(self):
