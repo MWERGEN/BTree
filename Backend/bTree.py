@@ -300,6 +300,8 @@ class BTree:
                         self.getKeysPerLevel()
                         keysPerLevelBeforeInsert = self.keysPerLevel[:]
                         self.keysPerLevelCopies.append([list(l) for l in keysPerLevelBeforeInsert])
+                        self.visitiedNodes[0].append(0)
+                        self.visitiedNodes[1].append(0)
                 else:
                     # make space for one more key
                     node.keys.append(None)
@@ -313,6 +315,7 @@ class BTree:
                             i -= 1
                         # insert key to correct place
                         node.keys[i + 1] = key
+                        self.usedReferences.append(i + 1)
                         if fromSplit:
                             source = node.children[0].id
                             target = node.id 
