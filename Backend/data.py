@@ -24,6 +24,7 @@ class Backend:
         self.references = []
         self.usedKeys =[]
         self.treeList = []
+        self.operands = []
 
     def insertKeyIntoTree(self, key):
         # reset all parameters of backend object
@@ -37,6 +38,7 @@ class Backend:
         self.treeNodesPerLevel = []
         self.references = []
         self.treeList = []
+        self.operands = []
         # call function which inserts key into tree
         self.btree.insertKey(key)
         # prepare nodes per level list for frontend
@@ -68,6 +70,9 @@ class Backend:
             temp.append(self.edgeLists[i])
             self.treeList.append(temp)
             print('test')
+        self.operands = self.sourceDestination
+        self.operands.append(self.references)
+        self.operands.append(self.usedKeys)
 
 
 
