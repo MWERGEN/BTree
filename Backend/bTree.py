@@ -293,7 +293,7 @@ class BTree:
                             i -= 1
                         # insert key to correct place
                         node.keys[i + 1] = key
-                        source.append(source[0])
+                        #source.append(source[0])
                         target.append(node.id)
                     # animation for comparing 
                     self.animationList.append(1)
@@ -489,16 +489,12 @@ class BTree:
         queue.append(node)
         while(len(queue) > 0):
             currNode = queue.pop(0)
-            # also add leafes to edge list
-            if currNode.leaf:
-                edgeList.append(res.copy())
             # Enqueue children
             for child in currNode.children:
-                res.append(node.id)
                 res.append(child.id)
-                edgeList.append(res.copy())
-                res = []
                 queue.append(child)
+            edgeList.append(res.copy())
+            res = []
         # frontend needs the edge list is in reverse level order, so just reverse the list
         edgeList.reverse()
         edgeListCopy = edgeList[:]
