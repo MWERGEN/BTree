@@ -299,7 +299,7 @@ class BTreeVisualization:
             #animTypeList = [1, 0]
             #treeList = [[[1], [[1]], [[]]], [[1], [[1, 2]], [[]]]]
             #operands = [[0, 0], [0, 0], [0, 0], [2, 2]]
-            self.backend.insertKeyIntoTree(2)
+            self.backend.insertKeyIntoTree(9999)
             animationList = self.backend.animationList
             treeList = self.backend.treeList
             operands = self.backend.operands
@@ -414,7 +414,7 @@ class BTreeVisualization:
 
     # Update the scrollable region when the canvas size changes
     def update_scroll_region(self, event):
-        self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+        self.canvas.get_tk_widget().configure(scrollregion=self.canvas.get_tk_widget().bbox("all"))
 
     # resets all values of the graph in order to print it again in a different form
     def updateGraph(self):
@@ -1050,6 +1050,9 @@ class BTreeVisualization:
         bbox = self.ax.get_window_extent().transformed(self.fig.dpi_scale_trans.inverted())
         # get the width and height of the subplot in pixels
         width, height = bbox.width, bbox.height
+        if len(self.nodesList) == 1:
+            height *= 5
+            width *= 5
         # Remove plot elements from the previous frame
         self.ax.clear()
         # background color for subplot area
@@ -1116,7 +1119,7 @@ class BTreeVisualization:
             vertex_color = self.colorKeyList,
             # formula for dynamically resizing the labels, so they are perfectly fitting into the node
             # width and height depend on the axes of the graph
-            vertex_label_size = 0.92 * math.sqrt(width) * math.sqrt(height),
+            vertex_label_size = 0.98 * math.sqrt(width) * math.sqrt(height),
             # append style
             **self.visual_style, 
         )

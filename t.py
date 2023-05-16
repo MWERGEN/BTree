@@ -1,34 +1,32 @@
-import tkinter as tk
-from tkinter import ttk
+import igraph as ig
+import matplotlib.pyplot as plt
 
-# Create a tkinter window
-window = tk.Tk()
+# Create an iGraph graph
+graph = ig.Graph.Famous("petersen")
 
-# Create a canvas
-canvas = tk.Canvas(window)
-canvas.grid(row=0, column=0, sticky="nsew")
+# Create a Matplotlib figure and axis
+fig, ax = plt.subplots()
 
-# Create a frame inside the canvas to hold the content
-frame = ttk.Frame(canvas)
-canvas.create_window(0, 0, anchor='nw', window=frame)
+# Plot the iGraph graph within the Matplotlib axis
+layout = graph.layout("kk")
+ig.plot(graph, target=ax, layout=layout, bbox=(0, 0, 1, 1), margin=20)
 
-# Create a scrollbar
-scrollbar = ttk.Scrollbar(window, orient=tk.VERTICAL, command=canvas.yview)
-scrollbar.grid(row=0, column=1, sticky="ns")
-canvas.configure(yscrollcommand=scrollbar.set)
+# Retrieve the positions of the nodes within the Matplotlib plot
+positions = ax.collections[0].get_offsets()
 
-# Configure grid weights to allow resizing
-window.grid_rowconfigure(0, weight=1)
-window.grid_columnconfigure(0, weight=1)
+# Iterate over each node and its position
+for i, pos in enumerate(positions):
+    x, y = pos
 
-# Update the scrollable region when the canvas size changes
-def update_scroll_region(event):
-    canvas.configure(scrollregion=canvas.bbox("all"))
+    # Retrieve the label of the current node
+    label = graph.vs[i]["name"]
 
-canvas.bind("<Configure>", update_scroll_region)
+    # Adjust the position and size of the label to fit within the node
+    ax.text(x, y, label, ha="center", va="center", fontsize=8, color="white")
 
-# Add your content to the frame
-# ...
+# Set the aspect ratio and remove the axes
+ax.set_aspect("equal")
+ax.axis("off")
 
-# Start the tkinter event loop
-window.mainloop()
+# Show the plot
+plt.show()
