@@ -299,7 +299,7 @@ class BTreeVisualization:
             #animTypeList = [1, 0]
             #treeList = [[[1], [[1]], [[]]], [[1], [[1, 2]], [[]]]]
             #operands = [[0, 0], [0, 0], [0, 0], [2, 2]]
-            self.backend.insertKeyIntoTree(9999)
+            self.backend.insertKeyIntoTree(2)
             animationList = self.backend.animationList
             treeList = self.backend.treeList
             operands = self.backend.operands
@@ -343,6 +343,10 @@ class BTreeVisualization:
             animationList = self.backend.animationList
             treeList = self.backend.treeList
             operands = self.backend.operands
+        elif self.temp == 8:
+            animationList = [1, 1, 1, 0]
+            treeList = [[[2, 1], [[1, 2], [4, 5, 6, 7], [3]], [[], [], [0, 1]]], [[2, 1], [[1, 2], [4, 5, 6, 7], [3]], [[], [], [0, 1]]], [[2, 1], [[1, 2], [4, 5, 7, 8], [3]], [[], [], [0, 1]]], [[3, 1], [[1, 2], [4, 5], [7, 8], [3, 6]], [[], [], [], [0, 1, 2]]]]
+            operands = [[2, 2, 1, 2], [2, 1, 2, 2], [0, 1, 4, 1], [8, 8, 6, 6]]
         else:
             animationList = [0]
             treeList = [[[1], [[]], [[], [], []]]]
