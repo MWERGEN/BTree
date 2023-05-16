@@ -123,6 +123,9 @@ class BTree:
                 self.setEdgeList(self.rootNode)
                 edgeListBeforeSplit = self.edgeList[:]
                 self.edgeListCopies.append([list(l) for l in edgeListBeforeSplit])
+                # num of nodes list copy
+                nodePerLevelAfterSplit = self.countNodesPerLevel()
+                self.numOfNodesPerLevelCopies.append(nodePerLevelAfterSplit)
             else:
                 # root has children where key can be inserted
                 i = len(root.keys) - 1
@@ -147,6 +150,7 @@ class BTree:
             # key is inserted so animation is over -> 0
             self.animationList.append(0)
             self.usedReferences.append(0)
+            
 
 
     # split child node at index i of parent
@@ -171,6 +175,7 @@ class BTree:
             i -= 1
         # insert key to correct place
         splitNode.keys[i + 1] = key
+        self.animationList.append(1)
         middleIndex = int(len(splitNode.keys) / 2)
         # add reference to node which holds all greater keys
         parent.children.insert(index + 1, newNode) 
@@ -293,7 +298,7 @@ class BTree:
                             i -= 1
                         # insert key to correct place
                         node.keys[i + 1] = key
-                        #source.append(source[0])
+                        source.append(source[0])
                         target.append(node.id)
                     # animation for comparing 
                     self.animationList.append(1)
