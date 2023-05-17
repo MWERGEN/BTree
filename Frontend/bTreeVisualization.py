@@ -17,6 +17,8 @@
 #       10.     Marius Wergen on 12.05.23
 #       11.     Marius Wergen on 13.05.23
 #       12.     Marius Wergen on 14.05.23
+#       13.     Marius Wergen on 15.05.23
+#       14.     Marius Wergen on 17.05.23
 #
 ###############################################
 #
@@ -24,85 +26,23 @@
 #       - visualization of the B-tree
 #
 
+# library imports
 import time
-import numpy as np
 import math
-import tkinter as Tk
-from tkinter import ttk
+import numpy as np
 import igraph as ig
+import tkinter as Tk
 import itertools as it
+from tkinter import ttk
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-from matplotlib.backends.backend_tkagg import (
-    FigureCanvasTkAgg, NavigationToolbar2Tk)
 from matplotlib.backend_bases import key_press_handler
+from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
 
-from Frontend import anim as ani
+# local imports
 from Backend import data
+from Frontend import anim as ani
 
-#root = tkinter.Tk()
-#root.wm_title("Embedding in Tk")
-
-# initialize the subplots where the graph will be displayed
-# black background for design
-##fig = plt.Figure()
-##ax = fig.add_subplot(facecolor='black')
-
-##root = Tk.Tk()
-##root.geometry("700x400")
-
-##label = Tk.Label(root,text="B-Tree control elements").grid(column=0, row=0)
-
-##def test_button_clicked():
-##    animTypeList = [1, 1, 1, 1, 0]
-##    treeList = [[[5, 1], [[1, 2], [4, 5, 6], [8, 10, 15, 20], [40, 50, 60, 700], [100, 200, 420], [3, 7, 30, 80]], [[], [], [], [], [], [0, 1, 2, 3, 4]]], [[5, 1], [[1, 2], [4, 5, 6], [8, 10, 15, 20], [40, 50, 60, 700], [100, 200, 420], [3, 7, 30, 80]], [[], [], [], [], [], [0, 1, 2, 3, 4]]], [[5, 1], [[1, 2], [4, 5, 6], [8, 10, 17, 20], [40, 50, 60, 700], [100, 200, 420], [3, 7, 30, 80]], [[], [], [], [], [], [0, 1, 2, 3, 4]]], [[5, 1, 1], [[1, 2], [4, 5, 6], [8, 10, 17, 20], [40, 50, 60, 700], [100, 200, 420], [3, 7, 30, 80], []], [[], [], [], [], [], [0, 1, 2, 3, 4], []]], [[6, 2, 1], [[1, 2], [4, 5, 6], [8, 10], [17, 20], [40, 50, 60, 70], [100, 200, 420], [3, 7], [30, 80], [15]], [[], [], [], [], [], [], [0, 1, 2], [3, 4, 5], [6, 7]]]]
-##    operands = [[5, 5, 2, 5, 6], [5, 2, 5, 6, 6], [0, 2, 3, 2, 0], [17, 17, 15, 15, 15]]
-
-##button = Tk.Button(root, text='test', command=test_button_clicked)
-##button.grid(column=0, row=1)
-
-##label = Tk.Label(root,text="B-Tree visualization").grid(column=0, row=2)
-
-##canvas = FigureCanvasTkAgg(fig, master=root)
-##canvas.get_tk_widget().grid(column=0,row=3, sticky='nsew')
-##root.columnconfigure(0, weight=1)
-##root.rowconfigure(3, weight=1)
-
-# Define a function to handle the resize event
-##def on_resize(event):
-##    """Resize the Matplotlib figure to match the tkinter canvas size"""
-##    width = event.width
-##    height = event.height
-##    canvas.figure.set_size_inches(width/100, height/100)
-##    canvas.draw()
-
-# Bind the resize event to the tkinter window
-##root.bind('<Configure>', on_resize)
-
-# configuration for subplot area in matplotlib-window:
-#   -   left, bottom, right, top define where the edge of the subplot area is on the matplotlib-window
-#           -> by this configuration, the graph is positioned on the border of the window
-#           -> depending on its width to height ratio, the part of the window where no graph is plotted is drawn white
-#              whereas the part of the window where the graph is plotted has a gray background
-#   -   wspace, hspace define the space between multiple subplots
-#           -> we just have one subplot so these values are irrelevant  
-##fig.subplots_adjust(left=0, bottom=0, right=1, top=1, wspace=0, hspace=0)
-
-#canvas = FigureCanvasTkAgg(fig, master=root)
-#canvas.draw()
-
-#toolbar = NavigationToolbar2Tk(canvas, root, pack_toolbar=False)
-#toolbar.update()
-
-#canvas.mpl_connect(
-#    "key_press_event", lambda event: print(f"you pressed {event.key}"))
-#canvas.mpl_connect("key_press_event", key_press_handler)
-
-# button = tkinter.Button(master=root, text="Quit", command=root.quit)
-# button.pack(side=tkinter.BOTTOM)
-
-# toolbar.pack(side=tkinter.BOTTOM, fill=tkinter.X)
-#canvas.get_tk_widget().pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=1)
 
 class BTreeVisualization:
 
