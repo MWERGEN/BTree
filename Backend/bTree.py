@@ -296,6 +296,7 @@ class BTree:
                     node.keys.append(key)
                     self.animationList.append(1)
                     self.usedKeys.append(key)
+                    self.usedReferences.append(0)
                     # get the current keys per level of the tree
                     nodePerLevelBefore = self.countNodesPerLevel()
                     self.numOfNodesPerLevelCopies.append(nodePerLevelBefore)
