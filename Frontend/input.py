@@ -28,7 +28,7 @@ class Input:
         self.window.columnconfigure(0, weight=1)
         self.window.columnconfigure(2, weight=1)
         self.window.rowconfigure(0, weight=1)
-        self.window.rowconfigure(1, weight=6)
+        self.window.rowconfigure(1, weight=1)
         self.window.rowconfigure(2, weight=1)
         
         # mode selection
@@ -93,8 +93,8 @@ class Input:
         
         
         # reset button
-        self.reset_button_frame = tk.Frame(master=self.window, bg="red")
-        self.reset_button_frame.grid(column=0, row=1, columnspan=2, sticky="SE")
+        self.reset_button_frame = tk.Frame(master=self.window)
+        self.reset_button_frame.grid(column=0, row=3, columnspan=3, sticky="SE")
         #self.reset_button_frame.columnconfigure(0, weight=1)
         reset_button = tk.Button(self.reset_button_frame, text="Reset", command=self.update_settings, bg="red")
         reset_button.grid(column=0, row=4)
@@ -105,11 +105,14 @@ class Input:
         ##################
         ##################
         # insert matplotlib here
-        # should be row=2 and column=0 of self.window
+        # should be row=1 and column=0 of self.window
 
+        # frame for matplot content
+        self.matplot_frame = tk.Frame(master=self.window)
+        self.matplot_frame.grid(column=0, row=1, columnspan=3)
         # create a scale widget for selecting the number
-        self.scale = tk.Scale(self.window, from_=1, to=10, orient=tk.HORIZONTAL)
-        self.scale.grid(column=0, row=2)
+        self.scale = tk.Scale(self.matplot_frame, from_=1, to=10, orient=tk.HORIZONTAL)
+        self.scale.grid(column=0, row=0)
 
         animTypeList = [0]
         treeList = [[[1], [[]], [[]]]]
@@ -119,21 +122,21 @@ class Input:
         self.Graph = bt.BTreeVisualization(2, 0.2, 0.03, 0.1, animation)
         #self.Graph.initializeTK()
 
-        self.canvas = FigureCanvasTkAgg(self.Graph.fig, master=self.window)
-        self.window.counter = 0
-        self.window.after(10, self.countNext10Milliseconds)
+        self.canvas = FigureCanvasTkAgg(self.Graph.fig, master=self.matplot_frame)
+        self.matplot_frame.counter = 0
+        self.matplot_frame.after(10, self.countNext10Milliseconds)
         self.canvas.draw()
 
-        self.canvas.get_tk_widget().grid(column=0,row=3, sticky='nsew')
-        self.window.columnconfigure(0, weight=1)
-        self.window.rowconfigure(3, weight=1)
+        self.canvas.get_tk_widget().grid(column=0, row=1, sticky='WE')
+        self.matplot_frame.columnconfigure(0, weight=1)
+        self.matplot_frame.rowconfigure(3, weight=1)
 
         # Create a scrollbar
-        scrollbar = ttk.Scrollbar(self.window, orient=tk.VERTICAL, command=self.canvas.get_tk_widget().yview)
+        scrollbar = ttk.Scrollbar(self.matplot_frame, orient=tk.VERTICAL, command=self.canvas.get_tk_widget().yview)
         scrollbar.grid(row=3, column=1, sticky="ns")
         self.canvas.get_tk_widget().configure(yscrollcommand=scrollbar.set)
 
-        self.window.bind("<Configure>", self.update_scroll_region)
+        self.matplot_frame.bind("<Configure>", self.update_scroll_region)
 
         self.canvas.mpl_connect('motion_notify_event', self.on_mouse_motion)
 
@@ -158,16 +161,16 @@ class Input:
         # check if a method in bTreeVisualization has resetted the time counter to zero
         if self.Graph.timeCounter == 0:
             # accept the reset
-            self.window.counter = 0
+            self.matplot_frame.counter = 0
         # increment the counter
-        self.window.counter += 1
+        self.matplot_frame.counter += 1
         # assign counter to bTreeVisualization time counter
-        self.Graph.timeCounter = self.window.counter
+        self.Graph.timeCounter = self.matplot_frame.counter
         # get the selected speed from the user
         # pass it to the bTreeVisualization
         self.Graph.speed = self.scale.get()
         # schedule the next call to my_function in 1 second
-        self.window.after(10, self.countNext10Milliseconds)
+        self.matplot_frame.after(10, self.countNext10Milliseconds)
 
     # recognizes when mouse is over the tree and displays the keys of the node the cursor is currently on
     def on_mouse_motion(self, event):
@@ -185,7 +188,7 @@ class Input:
         # Check if the event occurred on the axis = the graph
         if event.inaxes is self.Graph.ax:
             # Iterate over all tk-widgets in the row for the hover-label
-            for widget in self.window.grid_slaves(row=4):
+            for widget in self.matplot_frame.grid_slaves(row=4):
                 # remove the old label to create a new one later on
                 widget.grid_remove()
             # save x position on the graph's axis of the mouse cursor
@@ -209,7 +212,7 @@ class Input:
                 # advice for user
                 nodeOnHover = "Hover over a node to display its keys!"
             # display the label with the advice or the keys in the hovered node
-            labelHover = tk.Label(self.window,text=nodeOnHover).grid(column=0, row=4)
+            labelHover = tk.Label(self.matplot_frame,text=nodeOnHover).grid(column=0, row=4)
     
     def get_row_height(self, widget, row):
         # Get the number of rows and columns in the grid
