@@ -84,7 +84,9 @@ class Backend:
         self.sourceDestination = []
         self.btree.keysPerLevel = []
         self.btree.nodeIds = []
+        self.animationList = []
         self.btree.animationList = []
+        self.btree.searchedNodes = []
         self.edgeLists = []
         self.treeNodesPerLevel = []
         self.references = []
@@ -93,13 +95,19 @@ class Backend:
         self.searchedNodes = []
         # var to check if key is found
         keyFound = False
+        self.animationList.append(2)
+        self.animationList.append(0)
         # call function which searchs key
         if not self.btree.searchKey(key,self.btree.rootNode) == None:
             keyFound = True
+        self.searchedNodes = self.btree.searchedNodes
         self.operands.append(key)
         self.operands.append(self.searchedNodes)
         self.operands.append(keyFound)
-        print('test')
+        # search needs two tree lists so the animations works right
+        list = self.btree.getTreeListForSearch()
+        self.treeList.append(list)
+        self.treeList.append(list)
 
 
 
@@ -111,7 +119,7 @@ testData.insertKeyIntoTree(2)
 testData.insertKeyIntoTree(3)
 testData.insertKeyIntoTree(4)
 testData.insertKeyIntoTree(5)
-testData.searchKeyInTree(3)
+testData.searchKeyInTree(1)
 testData.insertKeyIntoTree(6)
 testData.insertKeyIntoTree(7)
 testData.insertKeyIntoTree(8)
