@@ -224,7 +224,7 @@ class BTreeVisualization:
         self.root.after(10, self.countNext10Milliseconds)
         #self.root.geometry("700x400")
 
-        label = Tk.Label(self.root,text="B-Tree control elements").grid(column=0, row=0)
+        label1 = Tk.Label(self.root,text="B-Tree control elements").grid(column=0, row=0)
 
         button0 = Tk.Button(self.root, text='insert 1 2 3 4 5', command=self.insert12345_button_clicked)
         button0.grid(column=0, row=1)
@@ -248,7 +248,7 @@ class BTreeVisualization:
         self.scale = Tk.Scale(self.root, from_=1, to=10, orient=Tk.HORIZONTAL)
         self.scale.grid(column=0, row=7)
 
-        label = Tk.Label(self.root,text="B-Tree visualization").grid(column=0, row=8)
+        label2 = Tk.Label(self.root,text="B-Tree visualization").grid(column=0, row=8)
         
         self.canvas.get_tk_widget().grid(column=0,row=9, sticky='nsew')
         self.root.columnconfigure(0, weight=1)
@@ -264,7 +264,52 @@ class BTreeVisualization:
         self.canvas.get_tk_widget().configure(yscrollcommand=scrollbar.set)
 
         self.root.bind("<Configure>", self.update_scroll_region)
+        #self.canvas.get_tk_widget().bind('<Motion>', self.motion)
+        # Bind the <Motion> event to the canvas and associate it with the on_mouse_motion function
+        self.canvas.mpl_connect('motion_notify_event', self.on_mouse_motion)
         # Bind the resize event to the tkinter window
+
+    # recognizes when mouse is over the tree and displays the keys of the node the cursor is currently on
+    def on_mouse_motion(self, event):
+        # flag for checking if the cursor is on a key   = True
+        #                                       or not  = False
+        flagOnNode = False
+        # index to remember the index of the node that is currently observed
+        index = 0
+        # self.xGNodes saves the center x position of the node 
+        # now we have to pre-calculate the distance from the center of the node to its outer rim
+        xDistCentreToEdge = self.k * (self.refWidth + self.keyWidth) + 0.5 * self.refWidth
+        # self.yGNodes saves the center y position of the node 
+        # now we have to pre-calculate the distance from the center of the node to edge above / underneath
+        yDistCentreToEdge = 2 * self.refWidth
+        # Check if the event occurred on the axis = the graph
+        if event.inaxes is self.ax:
+            # Iterate over all tk-widgets in the row for the hover-label
+            for widget in self.root.grid_slaves(row=10):
+                # remove the old label to create a new one later on
+                widget.grid_remove()
+            # save x position on the graph's axis of the mouse cursor
+            x = event.xdata
+            # save y position on the graph's axis of the mouse cursor
+            y = event.ydata
+            # iterate over all nodes
+            for i in self.keysList:
+                # check if the cursor is in the x-range of the current observed node
+                if x <= self.xGNodes[index] + xDistCentreToEdge and x >= self.xGNodes[index] - xDistCentreToEdge:
+                    # check if the cursor is in the y-range of the current observed node
+                    if y <= self.yGNodes[index] + yDistCentreToEdge and y >= self.yGNodes[index] - yDistCentreToEdge:
+                        # cursor is on a node
+                        flagOnNode = True
+                        # save the array of the keys ( = i ) of the node the cursor is on
+                        nodeOnHover = str(i)
+                # raise index in order to check the other nodes
+                index += 1
+            # if the cursor is not on any node
+            if not flagOnNode:
+                # advice for user
+                nodeOnHover = "Hover over a node to display its keys!"
+            # display the label with the advice or the keys in the hovered node
+            labelHover = Tk.Label(self.root,text=nodeOnHover).grid(column=0, row=10)
 
     def insert17_button_clicked(self):
         # self.currentAnimation = self.backendObj.insert(17)
@@ -299,7 +344,7 @@ class BTreeVisualization:
             #animTypeList = [1, 0]
             #treeList = [[[1], [[1]], [[]]], [[1], [[1, 2]], [[]]]]
             #operands = [[0, 0], [0, 0], [0, 0], [2, 2]]
-            self.backend.insertKeyIntoTree(2)
+            self.backend.insertKeyIntoTree(9999)
             animationList = self.backend.animationList
             treeList = self.backend.treeList
             operands = self.backend.operands
@@ -352,9 +397,9 @@ class BTreeVisualization:
             treeList = [[[1], [[]], [[], [], []]]]
             operands = []
 
-        print(animationList)
-        print(treeList)
-        print(operands)
+        #print(animationList)
+        #print(treeList)
+        #print(operands)
         self.currentAnimation = ani.Animation(animationList, treeList, operands)
 
     def insert65_button_clicked(self):
@@ -414,7 +459,7 @@ class BTreeVisualization:
 
     # Update the scrollable region when the canvas size changes
     def update_scroll_region(self, event):
-        self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+        self.canvas.get_tk_widget().configure(scrollregion=self.canvas.get_tk_widget().bbox("all"))
 
     # resets all values of the graph in order to print it again in a different form
     def updateGraph(self):
@@ -1050,6 +1095,9 @@ class BTreeVisualization:
         bbox = self.ax.get_window_extent().transformed(self.fig.dpi_scale_trans.inverted())
         # get the width and height of the subplot in pixels
         width, height = bbox.width, bbox.height
+        if len(self.nodesList) == 1:
+            height *= 5
+            width *= 5
         # Remove plot elements from the previous frame
         self.ax.clear()
         # background color for subplot area
@@ -1116,7 +1164,7 @@ class BTreeVisualization:
             vertex_color = self.colorKeyList,
             # formula for dynamically resizing the labels, so they are perfectly fitting into the node
             # width and height depend on the axes of the graph
-            vertex_label_size = 0.92 * math.sqrt(width) * math.sqrt(height),
+            vertex_label_size = 0.98 * math.sqrt(width) * math.sqrt(height),
             # append style
             **self.visual_style, 
         )
