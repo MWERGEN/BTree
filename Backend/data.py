@@ -26,6 +26,7 @@ class Backend:
         self.usedKeys =[]
         self.treeList = []
         self.operands = []
+        self.searchedNodes = []
 
     def insertKeyIntoTree(self, key):
         # reset all parameters of backend object
@@ -76,6 +77,31 @@ class Backend:
         self.operands.append(self.usedKeys)
 
 
+    def searchKeyInTree(self, key):
+        # reset all parameters of backend object
+        self.treeNodesPerLevel = []
+        self.treeKeysPerLevel = []
+        self.sourceDestination = []
+        self.btree.keysPerLevel = []
+        self.btree.nodeIds = []
+        self.btree.animationList = []
+        self.edgeLists = []
+        self.treeNodesPerLevel = []
+        self.references = []
+        self.treeList = []
+        self.operands = []
+        self.searchedNodes = []
+        # var to check if key is found
+        keyFound = False
+        # call function which searchs key
+        if not self.btree.searchKey(key,self.btree.rootNode) == None:
+            keyFound = True
+        self.operands.append(key)
+        self.operands.append(self.searchedNodes)
+        self.operands.append(keyFound)
+        print('test')
+
+
 
 
 
@@ -85,6 +111,7 @@ testData.insertKeyIntoTree(2)
 testData.insertKeyIntoTree(3)
 testData.insertKeyIntoTree(4)
 testData.insertKeyIntoTree(5)
+testData.searchKeyInTree(3)
 testData.insertKeyIntoTree(6)
 testData.insertKeyIntoTree(7)
 testData.insertKeyIntoTree(8)
