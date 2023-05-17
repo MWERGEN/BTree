@@ -96,6 +96,7 @@ class BTree:
         self.numOfNodesPerLevelCopies.append(nodePerLevelBefore)
         # used key is inserted key
         self.usedKeys.append(key)
+        self.usedReferences.append(0)
         #case 1
         # node can hold 2 * order keys
         if len(root.keys) == 2 * self.k:
@@ -157,7 +158,6 @@ class BTree:
             self.insertNotFull(root,key, source, target,False) 
             # key is inserted so animation is over -> 0
             self.animationList.append(0)
-            self.usedReferences.append(0)
             
 
 
@@ -188,6 +188,7 @@ class BTree:
             i -= 1
         # insert key to correct place
         splitNode.keys[i + 1] = key
+        self.usedReferences.append(i+1)
         self.animationList.append(1)
         middleIndex = int(len(splitNode.keys) / 2)
         # used key is inserted key
@@ -311,7 +312,6 @@ class BTree:
                         self.visitiedNodes[0].append(0)
                         self.visitiedNodes[1].append(0)
                 else:
-                    self.usedReferences.append(0)
                     # make space for one more key
                     node.keys.append(None)
                     if i == 0 and node.keys[0] == None:
@@ -324,6 +324,7 @@ class BTree:
                             i -= 1
                         # insert key to correct place
                         node.keys[i + 1] = key
+                        self.usedReferences.append(i + 1)
                         if fromSplit:
                             self.visitiedNodes[0].append(source)
                             self.visitiedNodes[1].append(target)
