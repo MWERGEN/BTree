@@ -13,11 +13,7 @@
 #   File description:
 #       - user data from the GUI
 #
-<<<<<<< HEAD
-from bTree import BTree
-=======
 from Backend import bTree
->>>>>>> f59c2bb (more fixes)
 
 class Backend:
     def __init__(self, k):
@@ -116,26 +112,6 @@ class Backend:
         self.treeList = temp
         print('test')
 
-
-
-
-
-<<<<<<< HEAD
-testData = Backend(2)
-testData.insertKeyIntoTree(1)
-testData.insertKeyIntoTree(2)
-testData.insertKeyIntoTree(3)
-testData.insertKeyIntoTree(4)
-testData.insertKeyIntoTree(5)
-testData.searchKeyInTree(1)
-testData.insertKeyIntoTree(6)
-testData.insertKeyIntoTree(7)
-testData.insertKeyIntoTree(8)
-testData.insertKeyIntoTree(18)
-testData.insertKeyIntoTree(24)
-testData.btree.setEdgeList(testData.btree.rootNode)
-print(testData)
-=======
 #testData = Backend(2)
 #testData.insertKeyIntoTree(3)
 #testData.insertKeyIntoTree(4)
@@ -149,4 +125,3 @@ print(testData)
 #testData.insertKeyIntoTree(24)
 #testData.btree.setEdgeList(testData.btree.rootNode)
 #print(testData)
->>>>>>> f59c2bb (more fixes)
