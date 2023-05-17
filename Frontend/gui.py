@@ -15,14 +15,14 @@
 #       - gui file
 #
 
-from Frontend import bTreeVisualization as bt
+#from Frontend import bTreeVisualization as bt
 
-from Frontend import anim as ani
+#from Frontend import anim as ani
 
-class Gui:
+#class Gui:
     
     # function for testing draw-behaviour of graph
-    def drawGraph(self):
+    #def drawGraph(self):
             
             #animTypeList = [1, 1, 0]
             #treeList = [[[6, 3, 1], [[1, 2], [7, 8, 9], [7, 8, 11], [33, 40], [50, 69, 70], [500], [4, 6, 12, 24, 30, 40], [41], [9999], [20, 25]], [[], [], [], [], [], [], [0, 1, 2], [3, 4], [5], [6, 7, 8]]], [[6, 3, 1], [[1, 2], [7, 8, 9], [7, 8, 11], [33, 40], [50, 69, 70], [500], [4, 6, 12, 24, 30, 40], [41], [9999], [20, 25]], [[], [], [], [], [], [], [0, 1, 2], [3, 4], [5], [6, 7, 8]]], [[6, 3, 1], [[1, 2], [7, 8, 9], [7, 8, 11], [33, 40], [50, 69, 70], [500], [4, 6, 12, 24, 30, 40], [41], [9999], [10, 20, 25]], [[], [], [], [], [], [], [0, 1, 2], [3, 4], [5], [6, 7, 8]]]]
@@ -39,10 +39,10 @@ class Gui:
             ####
             # no. 2
             # input when leaf and root full
-            animTypeList = [0]
+            #animTypeList = [0]
             #treeList = [[[5, 1], [[1, 2], [4, 5, 6], [8, 10, 15, 20], [40, 50, 60, 700], [100, 200, 420], [3, 7, 30, 80]], [[], [], [], [], [], [0, 1, 2, 3, 4]]]]
-            treeList = [[[1], [[]], [[]]]]
-            operands = []
+            #treeList = [[[1], [[]], [[]]]]
+            #operands = []
             #animTypeList = [1, 1, 1, 1, 0]
             #treeList = [[[5, 1], [[1, 2], [4, 5, 6], [8, 10, 15, 20], [40, 50, 60, 700], [100, 200, 420], [3, 7, 30, 80]], [[], [], [], [], [], [0, 1, 2, 3, 4]]], [[5, 1], [[1, 2], [4, 5, 6], [8, 10, 15, 20], [40, 50, 60, 700], [100, 200, 420], [3, 7, 30, 80]], [[], [], [], [], [], [0, 1, 2, 3, 4]]], [[5, 1], [[1, 2], [4, 5, 6], [8, 10, 17, 20], [40, 50, 60, 700], [100, 200, 420], [3, 7, 30, 80]], [[], [], [], [], [], [0, 1, 2, 3, 4]]], [[5, 1, 1], [[1, 2], [4, 5, 6], [8, 10, 17, 20], [40, 50, 60, 700], [100, 200, 420], [3, 7, 30, 80], []], [[], [], [], [], [], [0, 1, 2, 3, 4], []]], [[6, 2, 1], [[1, 2], [4, 5, 6], [8, 10], [17, 20], [40, 50, 60, 70], [100, 200, 420], [3, 7], [30, 80], [15]], [[], [], [], [], [], [], [0, 1, 2], [3, 4, 5], [6, 7]]]]
             #operands = [[5, 5, 2, 5, 6], [5, 2, 5, 6, 6], [0, 2, 3, 2, 0], [17, 17, 15, 15, 15]]
@@ -59,7 +59,7 @@ class Gui:
             #treeList = [[[5, 1], [[1, 2], [4, 5, 6], [9, 10, 15, 20], [40, 50, 60, 700], [100, 200, 420], [3, 8, 30, 80]], [[], [], [], [], [], [0, 1, 2, 3, 4]]], [[5, 1], [[1, 2], [4, 5, 6], [9, 10, 15, 20], [40, 50, 60, 700], [100, 200, 420], [3, 8, 30, 80]], [[], [], [], [], [], [0, 1, 2, 3, 4]]]]
             #operands = [5, [5, 1], True]
             # animation = move key with label 10 from root one node to the left down
-            animation = ani.Animation(animTypeList, treeList, operands)
+            #animation = ani.Animation(animTypeList, treeList, operands)
             #animation = ani.Animation(0, [[6, 3, 1], [[1, 2], [7, 8, 9], [15], [33, 40], [50, 69, 70], [9999], [4, 12], [41], [75, 76], [20]], [[], [], [], [], [], [], [0, 1, 2], [3, 4], [5], [6, 7, 8]]], [])
             # btree Visualization object (k = 3, key-width = 0.06, ref-width = 0.03, minNodeDistance = 0.1, nodesList[lowest level, ... , root], keysList, animation=moveKey)
             ####
@@ -67,17 +67,17 @@ class Gui:
             #self.GraphNodes = bt.BTreeVisualization(3, 0.2, 0.03, 0.1, animation)
             ####
             # no. 2
-            self.GraphNodes = bt.BTreeVisualization(2, 0.2, 0.03, 0.1, animation)
-            self.GraphNodes.initializeTK()
+            #self.GraphNodes = bt.BTreeVisualization(2, 0.2, 0.03, 0.1, animation)
+            #self.GraphNodes.initializeTK()
             # predefine 4 nodes 
-            self.GraphNodes.calcNodesPositions()
+            #self.GraphNodes.calcNodesPositions()
             # calc where the references will be inside the nodes
-            self.GraphNodes.calcRefPositions()
+            #self.GraphNodes.calcRefPositions()
             # calc where the keys will be inside the nodes
-            self.GraphNodes.calcKeyPositions()
+            #self.GraphNodes.calcKeyPositions()
             # calculate all graphs
-            self.GraphNodes.assertValuesToGraphs()
+            #self.GraphNodes.assertValuesToGraphs()
             # calculate the edges' relationships
-            self.GraphNodes.calcEdges()
+            #self.GraphNodes.calcEdges()
             # draw all graphs
-            self.GraphNodes.runAnimation()
+            #self.GraphNodes.runAnimation()
