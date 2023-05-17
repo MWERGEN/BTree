@@ -110,8 +110,11 @@ class Backend:
         self.operands.append(keyFound)
         # search needs two tree lists so the animations works right
         list = self.btree.getTreeListForSearch()
-        self.treeList.append(list)
-        self.treeList.append(list)
+        temp = []
+        temp.append(list)
+        temp.append(list)
+        self.treeList = temp
+        print('test')
 
 
 
