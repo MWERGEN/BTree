@@ -1,0 +1,6 @@
+\babel@toc {ngerman}{}\relax 
+\contentsline {chapter}{\nonumberline Abkürzungsverzeichnis}{II}{chapter*.2}%
+\contentsline {chapter}{Glossar}{III}{chapter*.4}%
+\contentsline {chapter}{\nonumberline Abbildungsverzeichnis}{IV}{chapter*.5}%
+\contentsline {chapter}{\numberline {1}Uno}{1}{chapter.1}%
+\providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 

@@ -1,0 +1,15 @@
+[0] Config.pm:307> INFO - This is Biber 2.17
+[0] Config.pm:310> INFO - Logfile is 'dokumentation.blg'
+[50] biber-darwin:340> INFO - === So Apr 23, 2023, 12:24:01
+[61] Biber.pm:418> INFO - Reading 'dokumentation.bcf'
+[133] Biber.pm:972> INFO - Found 28 citekeys in bib section 0
+[144] Biber.pm:4383> INFO - Processing section 0
+[152] Biber.pm:4574> INFO - Looking for bibtex file 'bibliographie.bib' for section 0
+[153] bibtex.pm:1713> INFO - LaTeX decoding ...
+[179] bibtex.pm:1518> INFO - Found BibTeX data source 'bibliographie.bib'
+[304] UCollate.pm:68> INFO - Overriding locale 'de_DE' defaults 'normalization = NFD' with 'normalization = prenormalized'
+[304] UCollate.pm:68> INFO - Overriding locale 'de_DE' defaults 'variable = shifted' with 'variable = non-ignorable'
+[304] Biber.pm:4203> INFO - Sorting list 'nty/global//global/global' of type 'entry' with template 'nty' and locale 'de_DE'
+[304] Biber.pm:4209> INFO - No sort tailoring available for locale 'de_DE'
+[328] bbl.pm:654> INFO - Writing 'dokumentation.bbl' with encoding 'UTF-8'
+[338] bbl.pm:757> INFO - Output to dokumentation.bbl
