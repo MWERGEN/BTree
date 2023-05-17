@@ -419,7 +419,7 @@ class BTree:
             return nextNode
         # if keys is not found and node is a leaf -> key is not in the tree
         elif nextNode.leaf: 
-            return 'not in tree'
+            return None
         #go to node in which key maybe is 
         return self.searchKey(key, nextNode.children[i]) 
 
