@@ -48,6 +48,8 @@ class BTree:
         self.usedReferences = []
         # list of used keys for animation
         self.usedKeys = []
+        # list for searching algorithmn, contains all searched node ids
+        self.searchedNodes = []
 
 
 
@@ -411,6 +413,7 @@ class BTree:
     # if not and node has no children -> key is not in the tree
     # if node has children go to child node with current index i
     def searchKey(self, key, nextNode = None):
+        self.searchedNodes.append(nextNode.id)
         i = 0
         # go through node and check at which point key is smaller
         while i < len(nextNode.keys) and key > nextNode.keys[i]: 
@@ -555,4 +558,21 @@ class BTree:
         edgeList.reverse()
         edgeListCopy = edgeList[:]
         self.edgeList = edgeListCopy
+
+    def getTreeListForSearch(self):
+        # create a tree list for searching
+        # tree list is made of nodes per level, keys per level and edges
+        treeList = []
+        numOfNodesPerLevel = self.countNodesPerLevel()
+        self.getKeysPerLevel()
+        keysPerLevel = self.keysPerLevel[:]
+        self.setEdgeList(self.rootNode)
+        edgeList = self.edgeList[:]
+        # temp list for tree list
+        temp = []
+        temp.append(numOfNodesPerLevel)
+        temp.append(keysPerLevel)
+        temp.append(edgeList)
+        treeList.append(temp)
+        return treeList
 
