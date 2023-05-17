@@ -1,54 +1,32 @@
-"""
-===============
-Embedding in Tk
-===============
+import igraph as ig
+import matplotlib.pyplot as plt
 
-"""
+# Create an iGraph graph
+graph = ig.Graph.Famous("petersen")
 
-import tkinter
+# Create a Matplotlib figure and axis
+fig, ax = plt.subplots()
 
-from matplotlib.backends.backend_tkagg import (
-    FigureCanvasTkAgg, NavigationToolbar2Tk)
-# Implement the default Matplotlib key bindings.
-from matplotlib.backend_bases import key_press_handler
-from matplotlib.figure import Figure
+# Plot the iGraph graph within the Matplotlib axis
+layout = graph.layout("kk")
+ig.plot(graph, target=ax, layout=layout, bbox=(0, 0, 1, 1), margin=20)
 
-import numpy as np
+# Retrieve the positions of the nodes within the Matplotlib plot
+positions = ax.collections[0].get_offsets()
 
+# Iterate over each node and its position
+for i, pos in enumerate(positions):
+    x, y = pos
 
-root = tkinter.Tk()
-root.wm_title("Embedding in Tk")
+    # Retrieve the label of the current node
+    label = graph.vs[i]["name"]
 
-fig = Figure(figsize=(5, 4), dpi=100)
-t = np.arange(0, 3, .01)
-fig.add_subplot(111).plot(t, 2 * np.sin(2 * np.pi * t))
+    # Adjust the position and size of the label to fit within the node
+    ax.text(x, y, label, ha="center", va="center", fontsize=8, color="white")
 
-canvas = FigureCanvasTkAgg(fig, master=root)  # A tk.DrawingArea.
-canvas.draw()
-canvas.get_tk_widget().pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=1)
+# Set the aspect ratio and remove the axes
+ax.set_aspect("equal")
+ax.axis("off")
 
-toolbar = NavigationToolbar2Tk(canvas, root)
-toolbar.update()
-canvas.get_tk_widget().pack(side=tkinter.TOP, fill=tkinter.BOTH, expand=1)
-
-
-def on_key_press(event):
-    print("you pressed {}".format(event.key))
-    key_press_handler(event, canvas, toolbar)
-
-
-canvas.mpl_connect("key_press_event", on_key_press)
-
-
-def _quit():
-    root.quit()     # stops mainloop
-    root.destroy()  # this is necessary on Windows to prevent
-                    # Fatal Python Error: PyEval_RestoreThread: NULL tstate
-
-
-button = tkinter.Button(master=root, text="Quit", command=_quit)
-button.pack(side=tkinter.BOTTOM)
-
-tkinter.mainloop()
-# If you put root.destroy() here, it will cause an error if the window is
-# closed with the window manager.
+# Show the plot
+plt.show()
