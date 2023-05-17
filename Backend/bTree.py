@@ -170,10 +170,10 @@ class BTree:
         #target = []
         k = self.k
         self.updateNodeIds(self.rootNode)
-        source = parent.children[0].id
+        source = parent.children[index].id
         target = parent.id 
-        self.visitiedNodes[0].append(source)
-        self.visitiedNodes[1].append(target)
+        #self.visitiedNodes[0].append(source)
+        #self.visitiedNodes[1].append(target)
         # full node
         splitNode = parent.children[index]
         # second node where are all keys which are greater than the middle key will go
@@ -193,11 +193,12 @@ class BTree:
         # used key is inserted key
         self.usedKeys.append(splitNode.keys[middleIndex])
         copyOfSplitKey = splitNode.keys[middleIndex]
-        del splitNode.keys[middleIndex] 
-        # set keys per level list -> has to be copy of list because every key list can be different!
-        self.getKeysPerLevel()
-        keysPerLevelBeforeSplit = self.keysPerLevel[:]
-        self.keysPerLevelCopies.append([list(l) for l in keysPerLevelBeforeSplit])
+        del splitNode.keys[middleIndex]
+        if parent.keys: 
+            # set keys per level list -> has to be copy of list because every key list can be different!
+            self.getKeysPerLevel()
+            keysPerLevelBeforeSplit = self.keysPerLevel[:]
+            self.keysPerLevelCopies.append([list(l) for l in keysPerLevelBeforeSplit])
         # add reference to node which holds all greater keys
         parent.children.insert(index + 1, newNode)
         # fill parent with splitkey -> middle key
@@ -206,6 +207,8 @@ class BTree:
         newNode.keys = splitNode.keys[middleIndex: 2 * k] 
         # take all smaller keys and insert them from 0 to order - 1
         splitNode.keys = splitNode.keys[0: middleIndex] 
+        self.visitiedNodes[0].append(target)
+        self.visitiedNodes[1].append(target)
         if not splitNode.leaf:
             # give newNode with all greater keys all references to all greater children
             newNode.children = splitNode.children[k: 2 * k] 
@@ -322,8 +325,6 @@ class BTree:
                         # insert key to correct place
                         node.keys[i + 1] = key
                         if fromSplit:
-                            source = node.children[0].id
-                            target = node.id 
                             self.visitiedNodes[0].append(source)
                             self.visitiedNodes[1].append(target)
                         else:
@@ -340,6 +341,9 @@ class BTree:
                     # get current nodes per level
                     nodePerLevelBefore = self.countNodesPerLevel()
                     self.numOfNodesPerLevelCopies.append(nodePerLevelBefore)
+                    # there is a new node in the tree so update the ids of the nodes
+                    # this ensures that at every operation the node ids are correct
+                    self.updateNodeIds(self.rootNode)
                     # edge list copy
                     self.setEdgeList(self.rootNode)
                     edgeListBeforeInsert = self.edgeList[:]
@@ -371,12 +375,18 @@ class BTree:
                     # + 1 because insertion key must come after the first node key which is smaller
                     i += 1
                     self.usedReferences.append(i)
+                    tempSource = source[0]
+                    self.visitiedNodes[0].append(tempSource)
+                    self.visitiedNodes[1].append(i)
                     # get the current keys per level of the tree
                     nodePerLevelBeforeSplit = self.countNodesPerLevel()
                     self.numOfNodesPerLevelCopies.append(nodePerLevelBeforeSplit)
                     # check if node where key should go is full -> children[i] means all keys in this node are smaller!
                     if not node.children[i].children:
-                        if len(node.children[i].keys) == (2 * self.k): 
+                        if len(node.children[i].keys) == (2 * self.k):
+                            self.setEdgeList(self.rootNode)
+                            edgeListBeforeSplit = self.edgeList[:]
+                            self.edgeListCopies.append([list(l) for l in edgeListBeforeSplit]) 
                             # split node to make room for new key 
                             self.splitNode(node, key,i) 
                             test = True
