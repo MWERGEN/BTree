@@ -26,7 +26,7 @@ class Input:
     def __init__(self) -> None:
         self.window = tk.Tk()
         self.window.columnconfigure(0, weight=1)
-        self.window.columnconfigure(1, weight=1)
+        self.window.columnconfigure(2, weight=1)
         self.window.rowconfigure(0, weight=1)
         self.window.rowconfigure(1, weight=6)
         self.window.rowconfigure(2, weight=1)
@@ -76,7 +76,7 @@ class Input:
         
         # settings menu
         self.settings_fields_frame = tk.Frame(master=self.window)
-        self.settings_fields_frame.grid(column=1, row=0, sticky="NE")
+        self.settings_fields_frame.grid(column=2, row=0, sticky="NE")
         # Order
         self.settings_order_label = tk.Label(self.settings_fields_frame, text="Order:")
         self.settings_order_label.grid(column=0, row=0, sticky="W")
@@ -84,12 +84,12 @@ class Input:
         self.settings_order_field.grid(column=0, row=1, sticky="W")
         # Speed
         self.settings_speed_label = tk.Label(self.settings_fields_frame, text="Speed:")
-        self.settings_speed_label.grid(column=1, row=0, sticky="W")
+        self.settings_speed_label.grid(column=2, row=0, sticky="W")
         self.settings_speed_field = tk.Entry(self.settings_fields_frame, width=6)
-        self.settings_speed_field.grid(column=1, row=1, sticky="W")
+        self.settings_speed_field.grid(column=2, row=1, sticky="W")
         # Update button
         update_button = tk.Button(self.settings_fields_frame, text="Update", command=self.update_settings)
-        update_button.grid(column=2, row=1)
+        update_button.grid(column=3, row=1)
         
         
         # reset button
@@ -97,7 +97,7 @@ class Input:
         self.reset_button_frame.grid(column=0, row=1, columnspan=2, sticky="SE")
         #self.reset_button_frame.columnconfigure(0, weight=1)
         reset_button = tk.Button(self.reset_button_frame, text="Reset", command=self.update_settings, bg="red")
-        reset_button.grid(column=0, row=0)
+        reset_button.grid(column=0, row=4)
         
         ##################
         ##################
