@@ -14,6 +14,7 @@
 #       - GUI for input 
 #
 
+import random
 import tkinter as tk
 from tkinter import filedialog
 from tkinter import ttk
@@ -21,6 +22,7 @@ from Frontend import bTreeVisualization as bt
 from Frontend import anim as ani
 from matplotlib.backend_bases import key_press_handler
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
+import threading
 
 class Input:
     def __init__(self) -> None:
@@ -133,25 +135,14 @@ class Input:
 
         # Create a scrollbar
         scrollbar = ttk.Scrollbar(self.matplot_frame, orient=tk.VERTICAL, command=self.canvas.get_tk_widget().yview)
-        scrollbar.grid(row=3, column=1, sticky="ns")
+        scrollbar.grid(row=1, column=1, sticky="ns")
         self.canvas.get_tk_widget().configure(yscrollcommand=scrollbar.set)
 
         self.matplot_frame.bind("<Configure>", self.update_scroll_region)
 
         self.canvas.mpl_connect('motion_notify_event', self.on_mouse_motion)
 
-        # predefine 4 nodes 
-        self.Graph.calcNodesPositions()
-        # calc where the references will be inside the nodes
-        self.Graph.calcRefPositions()
-        # calc where the keys will be inside the nodes
-        self.Graph.calcKeyPositions()
-        # calculate all graphs
-        self.Graph.assertValuesToGraphs()
-        # calculate the edges' relationships
-        self.Graph.calcEdges()
-        # draw all graphs
-        self.Graph.runAnimation()
+        self.window.after(0, self.Graph.initializeGraph)  # Schedule the update in the main event loop
 
         tk.mainloop()
 
@@ -267,6 +258,8 @@ class Input:
             
     def confirm_input(self, *args):
         print('confirm clicked')
+        # insert a random number between 1 and 9999
+        self.Graph.insert(random.randint(1, 9999))
         
     def update_settings(self, *args):
         print('update clicked')

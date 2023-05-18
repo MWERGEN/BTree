@@ -31,7 +31,7 @@ import time
 import math
 import numpy as np
 import igraph as ig
-import tkinter as Tk
+import tkinter as tk
 import itertools as it
 from tkinter import ttk
 import matplotlib.pyplot as plt
@@ -958,5 +958,20 @@ class BTreeVisualization:
         # updating function is _update_graph
         # blitting is deactivated to enable the graph to grow and shrink dynamically
         anim = animation.FuncAnimation(self.fig, self._update_graph, interval=1, blit=False, cache_frame_data=False)
+        anim._start()
         # start the tkinter window
-        Tk.mainloop()
+        #tk.mainloop()
+
+    def initializeGraph(self):
+        # predefine 4 nodes 
+        self.calcNodesPositions()
+        # calc where the references will be inside the nodes
+        self.calcRefPositions()
+        # calc where the keys will be inside the nodes
+        self.calcKeyPositions()
+        # calculate all graphs
+        self.assertValuesToGraphs()
+        # calculate the edges' relationships
+        self.calcEdges()
+        # draw all graphs
+        self.runAnimation()
