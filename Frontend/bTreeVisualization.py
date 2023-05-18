@@ -124,10 +124,6 @@ class BTreeVisualization:
         # rectangular vertices
         self.visual_style['vertex_shape'] = 'rectangle'
         
-        #######
-        # TK 
-        #######
-        
         self.fig = plt.Figure()
         # configuration for subplot area in matplotlib-window:
         #   -   left, bottom, right, top define where the edge of the subplot area is on the matplotlib-window
