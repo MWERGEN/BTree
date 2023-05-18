@@ -35,6 +35,8 @@ class Input:
 
         self.mode = tk.IntVar()
         self.mode.set(1)  # initializing the choice, i.e. Python
+        self.action = tk.IntVar()
+        self.action.set(1)  # initializing the choice, i.e. Python
         
         # mode selection
         self.input_fields_frame = tk.Frame(master=self.window)
@@ -44,21 +46,21 @@ class Input:
         ### Radio Buttons for mode-selection
         # standard: simple mode = insert, search, delete a specific key
         self.radio_simple = tk.Radiobutton(self.input_fields_frame, 
-                                            text="simple",
+                                            text="Simple",
                                             padx = 20, 
                                             variable=self.mode, 
                                             command=self.mode_change,
                                             value=1).grid(column=0, row=1, columnspan=5, sticky="W")
         # csv mode = read a tree from a csv file
         self.radio_csv = tk.Radiobutton(self.input_fields_frame, 
-                                            text="csv",
+                                            text="CSV",
                                             padx = 20, 
                                             variable=self.mode, 
                                             command=self.mode_change,
                                             value=2).grid(column=0, row=2, columnspan=5, sticky="W")
         # random mode = insert random keys
         self.radio_random = tk.Radiobutton(self.input_fields_frame, 
-                                            text="random",
+                                            text="Random",
                                             padx = 20, 
                                             variable=self.mode, 
                                             command=self.mode_change,
@@ -70,9 +72,31 @@ class Input:
         self.simple_input_field.config(width=6)
         
         self.simple_action_label = tk.Label(self.input_fields_frame, text="Action:")
-        self.simple_action = tk.StringVar()
-        self.simple_action_select = tk.OptionMenu(self.input_fields_frame, self.simple_action, *["Insert", "Delete", "Search"])
-        self.simple_action_select.config(width=6)
+        #self.simple_action = tk.StringVar()
+        #self.simple_action_select = tk.OptionMenu(self.input_fields_frame, self.simple_action, *["Insert", "Delete", "Search"])
+        #self.simple_action_select.config(width=6)
+        ### Radio Buttons for action-selection
+        # standard: simple mode = insert, search, delete a specific key
+        self.radio_action_insert = tk.Radiobutton(self.input_fields_frame, 
+                                                    text="Insert",
+                                                    padx = 20, 
+                                                    variable=self.action, 
+                                                    command=self.mode_change,
+                                                    value=1)
+        # csv mode = read a tree from a csv file
+        self.radio_action_search = tk.Radiobutton(self.input_fields_frame, 
+                                                    text="Search",
+                                                    padx = 20, 
+                                                    variable=self.action, 
+                                                    command=self.mode_change,
+                                                    value=2)
+        # random mode = insert random keys
+        self.radio_action_delete = tk.Radiobutton(self.input_fields_frame, 
+                                                    text="Delete",
+                                                    padx = 20, 
+                                                    variable=self.action, 
+                                                    command=self.mode_change,
+                                                    value=3)
 
         # elements of "CSV" mode
         self.select_csv_button = tk.Button(self.input_fields_frame, text = "Browse Files", command = self.browse_files)
@@ -166,9 +190,6 @@ class Input:
 
         tk.mainloop()
 
-    def ShowChoice(self):
-        print(self.v.get())
-
     # raises a counter all 10 milliseconds
     # used for correct timing of animation
     def countNext10Milliseconds(self):
@@ -249,7 +270,9 @@ class Input:
         self.simple_input_label.grid_forget()
         self.simple_input_field.grid_forget()
         self.simple_action_label.grid_forget()
-        self.simple_action_select.grid_forget()
+        self.radio_action_insert.grid_forget()
+        self.radio_action_search.grid_forget()
+        self.radio_action_delete.grid_forget()
         
         self.select_csv_button.grid_forget()
         
@@ -266,7 +289,9 @@ class Input:
             self.simple_input_field.grid(column=6, row=1, sticky="W")
             
             self.simple_action_label.grid(column=12, row=0, sticky="W")
-            self.simple_action_select.grid(column=12, row=1, columnspan=5, sticky="W")
+            self.radio_action_insert.grid(column=12, row=1, sticky="W")
+            self.radio_action_search.grid(column=12, row=2, sticky="W")
+            self.radio_action_delete.grid(column=12, row=3, sticky="W")
             
         elif self.mode.get() == 2:
             self.select_csv_button.grid(column=6, row=1, sticky="W")
@@ -281,8 +306,12 @@ class Input:
             
     def confirm_input(self, *args):
         print('confirm clicked')
-        # insert a random number between 1 and 9999
-        self.Graph.insert(random.randint(1, 9999))
+        if self.action.get() == 1:
+            self.Graph.insert(int(self.simple_input_field.get()))
+        elif self.action.get() == 2:
+            self.Graph.search(int(self.simple_input_field.get()))
+        elif self.action.get() == 3:
+            self.Graph.delete(int(self.simple_input_field.get()))
         
     def update_settings(self, *args):
         print('update clicked')

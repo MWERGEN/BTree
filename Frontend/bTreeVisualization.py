@@ -290,6 +290,12 @@ class BTreeVisualization:
         operands = self.backend.operands
         self.currentAnimation = ani.Animation(animationList, treeList, operands)
 
+    def search(self, key):
+        print("search key" + str(key))
+
+    def delete(self, key):
+        print("delete key" + str(key))
+
     # initializes all keys with a lightblue background
     def initializeColorKeyList(self):
         self.colorKeyList = []
