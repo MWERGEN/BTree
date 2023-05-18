@@ -632,29 +632,35 @@ class BTree:
             self.nodeIds.append(currentNode.id)
 
     def setEdgeList(self, node):
-        # empty list for edge conncection
         res = []
-        edgeList = []
-        # Base Case
-        if node is None:
+        if self.rootNode is None:
             return
-        # Create an empty queue
-        # for level order traversal
-        queue = []
-        # Enqueue Root and initialize height
-        queue.append(node)
-        while(len(queue) > 0):
-            currNode = queue.pop(0)
-            # Enqueue children
-            for child in currNode.children:
-                res.append(child.id)
+        # create an empty queue and enqueue the root node
+        queue = deque()
+        queue.append(self.rootNode)
+        # create a stack to reverse level order nodes
+        stack = deque()
+        # loop till queue is empty
+        while queue:
+            # process each node in the queue and enqueue their children
+            curr = queue.popleft()
+            # push the current node into the stack
+            stack.append(curr)
+            # it is important to process the right node before the left node
+            for child in reversed(curr.children):
                 queue.append(child)
-            edgeList.append(res.copy())
-            res = []
-        # frontend needs the edge list is in reverse level order, so just reverse the list
-        edgeList.reverse()
-        edgeListCopy = edgeList[:]
+        # pop all nodes from the stack and print them
+        while stack:
+            #print(stack.pop(), end=' ')
+            currentNode = stack.pop()
+            temp = []
+            for child in currentNode.children:
+                temp.append(child.id)
+            res.append(temp)
+        edgeListCopy = res[:]
         self.edgeList = edgeListCopy
+
+
 
     def getTreeListForSearch(self):
         # create a tree list for searching
