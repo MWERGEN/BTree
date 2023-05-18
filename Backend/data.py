@@ -112,6 +112,57 @@ class Backend:
         self.treeList.append(list)
         self.treeList.append(list)
 
+    def deleteKeyFromTree(self, key):
+        # reset all parameters of backend object
+        self.treeNodesPerLevel = []
+        self.treeKeysPerLevel = []
+        self.sourceDestination = []
+        self.btree.keysPerLevel = []
+        self.btree.nodeIds = []
+        self.animationList = []
+        self.btree.animationList = []
+        self.btree.searchedNodes = []
+        self.edgeLists = []
+        self.treeNodesPerLevel = []
+        self.references = []
+        self.treeList = []
+        self.operands = []
+        self.searchedNodes = []
+        # key in tree?
+        keyFound = False
+        self.animationList.append(2)
+        self.animationList.append(0)
+        if self.btree.searchKey(key, self.btree.rootNode):
+            keyFound = True
+            self.btree.deleteKey(key, self.btree.rootNode)
+            self.searchedNodes = self.btree.searchedNodes
+            self.treeNodesPerLevel = self.btree.numOfNodesPerLevelCopies
+            self.treeKeysPerLevel = self.btree.keysPerLevelCopies
+            self.edgeLists = self.btree.edgeListCopies
+            # temp var for iterations for treelist
+            iterations = len(self.animationList)
+            for i in range(iterations):
+                temp = []
+                temp.append(self.treeNodesPerLevel[i])
+                temp.append(self.treeKeysPerLevel[i])
+                temp.append(self.edgeLists[i])
+                self.treeList.append(temp)
+            self.operands.append(key)
+            self.operands.append(self.searchedNodes)
+            self.operands.append(keyFound)
+            print('test')
+        else:
+            # search needs two tree lists so the animations works right
+            self.searchedNodes = self.btree.searchedNodes
+            list = self.btree.getTreeListForSearch()
+            self.treeList.append(list)
+            self.treeList.append(list)
+            self.operands.append(key)
+            self.operands.append(self.searchedNodes)
+            self.operands.append(keyFound)
+
+
+
 testData = Backend(2)
 testData.insertKeyIntoTree(1)
 testData.insertKeyIntoTree(2)
@@ -121,6 +172,7 @@ testData.insertKeyIntoTree(5)
 #testData.searchKeyInTree(1)
 testData.insertKeyIntoTree(6)
 testData.insertKeyIntoTree(7)
+testData.deleteKeyFromTree(7)
 testData.insertKeyIntoTree(8)
 testData.insertKeyIntoTree(18)
 testData.insertKeyIntoTree(24)

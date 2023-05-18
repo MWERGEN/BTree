@@ -502,8 +502,44 @@ class BTree:
 
 
     #TODO implement deleting key
-    #def deleteKey(key):
-    #    null
+    def deleteKey(self,key, nextNode = None):
+        # reset all attributes
+        self.numOfNodesPerLevel = []
+        self.numOfNodesPerLevelCopies = []
+        self.keysPerLevel = []
+        self.keysPerLevelCopies = []
+        self.edgeList = []
+        self.edgeListCopies = []
+        self.searchedNodes = []
+        # set keys per level list -> has to be copy of list because every key list can be different!
+        self.getKeysPerLevel()
+        keysPerLevelBeforeInsert = self.keysPerLevel[:]
+        self.keysPerLevelCopies.append([list(l) for l in keysPerLevelBeforeInsert])
+        # edge list copy
+        self.setEdgeList(self.rootNode)
+        edgeListBeforeInsert = self.edgeList[:]
+        self.edgeListCopies.append([list(l) for l in edgeListBeforeInsert])
+        # num of nodes list copy
+        nodePerLevelBefore = self.countNodesPerLevel()
+        self.numOfNodesPerLevelCopies.append(nodePerLevelBefore)
+        # use search to find node with key inside
+        nodeWithKey = self.searchKey(key, nextNode)
+        # if node has more than k + 1 keys, just delete it
+        if len(nodeWithKey.keys) > (self.k + 1) :
+            nodeWithKey.keys.remove(key)
+            # set keys per level list -> has to be copy of list because every key list can be different!
+            self.getKeysPerLevel()
+            keysPerLevelBeforeInsert = self.keysPerLevel[:]
+            self.keysPerLevelCopies.append([list(l) for l in keysPerLevelBeforeInsert])
+            # edge list copy
+            self.setEdgeList(self.rootNode)
+            edgeListBeforeInsert = self.edgeList[:]
+            self.edgeListCopies.append([list(l) for l in edgeListBeforeInsert])
+            # num of nodes list copy
+            nodePerLevelBefore = self.countNodesPerLevel()
+            self.numOfNodesPerLevelCopies.append(nodePerLevelBefore)
+
+
 
     # search key in node
     # go through node and check if key is there
@@ -666,9 +702,11 @@ class BTree:
         # create a tree list for searching
         # tree list is made of nodes per level, keys per level and edges
         treeList = []
+        keysPerLevelCopies = []
         numOfNodesPerLevel = self.countNodesPerLevel()
         self.getKeysPerLevel()
         keysPerLevel = self.keysPerLevel[:]
+        keysPerLevelCopies.append([list(l) for l in keysPerLevel])
         self.setEdgeList(self.rootNode)
         edgeList = self.edgeList[:]
         # temp list for tree list
