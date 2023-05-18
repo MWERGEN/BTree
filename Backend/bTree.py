@@ -480,9 +480,6 @@ class BTree:
                     tempSource = node.id
                     self.visitiedNodes[0].append(tempSource)
                     self.visitiedNodes[1].append(targetNode)
-                    # get the current keys per level of the tree
-                    nodePerLevelBeforeSplit = self.countNodesPerLevel()
-                    self.numOfNodesPerLevelCopies.append(nodePerLevelBeforeSplit)
                     # check if node where key should go is full -> children[i] means all keys in this node are smaller!
                     if not node.children[i].children:
                         if len(node.children[i].keys) == (2 * self.k):
