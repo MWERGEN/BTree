@@ -334,6 +334,9 @@ class BTree:
             newNode.keys = splitNode.keys[middleIndex: 2 * k] 
             # take all smaller keys and insert them from 0 to order - 1
             splitNode.keys = splitNode.keys[0: middleIndex]
+            # get the current keys per level of the tree
+            nodePerLevelBefore = self.countNodesPerLevel()
+            self.numOfNodesPerLevelCopies.append(nodePerLevelBefore)
 
 
     def splitRoot(self, parent, index):
@@ -391,7 +394,7 @@ class BTree:
                     self.animationList.append(1)
                     self.usedKeys.append(key)
                     self.usedReferences.append(0)
-                    if not fromRootSplit:
+                    if not fromRootSplit and not fromSplit:
                         # get the current keys per level of the tree
                         nodePerLevelBefore = self.countNodesPerLevel()
                         self.numOfNodesPerLevelCopies.append(nodePerLevelBefore)
