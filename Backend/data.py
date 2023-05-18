@@ -134,7 +134,7 @@ class Backend:
         self.animationList.append(0)
         if self.btree.searchKey(key, self.btree.rootNode):
             keyFound = True
-            self.btree.deleteKey(key, self.btree.rootNode)
+            deleted = self.btree.deleteKey(key, self.btree.rootNode)
             self.searchedNodes = self.btree.searchedNodes
             self.treeNodesPerLevel = self.btree.numOfNodesPerLevelCopies
             self.treeKeysPerLevel = self.btree.keysPerLevelCopies
@@ -149,7 +149,7 @@ class Backend:
                 self.treeList.append(temp)
             self.operands.append(key)
             self.operands.append(self.searchedNodes)
-            self.operands.append(keyFound)
+            self.operands.append(deleted)
             print('test')
         else:
             # search needs two tree lists so the animations works right
@@ -171,8 +171,8 @@ testData.insertKeyIntoTree(4)
 testData.insertKeyIntoTree(5)
 #testData.searchKeyInTree(1)
 testData.insertKeyIntoTree(6)
+testData.deleteKeyFromTree(0)
 testData.insertKeyIntoTree(7)
-testData.deleteKeyFromTree(7)
 testData.insertKeyIntoTree(8)
 testData.insertKeyIntoTree(18)
 testData.insertKeyIntoTree(24)

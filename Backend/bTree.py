@@ -511,6 +511,7 @@ class BTree:
         self.edgeList = []
         self.edgeListCopies = []
         self.searchedNodes = []
+        deleted = False
         # set keys per level list -> has to be copy of list because every key list can be different!
         self.getKeysPerLevel()
         keysPerLevelBeforeInsert = self.keysPerLevel[:]
@@ -525,19 +526,21 @@ class BTree:
         # use search to find node with key inside
         nodeWithKey = self.searchKey(key, nextNode)
         # if node has more than k + 1 keys, just delete it
-        if len(nodeWithKey.keys) > (self.k + 1) :
+        if len(nodeWithKey.keys) >= (self.k + 1) :
             nodeWithKey.keys.remove(key)
-            # set keys per level list -> has to be copy of list because every key list can be different!
-            self.getKeysPerLevel()
-            keysPerLevelBeforeInsert = self.keysPerLevel[:]
-            self.keysPerLevelCopies.append([list(l) for l in keysPerLevelBeforeInsert])
-            # edge list copy
-            self.setEdgeList(self.rootNode)
-            edgeListBeforeInsert = self.edgeList[:]
-            self.edgeListCopies.append([list(l) for l in edgeListBeforeInsert])
-            # num of nodes list copy
-            nodePerLevelBefore = self.countNodesPerLevel()
-            self.numOfNodesPerLevelCopies.append(nodePerLevelBefore)
+            deleted = True
+        # set keys per level list -> has to be copy of list because every key list can be different!
+        self.getKeysPerLevel()
+        keysPerLevelBeforeInsert = self.keysPerLevel[:]
+        self.keysPerLevelCopies.append([list(l) for l in keysPerLevelBeforeInsert])
+        # edge list copy
+        self.setEdgeList(self.rootNode)
+        edgeListBeforeInsert = self.edgeList[:]
+        self.edgeListCopies.append([list(l) for l in edgeListBeforeInsert])
+        # num of nodes list copy
+        nodePerLevelBefore = self.countNodesPerLevel()
+        self.numOfNodesPerLevelCopies.append(nodePerLevelBefore)
+        return deleted
 
 
 
