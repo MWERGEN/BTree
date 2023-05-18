@@ -149,6 +149,8 @@ class BTree:
                     i -= 1
                 # + 1 because insertion key must come after the first node key which is smaller
                 i += 1
+                self.animationList.append(1)
+                self.usedReferences.append(i)
                 # check if node where key should go is full -> children[i] means all keys in this node are smaller!
                 if len(root.children[i].keys) == (2 * self.k): 
                     # split node to make room for new key 
@@ -157,7 +159,20 @@ class BTree:
                     #if key > root.keys[i]:
                     #   i += 1
                 if not test:
+                    # set keys per level list -> has to be copy of list because every key list can be different!
+                    self.getKeysPerLevel()
+                    keysPerLevelBeforeInsertFullRoot = self.keysPerLevel[:]
+                    self.keysPerLevelCopies.append([list(l) for l in keysPerLevelBeforeInsertFullRoot])
+                    # edge list copy
+                    self.setEdgeList(self.rootNode)
+                    edgeListBeforeInsertFullRoot = self.edgeList[:]
+                    self.edgeListCopies.append([list(l) for l in edgeListBeforeInsertFullRoot])
+                    # num of nodes list copy
+                    nodePerLevelBeforeFullRoot = self.countNodesPerLevel()
+                    self.numOfNodesPerLevelCopies.append(nodePerLevelBeforeFullRoot)
                     self.insertNotFull(root.children[i], key, source, target, False)
+                    # key is inserted so animation is over -> 0
+                    self.animationList.append(0)
         # case2
         else:
             # just insert key into node 
