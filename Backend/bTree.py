@@ -334,9 +334,13 @@ class BTree:
             newNode.keys = splitNode.keys[middleIndex: 2 * k] 
             # take all smaller keys and insert them from 0 to order - 1
             splitNode.keys = splitNode.keys[0: middleIndex]
+            self.updateNodeIds(self.rootNode)
             # get the current keys per level of the tree
             nodePerLevelBefore = self.countNodesPerLevel()
             self.numOfNodesPerLevelCopies.append(nodePerLevelBefore)
+            self.setEdgeList(self.rootNode)
+            edgeListBeforeSplit = self.edgeList[:]
+            self.edgeListCopies.append([list(l) for l in edgeListBeforeSplit]) 
 
 
     def splitRoot(self, parent, index):
@@ -483,9 +487,6 @@ class BTree:
                     # check if node where key should go is full -> children[i] means all keys in this node are smaller!
                     if not node.children[i].children:
                         if len(node.children[i].keys) == (2 * self.k):
-                            self.setEdgeList(self.rootNode)
-                            edgeListBeforeSplit = self.edgeList[:]
-                            self.edgeListCopies.append([list(l) for l in edgeListBeforeSplit]) 
                             # split node to make room for new key 
                             self.splitNode(node, key,i,False) 
                             test = True
