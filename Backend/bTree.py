@@ -15,7 +15,10 @@
 #       - inserting, deleting and searching algorithm
 #       - preparing lists for frontend (num of nodes per level, keys per level and edges)
 #
-from Backend import node
+# when executed by main
+#from Backend import node
+# debugging
+import node
 from collections import deque
 
 class BTree:

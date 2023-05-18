@@ -13,7 +13,11 @@
 #   File description:
 #       - user data from the GUI
 #
-from Backend import bTree
+
+# when executed by main
+#from Backend import bTree
+# debugging
+import bTree
 
 class Backend:
     def __init__(self, k):
@@ -109,7 +113,7 @@ class Backend:
         self.treeList.append(list)
         self.treeList.append(list)
 
-#testData = Backend(2)
+testData = Backend(2)
 #testData.insertKeyIntoTree(1)
 #testData.insertKeyIntoTree(2)
 #testData.insertKeyIntoTree(3)
