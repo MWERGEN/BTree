@@ -1,32 +1,33 @@
-import igraph as ig
-import matplotlib.pyplot as plt
+from tkinter import *
 
-# Create an iGraph graph
-graph = ig.Graph.Famous("petersen")
+root = Tk()
 
-# Create a Matplotlib figure and axis
-fig, ax = plt.subplots()
+v = IntVar()
+v.set(1)  # initializing the choice, i.e. Python
 
-# Plot the iGraph graph within the Matplotlib axis
-layout = graph.layout("kk")
-ig.plot(graph, target=ax, layout=layout, bbox=(0, 0, 1, 1), margin=20)
+languages = [
+    ("Python",1),
+    ("Perl",2),
+    ("Java",3),
+    ("C++",4),
+    ("C",5)
+]
 
-# Retrieve the positions of the nodes within the Matplotlib plot
-positions = ax.collections[0].get_offsets()
+def ShowChoice():
+    print(v.get())
 
-# Iterate over each node and its position
-for i, pos in enumerate(positions):
-    x, y = pos
+Label(root, 
+      text="""Choose your favourite 
+programming language:""",
+      justify = LEFT,
+      padx = 20).pack()
 
-    # Retrieve the label of the current node
-    label = graph.vs[i]["name"]
+for txt, val in languages:
+    Radiobutton(root, 
+                text=txt,
+                padx = 20, 
+                variable=v, 
+                command=ShowChoice,
+                value=val).pack(anchor=W)
 
-    # Adjust the position and size of the label to fit within the node
-    ax.text(x, y, label, ha="center", va="center", fontsize=8, color="white")
-
-# Set the aspect ratio and remove the axes
-ax.set_aspect("equal")
-ax.axis("off")
-
-# Show the plot
-plt.show()
+mainloop()

@@ -32,17 +32,37 @@ class Input:
         self.window.rowconfigure(0, weight=1)
         self.window.rowconfigure(1, weight=1)
         self.window.rowconfigure(2, weight=1)
+
+        self.mode = tk.IntVar()
+        self.mode.set(1)  # initializing the choice, i.e. Python
         
         # mode selection
         self.input_fields_frame = tk.Frame(master=self.window)
         self.input_fields_frame.grid(column=0, row=0, sticky="NW")
         mode_label = tk.Label(self.input_fields_frame, text="Mode:")
         mode_label.grid(column=0, row=0, sticky="W")
-        self.mode = tk.StringVar()
-        mode_select = tk.OptionMenu(self.input_fields_frame, self.mode, *["Simple", "CSV", "Random"])
-        mode_select.grid(column=0, row=1, columnspan=5, sticky="W")
-        mode_select.config(width=6)
-        self.mode.set("Simple") # simple as standard mode
+        ### Radio Buttons for mode-selection
+        # standard: simple mode = insert, search, delete a specific key
+        self.radio_simple = tk.Radiobutton(self.input_fields_frame, 
+                                            text="simple",
+                                            padx = 20, 
+                                            variable=self.mode, 
+                                            command=self.mode_change,
+                                            value=1).grid(column=0, row=1, columnspan=5, sticky="W")
+        # csv mode = read a tree from a csv file
+        self.radio_csv = tk.Radiobutton(self.input_fields_frame, 
+                                            text="csv",
+                                            padx = 20, 
+                                            variable=self.mode, 
+                                            command=self.mode_change,
+                                            value=2).grid(column=0, row=2, columnspan=5, sticky="W")
+        # random mode = insert random keys
+        self.radio_random = tk.Radiobutton(self.input_fields_frame, 
+                                            text="random",
+                                            padx = 20, 
+                                            variable=self.mode, 
+                                            command=self.mode_change,
+                                            value=3).grid(column=0, row=3, columnspan=5, sticky="W")
         
         # elements of "Simple" mode
         self.simple_input_label = tk.Label(self.input_fields_frame, text="Input:")
@@ -72,10 +92,10 @@ class Input:
         confirm_button = tk.Button(self.input_fields_frame, text="Confirm", command=self.confirm_input, bg="green")
         confirm_button.grid(column=24, row=1)
         
-        self.mode.trace('w', self.mode_change)
+        #self.mode.trace('w', self.mode_change)
         self.mode_change(self)
         
-        
+
         # settings menu
         self.settings_fields_frame = tk.Frame(master=self.window)
         self.settings_fields_frame.grid(column=2, row=0, sticky="NE")
@@ -145,6 +165,9 @@ class Input:
         self.window.after(0, self.Graph.initializeGraph)  # Schedule the update in the main event loop
 
         tk.mainloop()
+
+    def ShowChoice(self):
+        print(self.v.get())
 
     # raises a counter all 10 milliseconds
     # used for correct timing of animation
@@ -238,17 +261,17 @@ class Input:
         self.random_amount_legs_field.grid_forget()
         
         # create suboptions belonging to main options
-        if self.mode.get() == "Simple":
+        if self.mode.get() == 1:
             self.simple_input_label.grid(column=6, row=0, sticky="W")
             self.simple_input_field.grid(column=6, row=1, sticky="W")
             
             self.simple_action_label.grid(column=12, row=0, sticky="W")
             self.simple_action_select.grid(column=12, row=1, columnspan=5, sticky="W")
             
-        elif self.mode.get() == "CSV":
+        elif self.mode.get() == 2:
             self.select_csv_button.grid(column=6, row=1, sticky="W")
             
-        elif self.mode.get() == "Random":
+        elif self.mode.get() == 3:
             self.random_from_label.grid(column=6, row=0, sticky="W")
             self.random_from_field.grid(column=6, row=1, sticky="W")
             self.random_to_label.grid(column=12, row=0, sticky="W")
