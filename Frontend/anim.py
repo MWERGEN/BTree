@@ -35,6 +35,8 @@ class Animation:
         self.edgesList = tree[0][2]
         # indicates if animation is finished and can be deleted
         self.finished = False
+        # indicates what part of the animation is triggered
+        self.walkthrough = 0
 
         #######################################################
         #   operands initialization depending on animation type
@@ -49,8 +51,6 @@ class Animation:
             self.flagOuterKeyReached = False
             # label would be the highest in the observed node
             self.flagNewKeyHighest = False
-            # indicates what part of the animation is triggered
-            self.walkthrough = 0
             # helps scheduling the animation
             self.resetted = False
             

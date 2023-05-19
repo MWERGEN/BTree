@@ -14,6 +14,7 @@
 #       - GUI for input 
 #
 
+import random
 import tkinter as tk
 from tkinter import filedialog
 from tkinter import ttk
@@ -21,26 +22,49 @@ from Frontend import bTreeVisualization as bt
 from Frontend import anim as ani
 from matplotlib.backend_bases import key_press_handler
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
+import threading
 
 class Input:
     def __init__(self) -> None:
         self.window = tk.Tk()
         self.window.columnconfigure(0, weight=1)
-        self.window.columnconfigure(1, weight=1)
+        self.window.columnconfigure(2, weight=1)
         self.window.rowconfigure(0, weight=1)
-        self.window.rowconfigure(1, weight=6)
+        self.window.rowconfigure(1, weight=1)
         self.window.rowconfigure(2, weight=1)
+
+        self.mode = tk.IntVar()
+        self.mode.set(1)  # initializing the choice, i.e. Python
+        self.action = tk.IntVar()
+        self.action.set(1)  # initializing the choice, i.e. Python
         
         # mode selection
         self.input_fields_frame = tk.Frame(master=self.window)
         self.input_fields_frame.grid(column=0, row=0, sticky="NW")
         mode_label = tk.Label(self.input_fields_frame, text="Mode:")
         mode_label.grid(column=0, row=0, sticky="W")
-        self.mode = tk.StringVar()
-        mode_select = tk.OptionMenu(self.input_fields_frame, self.mode, *["Simple", "CSV", "Random"])
-        mode_select.grid(column=0, row=1, columnspan=5, sticky="W")
-        mode_select.config(width=6)
-        self.mode.set("Simple") # simple as standard mode
+        ### Radio Buttons for mode-selection
+        # standard: simple mode = insert, search, delete a specific key
+        self.radio_simple = tk.Radiobutton(self.input_fields_frame, 
+                                            text="Simple",
+                                            padx = 20, 
+                                            variable=self.mode, 
+                                            command=self.mode_change,
+                                            value=1).grid(column=0, row=1, columnspan=5, sticky="W")
+        # csv mode = read a tree from a csv file
+        self.radio_csv = tk.Radiobutton(self.input_fields_frame, 
+                                            text="CSV",
+                                            padx = 20, 
+                                            variable=self.mode, 
+                                            command=self.mode_change,
+                                            value=2).grid(column=0, row=2, columnspan=5, sticky="W")
+        # random mode = insert random keys
+        self.radio_random = tk.Radiobutton(self.input_fields_frame, 
+                                            text="Random",
+                                            padx = 20, 
+                                            variable=self.mode, 
+                                            command=self.mode_change,
+                                            value=3).grid(column=0, row=3, columnspan=5, sticky="W")
         
         # elements of "Simple" mode
         self.simple_input_label = tk.Label(self.input_fields_frame, text="Input:")
@@ -48,9 +72,31 @@ class Input:
         self.simple_input_field.config(width=6)
         
         self.simple_action_label = tk.Label(self.input_fields_frame, text="Action:")
-        self.simple_action = tk.StringVar()
-        self.simple_action_select = tk.OptionMenu(self.input_fields_frame, self.simple_action, *["Insert", "Delete", "Search"])
-        self.simple_action_select.config(width=6)
+        #self.simple_action = tk.StringVar()
+        #self.simple_action_select = tk.OptionMenu(self.input_fields_frame, self.simple_action, *["Insert", "Delete", "Search"])
+        #self.simple_action_select.config(width=6)
+        ### Radio Buttons for action-selection
+        # standard: simple mode = insert, search, delete a specific key
+        self.radio_action_insert = tk.Radiobutton(self.input_fields_frame, 
+                                                    text="Insert",
+                                                    padx = 20, 
+                                                    variable=self.action, 
+                                                    command=self.mode_change,
+                                                    value=1)
+        # csv mode = read a tree from a csv file
+        self.radio_action_search = tk.Radiobutton(self.input_fields_frame, 
+                                                    text="Search",
+                                                    padx = 20, 
+                                                    variable=self.action, 
+                                                    command=self.mode_change,
+                                                    value=2)
+        # random mode = insert random keys
+        self.radio_action_delete = tk.Radiobutton(self.input_fields_frame, 
+                                                    text="Delete",
+                                                    padx = 20, 
+                                                    variable=self.action, 
+                                                    command=self.mode_change,
+                                                    value=3)
 
         # elements of "CSV" mode
         self.select_csv_button = tk.Button(self.input_fields_frame, text = "Browse Files", command = self.browse_files)
@@ -70,13 +116,13 @@ class Input:
         confirm_button = tk.Button(self.input_fields_frame, text="Confirm", command=self.confirm_input, bg="green")
         confirm_button.grid(column=24, row=1)
         
-        self.mode.trace('w', self.mode_change)
+        #self.mode.trace('w', self.mode_change)
         self.mode_change(self)
         
-        
+
         # settings menu
         self.settings_fields_frame = tk.Frame(master=self.window)
-        self.settings_fields_frame.grid(column=1, row=0, sticky="NE")
+        self.settings_fields_frame.grid(column=2, row=0, sticky="NE")
         # Order
         self.settings_order_label = tk.Label(self.settings_fields_frame, text="Order:")
         self.settings_order_label.grid(column=0, row=0, sticky="W")
@@ -84,20 +130,20 @@ class Input:
         self.settings_order_field.grid(column=0, row=1, sticky="W")
         # Speed
         self.settings_speed_label = tk.Label(self.settings_fields_frame, text="Speed:")
-        self.settings_speed_label.grid(column=1, row=0, sticky="W")
+        self.settings_speed_label.grid(column=2, row=0, sticky="W")
         self.settings_speed_field = tk.Entry(self.settings_fields_frame, width=6)
-        self.settings_speed_field.grid(column=1, row=1, sticky="W")
+        self.settings_speed_field.grid(column=2, row=1, sticky="W")
         # Update button
         update_button = tk.Button(self.settings_fields_frame, text="Update", command=self.update_settings)
-        update_button.grid(column=2, row=1)
+        update_button.grid(column=3, row=1)
         
         
         # reset button
-        self.reset_button_frame = tk.Frame(master=self.window, bg="red")
-        self.reset_button_frame.grid(column=0, row=1, columnspan=2, sticky="SE")
+        self.reset_button_frame = tk.Frame(master=self.window)
+        self.reset_button_frame.grid(column=0, row=3, columnspan=3, sticky="SE")
         #self.reset_button_frame.columnconfigure(0, weight=1)
         reset_button = tk.Button(self.reset_button_frame, text="Reset", command=self.update_settings, bg="red")
-        reset_button.grid(column=0, row=0)
+        reset_button.grid(column=0, row=4)
         
         ##################
         ##################
@@ -105,50 +151,42 @@ class Input:
         ##################
         ##################
         # insert matplotlib here
-        # should be row=2 and column=0 of self.window
+        # should be row=1 and column=0 of self.window
 
+        # frame for matplot content
+        self.matplot_frame = tk.Frame(master=self.window)
+        self.matplot_frame.grid(column=0, row=1, columnspan=3)
         # create a scale widget for selecting the number
-        self.scale = tk.Scale(self.window, from_=1, to=10, orient=tk.HORIZONTAL)
-        self.scale.grid(column=0, row=2)
+        self.scale = tk.Scale(self.matplot_frame, from_=1, to=10, orient=tk.HORIZONTAL)
+        self.scale.grid(column=0, row=0)
 
-        animTypeList = [0]
+        animationList = [0]
         treeList = [[[1], [[]], [[]]]]
         operands = []
 
-        animation = ani.Animation(animTypeList, treeList, operands)
+        animation = ani.Animation(animationList, treeList, operands)
         self.Graph = bt.BTreeVisualization(2, 0.2, 0.03, 0.1, animation)
         #self.Graph.initializeTK()
 
-        self.canvas = FigureCanvasTkAgg(self.Graph.fig, master=self.window)
-        self.window.counter = 0
-        self.window.after(10, self.countNext10Milliseconds)
+        self.canvas = FigureCanvasTkAgg(self.Graph.fig, master=self.matplot_frame)
+        self.matplot_frame.counter = 0
+        self.matplot_frame.after(10, self.countNext10Milliseconds)
         self.canvas.draw()
 
-        self.canvas.get_tk_widget().grid(column=0,row=3, sticky='nsew')
-        self.window.columnconfigure(0, weight=1)
-        self.window.rowconfigure(3, weight=1)
+        self.canvas.get_tk_widget().grid(column=0, row=1, sticky='WE')
+        self.matplot_frame.columnconfigure(0, weight=1)
+        self.matplot_frame.rowconfigure(3, weight=1)
 
         # Create a scrollbar
-        scrollbar = ttk.Scrollbar(self.window, orient=tk.VERTICAL, command=self.canvas.get_tk_widget().yview)
-        scrollbar.grid(row=3, column=1, sticky="ns")
+        scrollbar = ttk.Scrollbar(self.matplot_frame, orient=tk.VERTICAL, command=self.canvas.get_tk_widget().yview)
+        scrollbar.grid(row=1, column=1, sticky="ns")
         self.canvas.get_tk_widget().configure(yscrollcommand=scrollbar.set)
 
-        self.window.bind("<Configure>", self.update_scroll_region)
+        self.matplot_frame.bind("<Configure>", self.update_scroll_region)
 
         self.canvas.mpl_connect('motion_notify_event', self.on_mouse_motion)
 
-        # predefine 4 nodes 
-        self.Graph.calcNodesPositions()
-        # calc where the references will be inside the nodes
-        self.Graph.calcRefPositions()
-        # calc where the keys will be inside the nodes
-        self.Graph.calcKeyPositions()
-        # calculate all graphs
-        self.Graph.assertValuesToGraphs()
-        # calculate the edges' relationships
-        self.Graph.calcEdges()
-        # draw all graphs
-        self.Graph.runAnimation()
+        self.window.after(0, self.Graph.initializeGraph)  # Schedule the update in the main event loop
 
         tk.mainloop()
 
@@ -158,16 +196,16 @@ class Input:
         # check if a method in bTreeVisualization has resetted the time counter to zero
         if self.Graph.timeCounter == 0:
             # accept the reset
-            self.window.counter = 0
+            self.matplot_frame.counter = 0
         # increment the counter
-        self.window.counter += 1
+        self.matplot_frame.counter += 1
         # assign counter to bTreeVisualization time counter
-        self.Graph.timeCounter = self.window.counter
+        self.Graph.timeCounter = self.matplot_frame.counter
         # get the selected speed from the user
         # pass it to the bTreeVisualization
         self.Graph.speed = self.scale.get()
         # schedule the next call to my_function in 1 second
-        self.window.after(10, self.countNext10Milliseconds)
+        self.matplot_frame.after(10, self.countNext10Milliseconds)
 
     # recognizes when mouse is over the tree and displays the keys of the node the cursor is currently on
     def on_mouse_motion(self, event):
@@ -185,7 +223,7 @@ class Input:
         # Check if the event occurred on the axis = the graph
         if event.inaxes is self.Graph.ax:
             # Iterate over all tk-widgets in the row for the hover-label
-            for widget in self.window.grid_slaves(row=4):
+            for widget in self.matplot_frame.grid_slaves(row=4):
                 # remove the old label to create a new one later on
                 widget.grid_remove()
             # save x position on the graph's axis of the mouse cursor
@@ -209,7 +247,7 @@ class Input:
                 # advice for user
                 nodeOnHover = "Hover over a node to display its keys!"
             # display the label with the advice or the keys in the hovered node
-            labelHover = tk.Label(self.window,text=nodeOnHover).grid(column=0, row=4)
+            labelHover = tk.Label(self.matplot_frame,text=nodeOnHover).grid(column=0, row=4)
     
     def get_row_height(self, widget, row):
         # Get the number of rows and columns in the grid
@@ -232,7 +270,9 @@ class Input:
         self.simple_input_label.grid_forget()
         self.simple_input_field.grid_forget()
         self.simple_action_label.grid_forget()
-        self.simple_action_select.grid_forget()
+        self.radio_action_insert.grid_forget()
+        self.radio_action_search.grid_forget()
+        self.radio_action_delete.grid_forget()
         
         self.select_csv_button.grid_forget()
         
@@ -244,17 +284,19 @@ class Input:
         self.random_amount_legs_field.grid_forget()
         
         # create suboptions belonging to main options
-        if self.mode.get() == "Simple":
+        if self.mode.get() == 1:
             self.simple_input_label.grid(column=6, row=0, sticky="W")
             self.simple_input_field.grid(column=6, row=1, sticky="W")
             
             self.simple_action_label.grid(column=12, row=0, sticky="W")
-            self.simple_action_select.grid(column=12, row=1, columnspan=5, sticky="W")
+            self.radio_action_insert.grid(column=12, row=1, sticky="W")
+            self.radio_action_search.grid(column=12, row=2, sticky="W")
+            self.radio_action_delete.grid(column=12, row=3, sticky="W")
             
-        elif self.mode.get() == "CSV":
+        elif self.mode.get() == 2:
             self.select_csv_button.grid(column=6, row=1, sticky="W")
             
-        elif self.mode.get() == "Random":
+        elif self.mode.get() == 3:
             self.random_from_label.grid(column=6, row=0, sticky="W")
             self.random_from_field.grid(column=6, row=1, sticky="W")
             self.random_to_label.grid(column=12, row=0, sticky="W")
@@ -264,9 +306,16 @@ class Input:
             
     def confirm_input(self, *args):
         print('confirm clicked')
+        if self.action.get() == 1:
+            self.Graph.insert(int(self.simple_input_field.get()))
+        elif self.action.get() == 2:
+            self.Graph.search(int(self.simple_input_field.get()))
+        elif self.action.get() == 3:
+            self.Graph.delete(int(self.simple_input_field.get()))
         
     def update_settings(self, *args):
-        print('update clicked')
+        self.Graph.reset()
+        print("reset")
         
     def browse_files(self, *args):
         # TODO do something with file(name)

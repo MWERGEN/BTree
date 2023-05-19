@@ -32,7 +32,7 @@ import time
 import math
 import numpy as np
 import igraph as ig
-import tkinter as Tk
+import tkinter as tk
 import itertools as it
 from tkinter import ttk
 import matplotlib.pyplot as plt
@@ -124,10 +124,6 @@ class BTreeVisualization:
         self.visual_style = {}
         # rectangular vertices
         self.visual_style['vertex_shape'] = 'rectangle'
-        
-        #######
-        # TK 
-        #######
         
         self.fig = plt.Figure()
         # configuration for subplot area in matplotlib-window:
@@ -284,11 +280,46 @@ class BTreeVisualization:
         self.calcEdges()
 
     def insert(self, key):
-        self.backend.insertKeyIntoTree(key)
+        # flag indicates if the key to be inserted is already in the tree
+        duplicate = False
+        # iterate over all keys
+        for i in self.keyLabels:
+            # check for each key in the tree if it is the one to be inserted
+            if i == key:
+                # duplicate found
+                duplicate = True
+                print("Key " + str(key) + " is a duplicate!")
+        # only insert the key if it is NOT a duplicate
+        if not duplicate:
+            # perform insertion in backend
+            self.backend.insertKeyIntoTree(key)
+        else:
+            # visualize search for the duplicate
+            # in order to underline that it is a duplicate
+            self.backend.searchKeyInTree(key)
+        # get updated animation list
         animationList = self.backend.animationList
+        # get updated tree List
         treeList = self.backend.treeList
+        # get updated operands
         operands = self.backend.operands
+        # create the animation for the insertion or the search
         self.currentAnimation = ani.Animation(animationList, treeList, operands)
+
+    def search(self, key):
+        print("search key" + str(key))
+
+    def delete(self, key):
+        print("delete key" + str(key))
+
+    def reset(self):
+        # self.backend.reset()
+        animationList = [0]
+        treeList = [[[1], [[]], [[]]]]
+        operands = []
+        self.currentAnimation = ani.Animation(animationList, treeList, operands)
+        self.currentAnimation.updateNewAnimation()
+        self.updateGraph()
 
     # initializes all keys with a lightblue background
     def initializeColorKeyList(self):
@@ -954,5 +985,20 @@ class BTreeVisualization:
         # updating function is _update_graph
         # blitting is deactivated to enable the graph to grow and shrink dynamically
         anim = animation.FuncAnimation(self.fig, self._update_graph, interval=1, blit=False, cache_frame_data=False)
+        anim._start()
         # start the tkinter window
-        Tk.mainloop()
+        #tk.mainloop()
+
+    def initializeGraph(self):
+        # predefine 4 nodes 
+        self.calcNodesPositions()
+        # calc where the references will be inside the nodes
+        self.calcRefPositions()
+        # calc where the keys will be inside the nodes
+        self.calcKeyPositions()
+        # calculate all graphs
+        self.assertValuesToGraphs()
+        # calculate the edges' relationships
+        self.calcEdges()
+        # draw all graphs
+        self.runAnimation()
