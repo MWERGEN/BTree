@@ -188,6 +188,8 @@ class Input:
 
         self.window.after(0, self.Graph.initializeGraph)  # Schedule the update in the main event loop
 
+        self.commandList = []
+
         tk.mainloop()
 
     # raises a counter all 10 milliseconds
@@ -305,13 +307,15 @@ class Input:
             self.random_amount_legs_field.grid(column=18, row=1, sticky="W")
             
     def confirm_input(self, *args):
+        input = self.simple_input_field.get()
+        self.separate_input(input)
         print('confirm clicked')
-        if self.action.get() == 1:
-            self.Graph.insert(int(self.simple_input_field.get()))
-        elif self.action.get() == 2:
-            self.Graph.search(int(self.simple_input_field.get()))
-        elif self.action.get() == 3:
-            self.Graph.delete(int(self.simple_input_field.get()))
+        # if self.action.get() == 1:
+        #     self.Graph.insert(int(self.simple_input_field.get()))
+        # elif self.action.get() == 2:
+        #     self.Graph.search(int(self.simple_input_field.get()))
+        # elif self.action.get() == 3:
+        #     self.Graph.delete(int(self.simple_input_field.get()))
         
     def update_settings(self, *args):
         self.Graph.reset()
@@ -326,7 +330,51 @@ class Input:
         )
         print(file_name)
 
+    # takes the input
+    # checks if input is valid 
+    # if valid: creates an int list with all int inputs
+    def separate_input(self, input):
+        # index for iterating over string input
+        index = 0
+        # flag to indicate if invalid char has been recognizes
+        invalid = False
+        # saves the current number as a string
+        currentNumStr = ""
+        # list with all number from input
+        inputNums = []
+        # iterate over all characters in input
+        while index < len(input):
+            # only continue working if input is still valid
+            if not invalid:
+                # comma or blank space separates two input-numbers
+                if input[index] == "," or input[index] == " ":
+                    # check if the current number is really an int
+                    if currentNumStr.isdigit():
+                        # append the current number as an int to the input List
+                        inputNums.append(int(currentNumStr))
+                    # reset the current number
+                    currentNumStr = ""
+                # if the current char is an int
+                elif input[index].isdigit():
+                    # add it to the current number as a string
+                    currentNumStr += input[index]
+                # invalid character in input
+                else:
+                    # set invalid flag
+                    invalid = True
+                    print("invalid")
+            # increment index for next char
+            index += 1
+        # check if the current number is a digit
+        # if the last character in input is a digit -> it is not appended yet
+        if currentNumStr.isdigit():
+            # append the last number to the number list
+            inputNums.append(int(currentNumStr))
+        # only continue with input if it is valid
+        if not invalid:
+            print(inputNums)
+
         
-if __name__ == '__main__':
-    input_obj = Input()
+#if __name__ == '__main__':
+#    input_obj = Input()
 
