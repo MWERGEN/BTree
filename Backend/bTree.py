@@ -212,6 +212,7 @@ class BTree:
         self.updateNodeIds(self.rootNode)
         source = parent.children[index].id
         target = parent.id 
+        fullParent = False
         #self.visitiedNodes[0].append(source)
         #self.visitiedNodes[1].append(target)
         # full node
@@ -303,6 +304,8 @@ class BTree:
             # parent is full
             else:
                 rootOfParent = self.getParent(parent, self.rootNode)
+                fullParent = True
+                rootSplit = True
                 loopIndex = 0
                 indexOfSplit = 0
                 for i in rootOfParent.children:
@@ -310,7 +313,7 @@ class BTree:
                     if i == parent:
                         indexOfSplit = loopIndex
                 indexOfSplit -= 1
-                self.splitRoot(rootOfParent,indexOfSplit)
+                self.splitRoot(rootOfParent,indexOfSplit, splitNode)
         if rootSplit:
             parentOfRootSplit = self.getParent(splitNode, self.rootNode)
             # take all greater keys and insert them from order to 2 * order - 1
@@ -330,6 +333,9 @@ class BTree:
             edgeListAfterRootSplit = self.edgeList[:]
             self.edgeListCopies.append([list(l) for l in edgeListAfterRootSplit])
         if not rootSplit:
+            # find correct parent 
+            if fullParent:
+                print('test')
             # add reference to node which holds all greater keys
             parent.children.insert(index + 1, newNode)
             # take all greater keys and insert them from order to 2 * order - 1
@@ -346,8 +352,8 @@ class BTree:
 
 
     def splitRoot(self, parent, index, willBeSplitt):
-        source = []
-        target = []
+        source = parent.id
+        target = parent.id
         k = self.k
         # full node
         splitNode = parent.children[index]
@@ -569,7 +575,7 @@ class BTree:
         elif nextNode.leaf: 
             return None
         #go to node in which key maybe is 
-        return self.searchKey(key, nextNode.children[i]) 
+        return self.searchKey(key, nextNode.children[i])
 
 
     # print tree
