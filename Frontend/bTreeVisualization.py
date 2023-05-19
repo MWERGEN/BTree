@@ -284,10 +284,30 @@ class BTreeVisualization:
         self.calcEdges()
 
     def insert(self, key):
-        self.backend.insertKeyIntoTree(key)
+        # flag indicates if the key to be inserted is already in the tree
+        duplicate = False
+        # iterate over all keys
+        for i in self.keyLabels:
+            # check for each key in the tree if it is the one to be inserted
+            if i == key:
+                # duplicate found
+                duplicate = True
+                print("Key " + str(key) + " is a duplicate!")
+        # only insert the key if it is NOT a duplicate
+        if not duplicate:
+            # perform insertion in backend
+            self.backend.insertKeyIntoTree(key)
+        else:
+            # visualize search for the duplicate
+            # in order to underline that it is a duplicate
+            self.backend.searchKeyInTree(key)
+        # get updated animation list
         animationList = self.backend.animationList
+        # get updated tree List
         treeList = self.backend.treeList
+        # get updated operands
         operands = self.backend.operands
+        # create the animation for the insertion or the search
         self.currentAnimation = ani.Animation(animationList, treeList, operands)
 
     def search(self, key):
