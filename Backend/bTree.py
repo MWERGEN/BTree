@@ -283,12 +283,13 @@ class BTree:
                 keysPerLevelBeforeFullRootSplit = self.keysPerLevel[:]
                 for lists in keysPerLevelBeforeFullRootSplit:
                     if copyOfSplitKey in lists:
-                        index = keysPerLevelBeforeFullRootSplit.index(lists)
+                        listIndex = keysPerLevelBeforeFullRootSplit.index(lists)
+                        valueIndex = lists.index(copyOfSplitKey)
                         lists.remove(copyOfSplitKey)
                 self.keysPerLevelCopies.append([list(l) for l in keysPerLevelBeforeFullRootSplit])
-                keysPerLevelBeforeFullRootSplit[index].append(copyOfSplitKey)
+                keysPerLevelBeforeFullRootSplit[listIndex].insert(valueIndex,copyOfSplitKey)
                 # split the full node
-                self.splitRoot(temp,0) 
+                self.splitRoot(temp,0,splitNode) 
                 #self.insertNotFull(temp,key, source, target)
                 # key is inserted so animation is over -> 0
                 self.animationList.append(0)
@@ -344,12 +345,13 @@ class BTree:
             self.edgeListCopies.append([list(l) for l in edgeListBeforeSplit]) 
 
 
-    def splitRoot(self, parent, index):
+    def splitRoot(self, parent, index, willBeSplitt):
         source = []
         target = []
         k = self.k
         # full node
         splitNode = parent.children[index]
+        indexOfOrgSplitNode = splitNode.children.index(willBeSplitt)
         # second node where are all keys which are greater than the middle key will go
         newNode = node.Node(splitNode.leaf) 
         i = len(splitNode.keys) - 1
@@ -362,11 +364,18 @@ class BTree:
         # take all greater keys and insert them from order to 2 * order - 1
         newNode.keys = splitNode.keys[middleIndex: 2 * k] 
         # take all smaller keys and insert them from 0 to order - 1
-        splitNode.keys = splitNode.keys[0: middleIndex] 
-        # give newNode with all greater keys all references to all greater children
-        newNode.children = splitNode.children[k + 1: 2 * k + 2] 
-        # updte references to only smaller children
-        splitNode.children = splitNode.children[0: k + 1]
+        splitNode.keys = splitNode.keys[0: middleIndex]
+        if indexOfOrgSplitNode < 2:
+            # give newNode with all greater keys all references to all greater children
+            newNode.children = splitNode.children[k : 2 * k + 1] 
+            # updte references to only smaller children
+            splitNode.children = splitNode.children[0: k]
+        else:
+            # give newNode with all greater keys all references to all greater children
+            newNode.children = splitNode.children[k + 1: 2 * k + 1] 
+            # updte references to only smaller children
+            splitNode.children = splitNode.children[0: k + 1]
+            print('test')
 
     def getParent(self, searchNode, rootNode):
         if searchNode in rootNode.children:
