@@ -28,9 +28,6 @@ class Input:
     def __init__(self) -> None:
         self.window = tk.Tk()
 
-        # Set the window size
-        #self.window.geometry("500x1000")  # Width x Height   
-
         self.window.columnconfigure(0, weight=1)
         self.window.columnconfigure(1, weight=1)
         self.window.columnconfigure(2, weight=1)
@@ -159,7 +156,7 @@ class Input:
 
         # frame for matplot content
         self.matplot_frame = tk.Frame(self.window)
-        self.matplot_frame.grid(column=0, row=1)
+        self.matplot_frame.grid(column=0, row=1, columnspan=3)
         #self.matplot_frame.pack(fill=tk.BOTH, expand=True)
 
         animationList = [0]
@@ -180,7 +177,7 @@ class Input:
         self.scale.grid(column=0, row=0)
 
         self.canvas = FigureCanvasTkAgg(self.Graph.fig, master=self.matplot_frame)
-        self.canvas.get_tk_widget().grid(column=0, row=1, sticky="NW")
+        self.canvas.get_tk_widget().grid(column=0, row=1, sticky="WE")
         #self.canvas.draw()
 
         # Create a scrollbar
@@ -201,13 +198,7 @@ class Input:
         tk.mainloop()
 
     def on_window_resize(self, event):
-        # Delay the canvas resizing to avoid continuous updates during window resizing
-        #self.window.after(100, self.resize_canvas, event.width, event.height)
-        #self.window.geometry("500x1000")  # Width x Height 
-        print("w: " + str(self.window.winfo_width()))
-        #print("h: " + str(event.height))
-        # self.canvas.get_tk_widget().configure(width=event.width, height= 0.8 * event.height)
-        self.canvas.get_tk_widget().configure(width=(self.window.winfo_width() * 0.8), height=(self.window.winfo_height() * 0.8))
+        self.canvas.get_tk_widget().configure(width=(self.window.winfo_width() * 0.95), height=(self.window.winfo_height() * 0.75))
 
     def resize_canvas(self, width, height):
         # Configure the canvas size to fill the available space
