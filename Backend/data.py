@@ -13,7 +13,11 @@
 #   File description:
 #       - user data from the GUI
 #
-from Backend import bTree
+
+# when executed by main
+#from Backend import bTree
+# debugging
+import bTree
 
 class Backend:
     def __init__(self, k):
@@ -71,7 +75,6 @@ class Backend:
             temp.append(self.treeKeysPerLevel[i])
             temp.append(self.edgeLists[i])
             self.treeList.append(temp)
-            print('test')
         self.operands = self.sourceDestination
         self.operands.append(self.references)
         self.operands.append(self.usedKeys)
@@ -112,6 +115,74 @@ class Backend:
         self.treeList = temp
         print('test')
 
+    def deleteKeyFromTree(self, key):
+        # reset all parameters of backend object
+        self.treeNodesPerLevel = []
+        self.treeKeysPerLevel = []
+        self.sourceDestination = []
+        self.btree.keysPerLevel = []
+        self.btree.nodeIds = []
+        self.animationList = []
+        self.btree.animationList = []
+        self.btree.searchedNodes = []
+        self.edgeLists = []
+        self.treeNodesPerLevel = []
+        self.references = []
+        self.treeList = []
+        self.operands = []
+        self.searchedNodes = []
+        # key in tree?
+        keyFound = False
+        self.animationList.append(2)
+        self.animationList.append(0)
+        if self.btree.searchKey(key, self.btree.rootNode):
+            keyFound = True
+            deleted = self.btree.deleteKey(key, self.btree.rootNode)
+            self.searchedNodes = self.btree.searchedNodes
+            self.treeNodesPerLevel = self.btree.numOfNodesPerLevelCopies
+            self.treeKeysPerLevel = self.btree.keysPerLevelCopies
+            self.edgeLists = self.btree.edgeListCopies
+            # temp var for iterations for treelist
+            iterations = len(self.animationList)
+            for i in range(iterations):
+                temp = []
+                temp.append(self.treeNodesPerLevel[i])
+                temp.append(self.treeKeysPerLevel[i])
+                temp.append(self.edgeLists[i])
+                self.treeList.append(temp)
+            self.operands.append(key)
+            self.operands.append(self.searchedNodes)
+            self.operands.append(deleted)
+            print('test')
+        else:
+            # search needs two tree lists so the animations works right
+            self.searchedNodes = self.btree.searchedNodes
+            list = self.btree.getTreeListForSearch()
+            self.treeList.append(list)
+            self.treeList.append(list)
+            self.operands.append(key)
+            self.operands.append(self.searchedNodes)
+            self.operands.append(keyFound)
+    
+    def resetTree(self):
+        # reset all parameters of backend object
+        self.treeNodesPerLevel = []
+        self.treeKeysPerLevel = []
+        self.sourceDestination = []
+        self.btree.keysPerLevel = []
+        self.btree.nodeIds = []
+        self.animationList = []
+        self.btree.animationList = []
+        self.btree.searchedNodes = []
+        self.edgeLists = []
+        self.treeNodesPerLevel = []
+        self.references = []
+        self.treeList = []
+        self.operands = []
+        self.searchedNodes = []
+        # animation list for reset is just 0
+        self.animationList.append(0)
+        self.treeList = self.btree.reset()
 #testData = Backend(2)
 #testData.insertKeyIntoTree(3)
 #testData.insertKeyIntoTree(4)
@@ -133,4 +204,3 @@ class Backend:
 #testData.insertKeyIntoTree(18)
 #testData.insertKeyIntoTree(24)
 #testData.btree.setEdgeList(testData.btree.rootNode)
-#print(testData)

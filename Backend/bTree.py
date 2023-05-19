@@ -15,7 +15,10 @@
 #       - inserting, deleting and searching algorithm
 #       - preparing lists for frontend (num of nodes per level, keys per level and edges)
 #
-from Backend import node
+# when executed by main
+#from Backend import node
+# debugging
+import node
 from collections import deque
 
 class BTree:
@@ -122,7 +125,7 @@ class BTree:
                 keysPerLevelBeforeSplit = self.keysPerLevel[:]
                 self.keysPerLevelCopies.append([list(l) for l in keysPerLevelBeforeSplit])
                 # split the full node
-                self.splitNode(temp, key,0) 
+                self.splitNode(temp, key,0,False) 
                 #self.insertNotFull(temp,key, source, target)
                 # key is inserted so animation is over -> 0
                 self.animationList.append(0)
@@ -146,19 +149,51 @@ class BTree:
                     i -= 1
                 # + 1 because insertion key must come after the first node key which is smaller
                 i += 1
+                self.animationList.append(1)
+                self.usedReferences.append(i)
+                self.usedKeys.append(key)
                 # check if node where key should go is full -> children[i] means all keys in this node are smaller!
-                if len(root.children[i].keys) == (2 * self.k): 
+                if len(root.children[i].keys) == (2 * self.k):
+                    # get the current keys per level of the tree
+                    nodePerLevelBeforeFullRootSplit = self.countNodesPerLevel()
+                    self.numOfNodesPerLevelCopies.append(nodePerLevelBeforeFullRootSplit)
+                    # set keys per level list -> has to be copy of list because every key list can be different!
+                    self.getKeysPerLevel()
+                    keysPerLevelBeforeFullRootSplit = self.keysPerLevel[:]
+                    self.keysPerLevelCopies.append([list(l) for l in keysPerLevelBeforeFullRootSplit])
+                    # edge list copy
+                    self.setEdgeList(self.rootNode)
+                    edgeListBeforeRootSplit = self.edgeList[:]
+                    self.edgeListCopies.append([list(l) for l in edgeListBeforeRootSplit])
+                    # reset target where node will be split
+                    targetNode = i
+                    sourceNode = self.rootNode.id
+                    self.visitiedNodes[0].append(sourceNode)
+                    self.visitiedNodes[1].append(targetNode)
                     # split node to make room for new key 
-                    self.splitNode(root, key,i) 
+                    self.splitNode(root, key,i,True) 
                     test = True
                     #if key > root.keys[i]:
                     #   i += 1
                 if not test:
-                    self.insertNotFull(root.children[i], key, source, target, False)
+                    # set keys per level list -> has to be copy of list because every key list can be different!
+                    self.getKeysPerLevel()
+                    keysPerLevelBeforeInsertFullRoot = self.keysPerLevel[:]
+                    self.keysPerLevelCopies.append([list(l) for l in keysPerLevelBeforeInsertFullRoot])
+                    # edge list copy
+                    self.setEdgeList(self.rootNode)
+                    edgeListBeforeInsertFullRoot = self.edgeList[:]
+                    self.edgeListCopies.append([list(l) for l in edgeListBeforeInsertFullRoot])
+                    # num of nodes list copy
+                    nodePerLevelBeforeFullRoot = self.countNodesPerLevel()
+                    self.numOfNodesPerLevelCopies.append(nodePerLevelBeforeFullRoot)
+                    self.insertNotFull(root.children[i], key, source, target, False,False)
+                    # key is inserted so animation is over -> 0
+                    self.animationList.append(0)
         # case2
         else:
             # just insert key into node 
-            self.insertNotFull(root,key, source, target,False) 
+            self.insertNotFull(root,key, source, target,False,False) 
             # key is inserted so animation is over -> 0
             self.animationList.append(0)
             
@@ -168,7 +203,9 @@ class BTree:
     # parent will have middle key of splitNode
     # splitNode will have all keys which are smaller than parents
     # newNode will have all keys which are greater than parents
-    def splitNode(self, parent, key, index):
+    def splitNode(self, parent, key, index, fromFullRoot):
+        # checks if parent needs to be split
+        rootSplit = False
         #source = []
         #target = []
         k = self.k
@@ -203,16 +240,11 @@ class BTree:
             self.getKeysPerLevel()
             keysPerLevelBeforeSplit = self.keysPerLevel[:]
             self.keysPerLevelCopies.append([list(l) for l in keysPerLevelBeforeSplit])
-        # add reference to node which holds all greater keys
-        parent.children.insert(index + 1, newNode)
         # fill parent with splitkey -> middle key
-        self.insertNotFull(parent,copyOfSplitKey, source, target, True)
-        # take all greater keys and insert them from order to 2 * order - 1
-        newNode.keys = splitNode.keys[middleIndex: 2 * k] 
-        # take all smaller keys and insert them from 0 to order - 1
-        splitNode.keys = splitNode.keys[0: middleIndex] 
-        self.visitiedNodes[0].append(target)
-        self.visitiedNodes[1].append(target)
+        self.insertNotFull(parent,copyOfSplitKey, source, target, True,False)
+        if not fromFullRoot:
+            self.visitiedNodes[0].append(target)
+            self.visitiedNodes[1].append(target)
         if not splitNode.leaf:
             # give newNode with all greater keys all references to all greater children
             newNode.children = splitNode.children[k: 2 * k] 
@@ -221,16 +253,50 @@ class BTree:
         if len(parent.keys) == (2 * self.k ) + 1:
             # root is full -> new root
             if parent is self.rootNode:
+                rootSplit = True
                 # new root node
                 temp = node.Node()
                 # reference to child which will hold all smaller keys!
                 temp.children.insert(0, parent) 
                 self.rootNode = temp
+                # give root id 0
+                self.updateNodeIds(self.rootNode)
+                source = parent.id
+                target = self.rootNode.id
+                self.visitiedNodes[0].append(source)
+                self.visitiedNodes[1].append(target)
+                # edge list copy
+                self.setEdgeList(self.rootNode)
+                edgeListBeforeSplit = self.edgeList[:]
+                if edgeListBeforeSplit:
+                    root = edgeListBeforeSplit[-1]
+                    if root:
+                        edge = edgeListBeforeSplit[-1]
+                        root.pop()
+                self.edgeListCopies.append([list(l) for l in edgeListBeforeSplit])
+                edgeListBeforeSplit[-1].append(edge)
+                # get the current keys per level of the tree
+                nodePerLevelBeforeFullRootSplit = self.countNodesPerLevel()
+                self.numOfNodesPerLevelCopies.append(nodePerLevelBeforeFullRootSplit)
+                # set keys per level list -> has to be copy of list because every key list can be different!
+                self.getKeysPerLevel()
+                keysPerLevelBeforeFullRootSplit = self.keysPerLevel[:]
+                for lists in keysPerLevelBeforeFullRootSplit:
+                    if copyOfSplitKey in lists:
+                        listIndex = keysPerLevelBeforeFullRootSplit.index(lists)
+                        valueIndex = lists.index(copyOfSplitKey)
+                        lists.remove(copyOfSplitKey)
+                self.keysPerLevelCopies.append([list(l) for l in keysPerLevelBeforeFullRootSplit])
+                keysPerLevelBeforeFullRootSplit[listIndex].insert(valueIndex,copyOfSplitKey)
                 # split the full node
-                self.splitRoot(temp,0) 
+                self.splitRoot(temp,0,splitNode) 
                 #self.insertNotFull(temp,key, source, target)
                 # key is inserted so animation is over -> 0
                 self.animationList.append(0)
+                source = self.rootNode.id
+                target = self.rootNode.id
+                self.visitiedNodes[0].append(source)
+                self.visitiedNodes[1].append(target)
                 # there is a new node in the tree so update the ids of the nodes
                 # this ensures that at every operation the node ids are correct
                 self.updateNodeIds(self.rootNode)
@@ -245,14 +311,47 @@ class BTree:
                         indexOfSplit = loopIndex
                 indexOfSplit -= 1
                 self.splitRoot(rootOfParent,indexOfSplit)
+        if rootSplit:
+            parentOfRootSplit = self.getParent(splitNode, self.rootNode)
+            # take all greater keys and insert them from order to 2 * order - 1
+            newNode.keys = splitNode.keys[middleIndex: 2 * k] 
+            # take all smaller keys and insert them from 0 to order - 1
+            splitNode.keys = splitNode.keys[0: middleIndex]
+            parentOfRootSplit.children.insert(index + 1, newNode)
+            self.updateNodeIds(self.rootNode)
+            nodePerLevelAfterRootSplit = self.countNodesPerLevel()
+            self.numOfNodesPerLevelCopies.append(nodePerLevelAfterRootSplit)
+            # set keys per level list -> has to be copy of list because every key list can be different!
+            self.getKeysPerLevel()
+            keysPerLevelAfterRootSplit = self.keysPerLevel[:]
+            self.keysPerLevelCopies.append([list(l) for l in keysPerLevelAfterRootSplit])
+            # edge list copy
+            self.setEdgeList(self.rootNode)
+            edgeListAfterRootSplit = self.edgeList[:]
+            self.edgeListCopies.append([list(l) for l in edgeListAfterRootSplit])
+        if not rootSplit:
+            # add reference to node which holds all greater keys
+            parent.children.insert(index + 1, newNode)
+            # take all greater keys and insert them from order to 2 * order - 1
+            newNode.keys = splitNode.keys[middleIndex: 2 * k] 
+            # take all smaller keys and insert them from 0 to order - 1
+            splitNode.keys = splitNode.keys[0: middleIndex]
+            self.updateNodeIds(self.rootNode)
+            # get the current keys per level of the tree
+            nodePerLevelBefore = self.countNodesPerLevel()
+            self.numOfNodesPerLevelCopies.append(nodePerLevelBefore)
+            self.setEdgeList(self.rootNode)
+            edgeListBeforeSplit = self.edgeList[:]
+            self.edgeListCopies.append([list(l) for l in edgeListBeforeSplit]) 
 
 
-    def splitRoot(self, parent, index):
+    def splitRoot(self, parent, index, willBeSplitt):
         source = []
         target = []
         k = self.k
         # full node
         splitNode = parent.children[index]
+        indexOfOrgSplitNode = splitNode.children.index(willBeSplitt)
         # second node where are all keys which are greater than the middle key will go
         newNode = node.Node(splitNode.leaf) 
         i = len(splitNode.keys) - 1
@@ -260,23 +359,32 @@ class BTree:
         # add reference to node which holds all greater keys
         parent.children.insert(index + 1, newNode) 
         # fill parent with splitkey -> middle key
-        self.insertNotFull(parent,splitNode.keys[middleIndex], source, target, True)
+        self.insertNotFull(parent,splitNode.keys[middleIndex], source, target, True, True)
         del splitNode.keys[middleIndex]
         # take all greater keys and insert them from order to 2 * order - 1
         newNode.keys = splitNode.keys[middleIndex: 2 * k] 
         # take all smaller keys and insert them from 0 to order - 1
-        splitNode.keys = splitNode.keys[0: middleIndex] 
-        # give newNode with all greater keys all references to all greater children
-        newNode.children = splitNode.children[k + 1: 2 * k + 2] 
-        # updte references to only smaller children
-        splitNode.children = splitNode.children[0: k + 1]
+        splitNode.keys = splitNode.keys[0: middleIndex]
+        if indexOfOrgSplitNode < 2:
+            # give newNode with all greater keys all references to all greater children
+            newNode.children = splitNode.children[k : 2 * k + 1] 
+            # updte references to only smaller children
+            splitNode.children = splitNode.children[0: k]
+        else:
+            # give newNode with all greater keys all references to all greater children
+            newNode.children = splitNode.children[k + 1: 2 * k + 1] 
+            # updte references to only smaller children
+            splitNode.children = splitNode.children[0: k + 1]
+            print('test')
 
     def getParent(self, searchNode, rootNode):
         if searchNode in rootNode.children:
             return rootNode
         if len(rootNode.children) > 0:
             for i in rootNode.children:
-                self.getParent(searchNode,i)
+                parent = self.getParent(searchNode,i)
+                if parent is not None:
+                    return parent
         else:
             return None
         
@@ -286,7 +394,7 @@ class BTree:
     # there are two cases:
     # 1. if node is leaf -> find correct place to insert and insert
     # 2. if node is not a leaf -> find correct node 
-    def insertNotFull(self, node, key, source, target, fromSplit):
+    def insertNotFull(self, node, key, source, target, fromSplit, fromRootSplit):
             test = False
             emptyNode = False
             if len(node.keys) == 0:
@@ -300,9 +408,10 @@ class BTree:
                     self.animationList.append(1)
                     self.usedKeys.append(key)
                     self.usedReferences.append(0)
-                    # get the current keys per level of the tree
-                    nodePerLevelBefore = self.countNodesPerLevel()
-                    self.numOfNodesPerLevelCopies.append(nodePerLevelBefore)
+                    if not fromRootSplit and not fromSplit:
+                        # get the current keys per level of the tree
+                        nodePerLevelBefore = self.countNodesPerLevel()
+                        self.numOfNodesPerLevelCopies.append(nodePerLevelBefore)
                     if not fromSplit:
                         # edge list copy
                         self.setEdgeList(self.rootNode)
@@ -332,7 +441,7 @@ class BTree:
                             self.visitiedNodes[0].append(source)
                             self.visitiedNodes[1].append(target)
                         else:
-                            currentPos = source[0]
+                            currentPos = source[-1]
                             source.append(currentPos)
                             target.append(node.id)
                             source.append(currentPos)
@@ -381,20 +490,15 @@ class BTree:
                     # + 1 because insertion key must come after the first node key which is smaller
                     i += 1
                     self.usedReferences.append(i)
-                    tempSource = source[0]
+                    targetNode = node.children[i].id
+                    tempSource = node.id
                     self.visitiedNodes[0].append(tempSource)
-                    self.visitiedNodes[1].append(i)
-                    # get the current keys per level of the tree
-                    nodePerLevelBeforeSplit = self.countNodesPerLevel()
-                    self.numOfNodesPerLevelCopies.append(nodePerLevelBeforeSplit)
+                    self.visitiedNodes[1].append(targetNode)
                     # check if node where key should go is full -> children[i] means all keys in this node are smaller!
                     if not node.children[i].children:
                         if len(node.children[i].keys) == (2 * self.k):
-                            self.setEdgeList(self.rootNode)
-                            edgeListBeforeSplit = self.edgeList[:]
-                            self.edgeListCopies.append([list(l) for l in edgeListBeforeSplit]) 
                             # split node to make room for new key 
-                            self.splitNode(node, key,i) 
+                            self.splitNode(node, key,i,False) 
                             test = True
                             # get the current keys per level of the tree
                             self.getKeysPerLevel()
@@ -403,12 +507,51 @@ class BTree:
                             #if key > node.keys[i]:
                              #   i += 1
                     if not test:
-                        self.insertNotFull(node.children[i], key, source, target, False)
+                        self.insertNotFull(node.children[i], key, source, target, False,False)
 
 
     #TODO implement deleting key
-    #def deleteKey(key):
-    #    null
+    def deleteKey(self,key, nextNode = None):
+        # reset all attributes
+        self.numOfNodesPerLevel = []
+        self.numOfNodesPerLevelCopies = []
+        self.keysPerLevel = []
+        self.keysPerLevelCopies = []
+        self.edgeList = []
+        self.edgeListCopies = []
+        self.searchedNodes = []
+        deleted = False
+        # set keys per level list -> has to be copy of list because every key list can be different!
+        self.getKeysPerLevel()
+        keysPerLevelBeforeInsert = self.keysPerLevel[:]
+        self.keysPerLevelCopies.append([list(l) for l in keysPerLevelBeforeInsert])
+        # edge list copy
+        self.setEdgeList(self.rootNode)
+        edgeListBeforeInsert = self.edgeList[:]
+        self.edgeListCopies.append([list(l) for l in edgeListBeforeInsert])
+        # num of nodes list copy
+        nodePerLevelBefore = self.countNodesPerLevel()
+        self.numOfNodesPerLevelCopies.append(nodePerLevelBefore)
+        # use search to find node with key inside
+        nodeWithKey = self.searchKey(key, nextNode)
+        # if node has more than k + 1 keys, just delete it
+        if len(nodeWithKey.keys) >= (self.k + 1) :
+            nodeWithKey.keys.remove(key)
+            deleted = True
+        # set keys per level list -> has to be copy of list because every key list can be different!
+        self.getKeysPerLevel()
+        keysPerLevelBeforeInsert = self.keysPerLevel[:]
+        self.keysPerLevelCopies.append([list(l) for l in keysPerLevelBeforeInsert])
+        # edge list copy
+        self.setEdgeList(self.rootNode)
+        edgeListBeforeInsert = self.edgeList[:]
+        self.edgeListCopies.append([list(l) for l in edgeListBeforeInsert])
+        # num of nodes list copy
+        nodePerLevelBefore = self.countNodesPerLevel()
+        self.numOfNodesPerLevelCopies.append(nodePerLevelBefore)
+        return deleted
+
+
 
     # search key in node
     # go through node and check if key is there
@@ -537,37 +680,66 @@ class BTree:
             self.nodeIds.append(currentNode.id)
 
     def setEdgeList(self, node):
-        # empty list for edge conncection
         res = []
-        edgeList = []
-        # Base Case
-        if node is None:
+        if self.rootNode is None:
             return
-        # Create an empty queue
-        # for level order traversal
-        queue = []
-        # Enqueue Root and initialize height
-        queue.append(node)
-        while(len(queue) > 0):
-            currNode = queue.pop(0)
-            # Enqueue children
-            for child in currNode.children:
-                res.append(child.id)
+        # create an empty queue and enqueue the root node
+        queue = deque()
+        queue.append(self.rootNode)
+        # create a stack to reverse level order nodes
+        stack = deque()
+        # loop till queue is empty
+        while queue:
+            # process each node in the queue and enqueue their children
+            curr = queue.popleft()
+            # push the current node into the stack
+            stack.append(curr)
+            # it is important to process the right node before the left node
+            for child in reversed(curr.children):
                 queue.append(child)
-            edgeList.append(res.copy())
-            res = []
-        # frontend needs the edge list is in reverse level order, so just reverse the list
-        edgeList.reverse()
-        edgeListCopy = edgeList[:]
+        # pop all nodes from the stack and print them
+        while stack:
+            #print(stack.pop(), end=' ')
+            currentNode = stack.pop()
+            temp = []
+            for child in currentNode.children:
+                temp.append(child.id)
+            res.append(temp)
+        edgeListCopy = res[:]
         self.edgeList = edgeListCopy
+
+
 
     def getTreeListForSearch(self):
         # create a tree list for searching
         # tree list is made of nodes per level, keys per level and edges
         treeList = []
+        keysPerLevelCopies = []
         numOfNodesPerLevel = self.countNodesPerLevel()
         self.getKeysPerLevel()
         keysPerLevel = self.keysPerLevel[:]
+        keysPerLevelCopies.append([list(l) for l in keysPerLevel])
+        self.setEdgeList(self.rootNode)
+        edgeList = self.edgeList[:]
+        # temp list for tree list
+        temp = []
+        temp.append(numOfNodesPerLevel)
+        temp.append(keysPerLevel)
+        temp.append(edgeList)
+        treeList.append(temp)
+        return treeList
+    
+
+    def reset(self):
+        # make new root and update all attributes
+        newRoot = node.Node(True)
+        self.rootNode = newRoot
+        treeList = []
+        keysPerLevelCopies = []
+        numOfNodesPerLevel = self.countNodesPerLevel()
+        self.getKeysPerLevel()
+        keysPerLevel = self.keysPerLevel[:]
+        keysPerLevelCopies.append([list(l) for l in keysPerLevel])
         self.setEdgeList(self.rootNode)
         edgeList = self.edgeList[:]
         # temp list for tree list

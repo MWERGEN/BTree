@@ -27,6 +27,7 @@
 #
 
 # library imports
+import random
 import time
 import math
 import numpy as np
@@ -169,18 +170,13 @@ class BTreeVisualization:
         self.currentAnimation = ani.Animation(animTypeList, treeList, operands)
 
     def insert12345_button_clicked(self):
-        self.temp += 1
-        #animTypeList = [1, 0]
-        #treeList = [[[1], [[]], [[]]], [[1], [[1]], [[]]]]
-        #operands = [[0, 0], [0, 0], [0, 0], [1, 1]]
-        self.backend.insertKeyIntoTree(self.temp)
+        self.backend.insertKeyIntoTree(random.randint(1, 9999))
         animationList = self.backend.animationList
         treeList = self.backend.treeList
         operands = self.backend.operands
-
-        #print(animationList)
-        #print(treeList)
-        #print(operands)
+        print(animationList)
+        print(treeList)
+        print(operands)
         self.currentAnimation = ani.Animation(animationList, treeList, operands)
 
     def insert65_button_clicked(self):
