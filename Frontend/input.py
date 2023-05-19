@@ -27,7 +27,9 @@ import threading
 class Input:
     def __init__(self) -> None:
         self.window = tk.Tk()
+
         self.window.columnconfigure(0, weight=1)
+        self.window.columnconfigure(1, weight=1)
         self.window.columnconfigure(2, weight=1)
         self.window.rowconfigure(0, weight=1)
         self.window.rowconfigure(1, weight=1)
@@ -119,10 +121,9 @@ class Input:
         #self.mode.trace('w', self.mode_change)
         self.mode_change(self)
         
-
         # settings menu
         self.settings_fields_frame = tk.Frame(master=self.window)
-        self.settings_fields_frame.grid(column=2, row=0, sticky="NE")
+        self.settings_fields_frame.grid(column=1, row=0, sticky="NE")
         # Order
         self.settings_order_label = tk.Label(self.settings_fields_frame, text="Order:")
         self.settings_order_label.grid(column=0, row=0, sticky="W")
@@ -154,11 +155,9 @@ class Input:
         # should be row=1 and column=0 of self.window
 
         # frame for matplot content
-        self.matplot_frame = tk.Frame(master=self.window)
+        self.matplot_frame = tk.Frame(self.window)
         self.matplot_frame.grid(column=0, row=1, columnspan=3)
-        # create a scale widget for selecting the number
-        self.scale = tk.Scale(self.matplot_frame, from_=1, to=10, orient=tk.HORIZONTAL)
-        self.scale.grid(column=0, row=0)
+        #self.matplot_frame.pack(fill=tk.BOTH, expand=True)
 
         animationList = [0]
         treeList = [[[1], [[]], [[]]]]
@@ -168,28 +167,43 @@ class Input:
         self.Graph = bt.BTreeVisualization(2, 0.2, 0.03, 0.1, animation)
         #self.Graph.initializeTK()
 
-        self.canvas = FigureCanvasTkAgg(self.Graph.fig, master=self.matplot_frame)
         self.matplot_frame.counter = 0
         self.matplot_frame.after(10, self.countNext10Milliseconds)
-        self.canvas.draw()
-
-        self.canvas.get_tk_widget().grid(column=0, row=1, sticky='WE')
         self.matplot_frame.columnconfigure(0, weight=1)
-        self.matplot_frame.rowconfigure(3, weight=1)
+        self.matplot_frame.rowconfigure(0, weight=1)
+
+        # create a scale widget for selecting the number
+        self.scale = tk.Scale(self.matplot_frame, from_=1, to=10, orient=tk.HORIZONTAL)
+        self.scale.grid(column=0, row=0)
+
+        self.canvas = FigureCanvasTkAgg(self.Graph.fig, master=self.matplot_frame)
+        self.canvas.get_tk_widget().grid(column=0, row=1, sticky="WE")
+        #self.canvas.draw()
 
         # Create a scrollbar
         scrollbar = ttk.Scrollbar(self.matplot_frame, orient=tk.VERTICAL, command=self.canvas.get_tk_widget().yview)
         scrollbar.grid(row=1, column=1, sticky="ns")
-        self.canvas.get_tk_widget().configure(yscrollcommand=scrollbar.set)
+        #self.canvas.get_tk_widget().configure(yscrollcommand=scrollbar.set)
 
-        self.matplot_frame.bind("<Configure>", self.update_scroll_region)
+        #self.matplot_frame.bind("<Configure>", self.update_scroll_region)
 
         self.canvas.mpl_connect('motion_notify_event', self.on_mouse_motion)
 
-        self.window.after(0, self.Graph.initializeGraph)  # Schedule the update in the main event loop
+        self.Graph.initializeGraph()
 
+        self.commandList = []
+
+        # Bind the event handler to window resize event
+        self.matplot_frame.bind("<Configure>", self.on_window_resize)
         tk.mainloop()
 
+    def on_window_resize(self, event):
+        self.canvas.get_tk_widget().configure(width=(self.window.winfo_width() * 0.95), height=(self.window.winfo_height() * 0.75))
+
+    def resize_canvas(self, width, height):
+        # Configure the canvas size to fill the available space
+        self.canvas.get_tk_widget().configure(width=self.window.winfo_width(), height=height)
+        
     # raises a counter all 10 milliseconds
     # used for correct timing of animation
     def countNext10Milliseconds(self):
@@ -204,6 +218,14 @@ class Input:
         # get the selected speed from the user
         # pass it to the bTreeVisualization
         self.Graph.speed = self.scale.get()
+        if self.Graph.currentAnimation.type == 0 and self.commandList:
+            if self.commandList[0][0] == 1:
+                self.Graph.insert(self.commandList[0][1])
+            elif self.commandList[0][0] == 2:
+                self.Graph.search(self.commandList[0][1])
+            elif self.commandList[0][0] == 3:
+                self.Graph.delete(self.commandList[0][1])
+            self.commandList.pop(0)
         # schedule the next call to my_function in 1 second
         self.matplot_frame.after(10, self.countNext10Milliseconds)
 
@@ -305,13 +327,15 @@ class Input:
             self.random_amount_legs_field.grid(column=18, row=1, sticky="W")
             
     def confirm_input(self, *args):
+        input = self.simple_input_field.get()
+        self.separate_input(input)
         print('confirm clicked')
-        if self.action.get() == 1:
-            self.Graph.insert(int(self.simple_input_field.get()))
-        elif self.action.get() == 2:
-            self.Graph.search(int(self.simple_input_field.get()))
-        elif self.action.get() == 3:
-            self.Graph.delete(int(self.simple_input_field.get()))
+        # if self.action.get() == 1:
+        #     self.Graph.insert(int(self.simple_input_field.get()))
+        # elif self.action.get() == 2:
+        #     self.Graph.search(int(self.simple_input_field.get()))
+        # elif self.action.get() == 3:
+        #     self.Graph.delete(int(self.simple_input_field.get()))
         
     def update_settings(self, *args):
         self.Graph.reset()
@@ -326,7 +350,73 @@ class Input:
         )
         print(file_name)
 
+    # takes the input
+    # checks if input is valid 
+    # only allows ints separated by comma or blank space
+    # also interval is limited from 1 to 9999
+    # if valid: creates an int list with all int inputs
+    def separate_input(self, input):
+        # index for iterating over string input
+        index = 0
+        # flag to indicate if invalid char has been recognizes
+        # empty input is invalid
+        if input == "":
+            invalid = True
+        # non-empty input is valid in the beginning
+        else:
+            invalid = False
+        # saves the current number as a string
+        currentNumStr = ""
+        # list with all number from input
+        inputNums = []
+        # iterate over all characters in input
+        while index < len(input):
+            # only continue working if input is still valid
+            if not invalid:
+                # comma or blank space separates two input-numbers
+                if input[index] == "," or input[index] == " ":
+                    # check if the current number is really an int
+                    if currentNumStr.isdigit():
+                        # only allow ints between 0 and 9999
+                        if int(currentNumStr) > 0 and int(currentNumStr) < 9999:
+                            # append the current number as an int to the input List
+                            inputNums.append((self.mode.get(), int(currentNumStr)))
+                        # invalid int
+                        else:
+                            # set invalid flag
+                            invalid = True
+                            print("invalid")
+                    # reset the current number
+                    currentNumStr = ""
+                # if the current char is an int
+                elif input[index].isdigit():
+                    # add it to the current number as a string
+                    currentNumStr += input[index]
+                # invalid character in input
+                else:
+                    # set invalid flag
+                    invalid = True
+                    print("invalid")
+            # increment index for next char
+            index += 1
+        # check if the current number is a digit
+        # if the last character in input is a digit -> it is not appended yet
+        if currentNumStr.isdigit() and not invalid:
+            # only allow ints between 0 and 9999
+            if int(currentNumStr) > 0 and int(currentNumStr) < 9999:
+                # append the last number to the number list
+                inputNums.append((self.mode.get(), int(currentNumStr)))
+            # invalid int
+            else:
+                # set invalid flag
+                invalid = True
+                print("invalid")
+        # only continue with input if it is valid
+        if not invalid:
+            self.commandList.extend(inputNums)
+            print(self.commandList)
+
         
-if __name__ == '__main__':
-    input_obj = Input()
+#if __name__ == '__main__':
+#    input_obj = Input()
 

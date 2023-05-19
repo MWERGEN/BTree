@@ -293,10 +293,10 @@ class BTreeVisualization:
         if not duplicate:
             # perform insertion in backend
             self.backend.insertKeyIntoTree(key)
-        else:
+        #else:
             # visualize search for the duplicate
             # in order to underline that it is a duplicate
-            self.backend.searchKeyInTree(key)
+            #self.backend.searchKeyInTree(key)
         # get updated animation list
         animationList = self.backend.animationList
         # get updated tree List
