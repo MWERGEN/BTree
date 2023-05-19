@@ -352,8 +352,8 @@ class BTree:
 
 
     def splitRoot(self, parent, index, willBeSplitt):
-        source = []
-        target = []
+        source = parent.id
+        target = parent.id
         k = self.k
         # full node
         splitNode = parent.children[index]
