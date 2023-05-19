@@ -160,11 +160,11 @@ class Input:
         self.scale = tk.Scale(self.matplot_frame, from_=1, to=10, orient=tk.HORIZONTAL)
         self.scale.grid(column=0, row=0)
 
-        animTypeList = [0]
+        animationList = [0]
         treeList = [[[1], [[]], [[]]]]
         operands = []
 
-        animation = ani.Animation(animTypeList, treeList, operands)
+        animation = ani.Animation(animationList, treeList, operands)
         self.Graph = bt.BTreeVisualization(2, 0.2, 0.03, 0.1, animation)
         #self.Graph.initializeTK()
 
@@ -314,7 +314,8 @@ class Input:
             self.Graph.delete(int(self.simple_input_field.get()))
         
     def update_settings(self, *args):
-        print('update clicked')
+        self.Graph.reset()
+        print("reset")
         
     def browse_files(self, *args):
         # TODO do something with file(name)

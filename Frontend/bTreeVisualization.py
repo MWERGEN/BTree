@@ -296,6 +296,15 @@ class BTreeVisualization:
     def delete(self, key):
         print("delete key" + str(key))
 
+    def reset(self):
+        # self.backend.reset()
+        animationList = [0]
+        treeList = [[[1], [[]], [[]]]]
+        operands = []
+        self.currentAnimation = ani.Animation(animationList, treeList, operands)
+        self.currentAnimation.updateNewAnimation()
+        self.updateGraph()
+
     # initializes all keys with a lightblue background
     def initializeColorKeyList(self):
         self.colorKeyList = []
