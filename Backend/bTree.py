@@ -719,4 +719,25 @@ class BTree:
         temp.append(edgeList)
         treeList.append(temp)
         return treeList
+    
+
+    def reset(self):
+        # make new root and update all attributes
+        newRoot = node.Node(True)
+        self.rootNode = newRoot
+        treeList = []
+        keysPerLevelCopies = []
+        numOfNodesPerLevel = self.countNodesPerLevel()
+        self.getKeysPerLevel()
+        keysPerLevel = self.keysPerLevel[:]
+        keysPerLevelCopies.append([list(l) for l in keysPerLevel])
+        self.setEdgeList(self.rootNode)
+        edgeList = self.edgeList[:]
+        # temp list for tree list
+        temp = []
+        temp.append(numOfNodesPerLevel)
+        temp.append(keysPerLevel)
+        temp.append(edgeList)
+        treeList.append(temp)
+        return treeList
 

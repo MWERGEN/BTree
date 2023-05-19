@@ -160,6 +160,27 @@ class Backend:
             self.operands.append(key)
             self.operands.append(self.searchedNodes)
             self.operands.append(keyFound)
+    
+    def resetTree(self):
+        # reset all parameters of backend object
+        self.treeNodesPerLevel = []
+        self.treeKeysPerLevel = []
+        self.sourceDestination = []
+        self.btree.keysPerLevel = []
+        self.btree.nodeIds = []
+        self.animationList = []
+        self.btree.animationList = []
+        self.btree.searchedNodes = []
+        self.edgeLists = []
+        self.treeNodesPerLevel = []
+        self.references = []
+        self.treeList = []
+        self.operands = []
+        self.searchedNodes = []
+        # animation list for reset is just 0
+        self.animationList.append(0)
+        self.treeList = self.btree.reset()
+
 
 
 
@@ -174,6 +195,7 @@ testData.insertKeyIntoTree(6)
 testData.deleteKeyFromTree(0)
 testData.insertKeyIntoTree(7)
 testData.insertKeyIntoTree(8)
+testData.resetTree()
 testData.insertKeyIntoTree(18)
 testData.insertKeyIntoTree(24)
 testData.insertKeyIntoTree(25)
