@@ -1,8 +1,0 @@
-*.synctex.gz
-.project
-output/
-*.swp
-*.backup
-*.bak
-*.orig
-*compile.log
