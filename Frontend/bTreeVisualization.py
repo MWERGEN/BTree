@@ -303,6 +303,9 @@ class BTreeVisualization:
         treeList = self.backend.treeList
         # get updated operands
         operands = self.backend.operands
+        print(animationList)
+        print(treeList)
+        print(operands)
         # create the animation for the insertion or the search
         self.currentAnimation = ani.Animation(animationList, treeList, operands)
 
