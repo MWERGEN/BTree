@@ -332,6 +332,8 @@ class Input:
 
     # takes the input
     # checks if input is valid 
+    # only allows ints separated by comma or blank space
+    # also interval is limited from 1 to 9999
     # if valid: creates an int list with all int inputs
     def separate_input(self, input):
         # index for iterating over string input
@@ -350,8 +352,15 @@ class Input:
                 if input[index] == "," or input[index] == " ":
                     # check if the current number is really an int
                     if currentNumStr.isdigit():
-                        # append the current number as an int to the input List
-                        inputNums.append(int(currentNumStr))
+                        # only allow ints between 0 and 9999
+                        if int(currentNumStr) > 0 and int(currentNumStr) < 9999:
+                            # append the current number as an int to the input List
+                            inputNums.append(int(currentNumStr))
+                        # invalid int
+                        else:
+                            # set invalid flag
+                            invalid = True
+                            print("invalid")
                     # reset the current number
                     currentNumStr = ""
                 # if the current char is an int
@@ -367,9 +376,16 @@ class Input:
             index += 1
         # check if the current number is a digit
         # if the last character in input is a digit -> it is not appended yet
-        if currentNumStr.isdigit():
-            # append the last number to the number list
-            inputNums.append(int(currentNumStr))
+        if currentNumStr.isdigit() and not invalid:
+            # only allow ints between 0 and 9999
+            if int(currentNumStr) > 0 and int(currentNumStr) < 9999:
+                # append the last number to the number list
+                inputNums.append(int(currentNumStr))
+            # invalid int
+            else:
+                # set invalid flag
+                invalid = True
+                print("invalid")
         # only continue with input if it is valid
         if not invalid:
             print(inputNums)
