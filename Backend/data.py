@@ -109,8 +109,11 @@ class Backend:
         self.operands.append(keyFound)
         # search needs two tree lists so the animations works right
         list = self.btree.getTreeListForSearch()
-        self.treeList.append(list)
-        self.treeList.append(list)
+        temp = []
+        temp.append(list)
+        temp.append(list)
+        self.treeList = temp
+        print('test')
 
     def deleteKeyFromTree(self, key):
         # reset all parameters of backend object
@@ -180,31 +183,24 @@ class Backend:
         # animation list for reset is just 0
         self.animationList.append(0)
         self.treeList = self.btree.reset()
-
-
-
-
-testData = Backend(2)
-testData.insertKeyIntoTree(18)
-testData.insertKeyIntoTree(24)
-testData.insertKeyIntoTree(25)
-testData.insertKeyIntoTree(26)
-testData.insertKeyIntoTree(27)
-testData.insertKeyIntoTree(28)
-testData.insertKeyIntoTree(29)
-testData.insertKeyIntoTree(30)
-testData.insertKeyIntoTree(31)
-testData.insertKeyIntoTree(10)
-testData.insertKeyIntoTree(99)
-testData.insertKeyIntoTree(3706)
-testData.insertKeyIntoTree(1)
-testData.insertKeyIntoTree(2)
-testData.insertKeyIntoTree(3)
-testData.insertKeyIntoTree(4)
-testData.insertKeyIntoTree(200)
-testData.insertKeyIntoTree(300)
-testData.insertKeyIntoTree(500)
-testData.insertKeyIntoTree(5)
-testData.resetTree()
+#testData = Backend(2)
+#testData.insertKeyIntoTree(3)
+#testData.insertKeyIntoTree(4)
+#testData.insertKeyIntoTree(5)
+#testData.insertKeyIntoTree(1)
+#testData.insertKeyIntoTree(2)
+#testData.insertKeyIntoTree(7)
+#testData.insertKeyIntoTree(99)
+#testData.insertKeyIntoTree(12)
+#testData.insertKeyIntoTree(1)
+#testData.insertKeyIntoTree(2)
+#testData.insertKeyIntoTree(3)
+#testData.insertKeyIntoTree(4)
+#testData.insertKeyIntoTree(5)
+#testData.searchKeyInTree(1)
+#testData.insertKeyIntoTree(6)
+#testData.insertKeyIntoTree(7)
+#testData.insertKeyIntoTree(8)
+#testData.insertKeyIntoTree(18)
+#testData.insertKeyIntoTree(24)
 #testData.btree.setEdgeList(testData.btree.rootNode)
-print(testData)

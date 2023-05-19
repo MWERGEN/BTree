@@ -747,6 +747,6 @@ class BTree:
         temp.append(numOfNodesPerLevel)
         temp.append(keysPerLevel)
         temp.append(edgeList)
-        treeList.append(temp)
+        treeList = temp
         return treeList
 

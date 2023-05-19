@@ -14,10 +14,7 @@
 #       - main file
 #
 
-from Frontend import gui
+from Frontend import input
 
 # gui object
-myGui = gui.Gui()
-
-# call a draw test
-myGui.drawGraph()
+gui = input.Input()

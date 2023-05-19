@@ -124,6 +124,7 @@ class BTreeVisualization:
         self.visual_style = {}
         # rectangular vertices
         self.visual_style['vertex_shape'] = 'rectangle'
+        
         #######
         # TK 
         #######
@@ -140,117 +141,14 @@ class BTreeVisualization:
         # initialize the subplots where the graph will be displayed
         # black background for design
         self.ax = self.fig.add_subplot(facecolor='black')
-        self.root = Tk.Tk()
-        # initialize the counter
-        self.root.counter = 0
-        self.canvas = FigureCanvasTkAgg(self.fig, master=self.root)
-        self.canvas.draw()
+        # animation speed
         self.speed = 1
-        self.scale = 0
-        self.temp = 0
+        #self.scale = 0
+        #self.temp = 0
+        # backend object
         self.backend = data.Backend(2)
-
-    def countNext10Milliseconds(self):
-        # check if 10 seconds have passed
-        ##if self.root.counter == 10:
-        ##    self.root.counter = 0
-        ##    print("Called every 10 seconds")
-        # increment the counter
-        self.root.counter += 1
-        # schedule the next call to my_function in 1 second
-        self.root.after(10, self.countNext10Milliseconds)
-
-    def initializeTK(self):
-        # schedule the first call to my_function in 1 second
-        self.root.after(10, self.countNext10Milliseconds)
-        #self.root.geometry("700x400")
-
-        label1 = Tk.Label(self.root,text="B-Tree control elements").grid(column=0, row=0)
-
-        button0 = Tk.Button(self.root, text='insert 1 2 3 4 5', command=self.insert12345_button_clicked)
-        button0.grid(column=0, row=1)
-
-        button1 = Tk.Button(self.root, text='search 5', command=self.search_button_clicked)
-        button1.grid(column=0, row=2)
-
-        button2 = Tk.Button(self.root, text='insert 17', command=self.insert17_button_clicked)
-        button2.grid(column=0, row=3)
-
-        button2 = Tk.Button(self.root, text='insert 65', command=self.insert65_button_clicked)
-        button2.grid(column=0, row=4)
-
-        button3 = Tk.Button(self.root, text='delete 2 pt.1', command=self.delete_button_clicked)
-        button3.grid(column=0, row=5)
-
-        button4 = Tk.Button(self.root, text='delete 2 pt.2', command=self.delete2_button_clicked)
-        button4.grid(column=0, row=6)
-
-        # create a scale widget for selecting the number
-        self.scale = Tk.Scale(self.root, from_=1, to=10, orient=Tk.HORIZONTAL)
-        self.scale.grid(column=0, row=7)
-
-        label2 = Tk.Label(self.root,text="B-Tree visualization").grid(column=0, row=8)
-        
-        self.canvas.get_tk_widget().grid(column=0,row=9, sticky='nsew')
-        self.root.columnconfigure(0, weight=1)
-        self.root.rowconfigure(9, weight=1)
-
-        # Create a frame inside the canvas to hold the content
-        #frame = ttk.Frame(self.canvas)
-        #self.canvas.create_window(0, 0, anchor='nw', window=frame)
-
-        # Create a scrollbar
-        scrollbar = ttk.Scrollbar(self.root, orient=Tk.VERTICAL, command=self.canvas.get_tk_widget().yview)
-        scrollbar.grid(row=9, column=1, sticky="ns")
-        self.canvas.get_tk_widget().configure(yscrollcommand=scrollbar.set)
-
-        self.root.bind("<Configure>", self.update_scroll_region)
-        #self.canvas.get_tk_widget().bind('<Motion>', self.motion)
-        # Bind the <Motion> event to the canvas and associate it with the on_mouse_motion function
-        self.canvas.mpl_connect('motion_notify_event', self.on_mouse_motion)
-        # Bind the resize event to the tkinter window
-
-    # recognizes when mouse is over the tree and displays the keys of the node the cursor is currently on
-    def on_mouse_motion(self, event):
-        # flag for checking if the cursor is on a key   = True
-        #                                       or not  = False
-        flagOnNode = False
-        # index to remember the index of the node that is currently observed
-        index = 0
-        # self.xGNodes saves the center x position of the node 
-        # now we have to pre-calculate the distance from the center of the node to its outer rim
-        xDistCentreToEdge = self.k * (self.refWidth + self.keyWidth) + 0.5 * self.refWidth
-        # self.yGNodes saves the center y position of the node 
-        # now we have to pre-calculate the distance from the center of the node to edge above / underneath
-        yDistCentreToEdge = 2 * self.refWidth
-        # Check if the event occurred on the axis = the graph
-        if event.inaxes is self.ax:
-            # Iterate over all tk-widgets in the row for the hover-label
-            for widget in self.root.grid_slaves(row=10):
-                # remove the old label to create a new one later on
-                widget.grid_remove()
-            # save x position on the graph's axis of the mouse cursor
-            x = event.xdata
-            # save y position on the graph's axis of the mouse cursor
-            y = event.ydata
-            # iterate over all nodes
-            for i in self.keysList:
-                # check if the cursor is in the x-range of the current observed node
-                if x <= self.xGNodes[index] + xDistCentreToEdge and x >= self.xGNodes[index] - xDistCentreToEdge:
-                    # check if the cursor is in the y-range of the current observed node
-                    if y <= self.yGNodes[index] + yDistCentreToEdge and y >= self.yGNodes[index] - yDistCentreToEdge:
-                        # cursor is on a node
-                        flagOnNode = True
-                        # save the array of the keys ( = i ) of the node the cursor is on
-                        nodeOnHover = str(i)
-                # raise index in order to check the other nodes
-                index += 1
-            # if the cursor is not on any node
-            if not flagOnNode:
-                # advice for user
-                nodeOnHover = "Hover over a node to display its keys!"
-            # display the label with the advice or the keys in the hovered node
-            labelHover = Tk.Label(self.root,text=nodeOnHover).grid(column=0, row=10)
+        # time counter for correct timing of animations
+        self.timeCounter = 0
 
     def insert17_button_clicked(self):
         # self.currentAnimation = self.backendObj.insert(17)
@@ -301,16 +199,15 @@ class BTreeVisualization:
         self.currentAnimation = ani.Animation(animTypeList, treeList, operands)
 
     def search_button_clicked(self):
-        # type 2 heißt suchen (bzw. löschen)
-        animTypeList = [2, 0]
-        # zwei Bäume, da zwei Animationen
-        treeList = [[[5, 1], [[1, 2], [4, 5, 6], [9, 10, 15, 20], [40, 50, 60, 700], [100, 200, 420], [3, 7, 30, 80]], [[], [], [], [], [], [0, 1, 2, 3, 4]]], [[5, 1], [[1, 2], [4, 5, 6], [9, 10, 15, 20], [40, 50, 60, 700], [100, 200, 420], [3, 7, 30, 80]], [[], [], [], [], [], [0, 1, 2, 3, 4]]]]
-        #           1.   2.      3.
-        # 1.:   welchen Key suchen wir?
-        # 2.:   welche Knoten haben wir abgesucht?
-        # 3.:   Key gefunden?
-        operands = [5, [5, 1], True]
-        self.currentAnimation = ani.Animation(animTypeList, treeList, operands)
+        self.backend.searchKeyInTree(6)
+        animationList = self.backend.animationList
+        treeList = self.backend.treeList
+        operands = self.backend.operands
+
+        print(animationList)
+        print(treeList)
+        print(operands)
+        self.currentAnimation = ani.Animation(animationList, treeList, operands)
 
     def delete_button_clicked(self):
         animTypeList = [2, 0]
@@ -323,22 +220,6 @@ class BTreeVisualization:
         treeList = [[[5, 1], [[1], [5, 6], [9, 10, 15, 20], [40, 50, 60, 700], [100, 200, 420], [3, 7, 30, 80]], [[], [], [], [], [], [0, 1, 2, 3, 4]]], [[5, 1], [[1], [5, 6], [9, 10, 15, 20], [40, 50, 60, 700], [100, 200, 420], [4, 7, 30, 80]], [[], [], [], [], [], [0, 1, 2, 3, 4]]], [[5, 1], [[1, 3], [5, 6], [9, 10, 15, 20], [40, 50, 60, 700], [100, 200, 420], [4, 7, 30, 80]], [[], [], [], [], [], [0, 1, 2, 3, 4]]]] 
         operands = [[1, 5, 0], [5, 0, 0], [0, 0, 0], [4, 3, 3]]
         self.currentAnimation = ani.Animation(animTypeList, treeList, operands)
-
-    def get_row_height(self, widget, row):
-        # Get the number of rows and columns in the grid
-        num_rows = widget.grid_size()[1]
-        # Check if the specified row is within the valid range
-        if row >= num_rows:
-            raise IndexError("Row index out of range")
-        # Get the bounding box information of the specified row
-        bbox = widget.grid_bbox(row, 0)
-        # Calculate the height of the row
-        height = bbox[3] - bbox[1]
-        return height
-
-    # Update the scrollable region when the canvas size changes
-    def update_scroll_region(self, event):
-        self.canvas.get_tk_widget().configure(scrollregion=self.canvas.get_tk_widget().bbox("all"))
 
     # resets all values of the graph in order to print it again in a different form
     def updateGraph(self):
@@ -401,6 +282,13 @@ class BTreeVisualization:
         self.assertValuesToGraphs()
         # calculate the edges' relationships
         self.calcEdges()
+
+    def insert(self, key):
+        self.backend.insertKeyIntoTree(key)
+        animationList = self.backend.animationList
+        treeList = self.backend.treeList
+        operands = self.backend.operands
+        self.currentAnimation = ani.Animation(animationList, treeList, operands)
 
     # initializes all keys with a lightblue background
     def initializeColorKeyList(self):
@@ -645,7 +533,7 @@ class BTreeVisualization:
         # reset the root counter for time scheduling
         if not anim.resetted:
             # reset counter
-            self.root.counter = 0
+            self.timeCounter = 0
             # prevent counter to be resetted every iteration
             anim.resetted = True
             anim.updateNewAnimation()                                   ### !!!!!!!!!!!!!!!!!!!!
@@ -728,7 +616,7 @@ class BTreeVisualization:
                 # if the key would surpass the destination node in the next iteration
                 else:
                     # reset the counter if the comparison will start
-                    self.root.counter = 0
+                    self.timeCounter = 0
                     # stop the key ahead of the destination node
                     # y position exactly on edge
                     anim.currY[0] = anim.destinationRefY
@@ -746,7 +634,7 @@ class BTreeVisualization:
                 # if the key would surpass the destination node in the next iteration
                 else:          
                     # reset the counter if the comparison will start
-                    self.root.counter = 0     
+                    self.timeCounter = 0     
                     # stop the key ahead of the destination node
                     # y position exactly on edge
                     anim.currY[0] = anim.destinationRefY + 7 * self.refWidth
@@ -794,11 +682,11 @@ class BTreeVisualization:
                 # indicate that it would be the highest key inside the node
                 anim.flagNewKeyHighest = True
             # observe one key all 50 to 500 milliseconds (depending on users selection)
-            elif self.root.counter != 0 and self.root.counter % round(50 / self.speed) == 0:
+            elif self.timeCounter != 0 and self.timeCounter % round(50 / self.speed) == 0:
                 # after 30 frames, switch to the following key
                 anim.highlightedKey += 1
         # make all keys lightblue again all 50 to 500 milliseconds (depending on users selection)
-        if self.root.counter != 0 and self.root.counter % round(50 / self.speed) == 0:
+        if self.timeCounter != 0 and self.timeCounter % round(50 / self.speed) == 0:
             # reset counter for next part of animation
             #anim.resetted = False
             # set all keys to lightblue
@@ -890,7 +778,7 @@ class BTreeVisualization:
         # reset the root counter for time scheduling
         if not anim.resetted:
             # reset counter
-            self.root.counter = 0
+            self.timeCounter = 0
             # prevent counter to be resetted every iteration
             anim.resetted = True
         # counter to find out which node has to be observed
@@ -924,13 +812,13 @@ class BTreeVisualization:
             # indicate that it would be the highest key inside the node
             anim.flagNewKeyHighest = True
         # observe one key all 50 to 500 milliseconds (depending on users selection)
-        elif self.root.counter != 0 and self.root.counter % round(50 / self.speed) == 0:
+        elif self.timeCounter != 0 and self.timeCounter % round(50 / self.speed) == 0:
             # after 30 frames, switch to the following key
             anim.highlightedKey += 1
         # make all keys lightblue again all 50 to 500 milliseconds (depending on users selection)
-        if self.root.counter != 0 and self.root.counter % round(50 / self.speed) == 0:
+        if self.timeCounter != 0 and self.timeCounter % round(50 / self.speed) == 0:
             # reset counter for next animation
-            self.root.counter = 0
+            self.timeCounter = 0
             # set all keys to lightblue
             self.initializeColorKeyList()
             # if the comparison animation is over
@@ -966,8 +854,6 @@ class BTreeVisualization:
 
     # draw whole tree including all part graphs
     def _update_graph(self, frame):
-        # get the selected speed from the user
-        self.speed = self.scale.get()
         # append the selected speed to the current animation's speed [pixels per iteration]
         self.currentAnimation.animationSpeed = 0.02 * self.speed
         # get the bounding box of the subplot in pixels
