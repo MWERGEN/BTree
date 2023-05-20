@@ -155,7 +155,7 @@ class BTree:
                 self.visitiedNodes[0].append(root.id)
                 self.visitiedNodes[1].append(root.children[i].id)
                 # check if node where key should go is full -> children[i] means all keys in this node are smaller!
-                if len(root.children[i].keys) == (2 * self.k):
+                if root.children[i].leaf and len(root.children[i].keys) == (2 * self.k):
                     # get the current keys per level of the tree
                     nodePerLevelBeforeFullRootSplit = self.countNodesPerLevel()
                     self.numOfNodesPerLevelCopies.append(nodePerLevelBeforeFullRootSplit)
@@ -316,6 +316,7 @@ class BTree:
                         indexOfSplit = loopIndex
                 indexOfSplit -= 1
                 self.splitRoot(rootOfParent,indexOfSplit, splitNode)
+                print('test')
         if rootSplit:
             parentOfRootSplit = self.getParent(splitNode, self.rootNode)
             # get index of split node
@@ -359,9 +360,14 @@ class BTree:
         source = parent.id
         target = parent.id
         k = self.k
+        fullRoot = False
         # full node
         splitNode = parent.children[index]
-        indexOfOrgSplitNode = splitNode.children.index(willBeSplitt)
+        if not parent.keys and parent == self.rootNode:
+            indexOfOrgSplitNode = parent.children.index(splitNode)
+            fullRoot = True
+        else:
+            indexOfOrgSplitNode = splitNode.children.index(willBeSplitt)
         # second node where are all keys which are greater than the middle key will go
         newNode = node.Node(splitNode.leaf) 
         i = len(splitNode.keys) - 1
@@ -375,17 +381,73 @@ class BTree:
         newNode.keys = splitNode.keys[middleIndex: 2 * k] 
         # take all smaller keys and insert them from 0 to order - 1
         splitNode.keys = splitNode.keys[0: middleIndex]
-        if indexOfOrgSplitNode < 2:
-            # give newNode with all greater keys all references to all greater children
-            newNode.children = splitNode.children[k : 2 * k + 1] 
-            # updte references to only smaller children
-            splitNode.children = splitNode.children[0: k]
-        else:
-            # give newNode with all greater keys all references to all greater children
-            newNode.children = splitNode.children[k + 1: 2 * k + 1] 
-            # updte references to only smaller children
+        if fullRoot:
+            newNode.children = splitNode.children[k + 1: 2 * k + 2]
             splitNode.children = splitNode.children[0: k + 1]
             print('test')
+        else:
+            if indexOfOrgSplitNode < 2:
+                # give newNode with all greater keys all references to all greater children
+                newNode.children = splitNode.children[k : 2 * k + 1] 
+                # updte references to only smaller children
+                splitNode.children = splitNode.children[0: k]
+            else:
+                # give newNode with all greater keys all references to all greater children
+                newNode.children = splitNode.children[k + 1: 2 * k + 1] 
+                # updte references to only smaller children
+                splitNode.children = splitNode.children[0: k + 1]
+                print('test')
+            # parent is also full
+            if len(parent.keys) == 2 * self.k + 1:
+                if parent == self.rootNode:
+                    rootSplit = True
+                    # new root node
+                    temp = node.Node()
+                    # reference to child which will hold all smaller keys!
+                    temp.children.insert(0, parent) 
+                    self.rootNode = temp
+                    # give root id 0
+                    self.updateNodeIds(self.rootNode)
+                    source = parent.id
+                    target = self.rootNode.id
+                    self.visitiedNodes[0].append(source)
+                    self.visitiedNodes[1].append(target)
+                    middleIndex = int(len(parent.keys) / 2)
+                    copyOfSplitKey = parent.keys[middleIndex]
+                    # edge list copy
+                    self.setEdgeList(self.rootNode)
+                    edgeListBeforeSplit = self.edgeList[:]
+                    if edgeListBeforeSplit:
+                        root = edgeListBeforeSplit[-1]
+                        if root:
+                            edge = edgeListBeforeSplit[-1]
+                            root.pop()
+                    self.edgeListCopies.append([list(l) for l in edgeListBeforeSplit])
+                    edgeListBeforeSplit[-1].append(edge)
+                    # get the current keys per level of the tree
+                    nodePerLevelBeforeFullRootSplit = self.countNodesPerLevel()
+                    self.numOfNodesPerLevelCopies.append(nodePerLevelBeforeFullRootSplit)
+                    # set keys per level list -> has to be copy of list because every key list can be different!
+                    self.getKeysPerLevel()
+                    keysPerLevelBeforeFullRootSplit = self.keysPerLevel[:]
+                    for lists in keysPerLevelBeforeFullRootSplit:
+                        if copyOfSplitKey in lists:
+                            listIndex = keysPerLevelBeforeFullRootSplit.index(lists)
+                            valueIndex = lists.index(copyOfSplitKey)
+                            lists.remove(copyOfSplitKey)
+                    self.keysPerLevelCopies.append([list(l) for l in keysPerLevelBeforeFullRootSplit])
+                    keysPerLevelBeforeFullRootSplit[listIndex].insert(valueIndex,copyOfSplitKey)
+                    # split the full node
+                    self.splitRoot(temp,0,parent) 
+                    #self.insertNotFull(temp,key, source, target)
+                    source = self.rootNode.id
+                    target = self.rootNode.id
+                    self.visitiedNodes[0].append(source)
+                    self.visitiedNodes[1].append(target)
+                    # there is a new node in the tree so update the ids of the nodes
+                    # this ensures that at every operation the node ids are correct
+                    self.updateNodeIds(self.rootNode)
+
 
     def getParent(self, searchNode, rootNode):
         if searchNode in rootNode.children:

@@ -185,9 +185,9 @@ class Backend:
         self.treeList = self.btree.reset()
 
 testData = Backend(2)
-for i in range(60):
-    if i == 48:
-      print('test')
+for i in range(1, 60):
+    if i == 53:
+        print('test')
     testData.insertKeyIntoTree(i)
 # testData.insertKeyIntoTree(3)
 # testData.insertKeyIntoTree(4)
