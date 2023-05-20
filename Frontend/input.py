@@ -124,8 +124,8 @@ class Input:
         self.random_amount_legs_field.config(width=6)
         
         # confirm button that is always present
-        confirm_button = tk.Button(self.input_fields_frame, text="Confirm", command=self.confirm_input, bg="green")
-        confirm_button.grid(column=24, row=1)
+        self.confirm_button = tk.Button(self.input_fields_frame, text="Confirm", command=self.confirm_input, bg="green")
+        self.confirm_button.grid(column=24, row=1)
         
         self.mode_change(self)
         
@@ -339,6 +339,8 @@ class Input:
         self.random_to_field.grid_forget()
         self.random_amount_legs_label.grid_forget()
         self.random_amount_legs_field.grid_forget()
+
+        self.confirm_button.grid(column=24, row=1)
         
         # create suboptions belonging to main options
         if self.mode.get() == 1:
@@ -351,6 +353,7 @@ class Input:
             self.radio_action_delete.grid(column=12, row=3, sticky="W")
             
         elif self.mode.get() == 2:
+            self.confirm_button.grid_forget()
             self.select_csv_button.grid(column=6, row=1, sticky="W")
             
         elif self.mode.get() == 3:
