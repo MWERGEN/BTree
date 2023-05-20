@@ -6,7 +6,10 @@
 #
 #   Editors:
 #       1.  Tim Steiner on 10.04.23
-#       2.  Thorben Schabel 17.05.23
+#       2.  Thorben Schabel on 17.05.23
+#       3.  Marius Wergen on 18.05.23
+#       4.  Marius Wergen on 19.05.23
+#       5.  Marius Wergen on 20.05.23
 #
 ###############################################
 #
@@ -124,7 +127,6 @@ class Input:
         confirm_button = tk.Button(self.input_fields_frame, text="Confirm", command=self.confirm_input, bg="green")
         confirm_button.grid(column=24, row=1)
         
-        #self.mode.trace('w', self.mode_change)
         self.mode_change(self)
         
         # settings menu
@@ -159,13 +161,10 @@ class Input:
         #   MATPLOTLIP   #
         ##################
         ##################
-        # insert matplotlib here
-        # should be row=1 and column=0 of self.window
 
         # frame for matplot content
         self.matplot_frame = tk.Frame(self.window)
         self.matplot_frame.grid(column=0, row=1, columnspan=3)
-        #self.matplot_frame.pack(fill=tk.BOTH, expand=True)
 
         animationList = [0]
         treeList = [[[1], [[]], [[]]]]
@@ -189,14 +188,10 @@ class Input:
 
         self.canvas = FigureCanvasTkAgg(self.Graph.fig, master=self.matplot_frame)
         self.canvas.get_tk_widget().grid(column=0, row=1, sticky="WE")
-        #self.canvas.draw()
-
+        
         # Create a scrollbar
         scrollbar = ttk.Scrollbar(self.matplot_frame, orient=tk.VERTICAL, command=self.canvas.get_tk_widget().yview)
         scrollbar.grid(row=1, column=1, sticky="ns")
-        #self.canvas.get_tk_widget().configure(yscrollcommand=scrollbar.set)
-
-        #self.matplot_frame.bind("<Configure>", self.update_scroll_region)
 
         self.canvas.mpl_connect('motion_notify_event', self.on_mouse_motion)
 
@@ -382,13 +377,11 @@ class Input:
         print("reset")
         
     def browse_files(self, *args):
-        # TODO do something with file(name)
         filename = filedialog.askopenfilename(
             initialdir="/",
             title="Select a CSV file",
             filetypes=[("CSV files", "*.csv")]
         )
-        print(filename)
         message_str = "Do you want to perform the following operations:\n\n"
         with open(filename, 'r') as file:
             reader = csv.reader(file)
@@ -477,8 +470,3 @@ class Input:
         if not invalid:
             self.commandList.extend(inputNums)
             print(self.commandList)
-
-        
-#if __name__ == '__main__':
-#    input_obj = Input()
-
