@@ -380,7 +380,7 @@ class Input:
                         # only allow ints between 0 and 9999
                         if int(currentNumStr) > 0 and int(currentNumStr) < 9999:
                             # append the current number as an int to the input List
-                            inputNums.append((self.mode.get(), int(currentNumStr)))
+                            inputNums.append((self.action.get(), int(currentNumStr)))
                         # invalid int
                         else:
                             # set invalid flag
@@ -405,7 +405,7 @@ class Input:
             # only allow ints between 0 and 9999
             if int(currentNumStr) > 0 and int(currentNumStr) < 9999:
                 # append the last number to the number list
-                inputNums.append((self.mode.get(), int(currentNumStr)))
+                inputNums.append((self.action.get(), int(currentNumStr)))
             # invalid int
             else:
                 # set invalid flag
