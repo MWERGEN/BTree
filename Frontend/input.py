@@ -176,6 +176,9 @@ class Input:
         self.scale = tk.Scale(self.matplot_frame, from_=1, to=10, orient=tk.HORIZONTAL)
         self.scale.grid(column=0, row=0)
 
+        self.curr_action_label = tk.Label(self.matplot_frame, text="Let's build a balanced tree!", font=("Arial", 28), foreground="white",  background="gray")
+        self.curr_action_label.grid(column=0, row=0, sticky="W")
+
         self.canvas = FigureCanvasTkAgg(self.Graph.fig, master=self.matplot_frame)
         self.canvas.get_tk_widget().grid(column=0, row=1, sticky="WE")
         #self.canvas.draw()
@@ -221,10 +224,13 @@ class Input:
         if self.Graph.currentAnimation.type == 0 and self.commandList:
             if self.commandList[0][0] == 1:
                 self.Graph.insert(self.commandList[0][1])
+                self.curr_action_label.configure(text="Input " + str(self.commandList[0][1]), foreground="white")
             elif self.commandList[0][0] == 2:
                 self.Graph.search(self.commandList[0][1])
+                self.curr_action_label.configure(text="Search " + str(self.commandList[0][1]), foreground="white")
             elif self.commandList[0][0] == 3:
                 self.Graph.delete(self.commandList[0][1])
+                self.curr_action_label.configure(text="Delete " + str(self.commandList[0][1]), foreground="white")
             self.commandList.pop(0)
         # schedule the next call to my_function in 1 second
         self.matplot_frame.after(10, self.countNext10Milliseconds)
@@ -378,14 +384,14 @@ class Input:
                     # check if the current number is really an int
                     if currentNumStr.isdigit():
                         # only allow ints between 0 and 9999
-                        if int(currentNumStr) > 0 and int(currentNumStr) < 9999:
+                        if int(currentNumStr) > 0 and int(currentNumStr) <= 9999:
                             # append the current number as an int to the input List
                             inputNums.append((self.mode.get(), int(currentNumStr)))
                         # invalid int
                         else:
                             # set invalid flag
                             invalid = True
-                            print("invalid")
+                            self.curr_action_label.configure(text="Invalid input! Choose number from 1 to 9999!", foreground="#FF6666")
                     # reset the current number
                     currentNumStr = ""
                 # if the current char is an int
@@ -396,21 +402,21 @@ class Input:
                 else:
                     # set invalid flag
                     invalid = True
-                    print("invalid")
+                    self.curr_action_label.configure(text="Invalid input! Char \'" + str(input[index]) + "\' is not allowed.", foreground="#FF6666")
             # increment index for next char
             index += 1
         # check if the current number is a digit
         # if the last character in input is a digit -> it is not appended yet
         if currentNumStr.isdigit() and not invalid:
             # only allow ints between 0 and 9999
-            if int(currentNumStr) > 0 and int(currentNumStr) < 9999:
+            if int(currentNumStr) > 0 and int(currentNumStr) <= 9999:
                 # append the last number to the number list
                 inputNums.append((self.mode.get(), int(currentNumStr)))
             # invalid int
             else:
                 # set invalid flag
                 invalid = True
-                print("invalid")
+                self.curr_action_label.configure(text="Invalid input! Choose number from 1 to 9999!", foreground="#FF6666")
         # only continue with input if it is valid
         if not invalid:
             self.commandList.extend(inputNums)
