@@ -16,9 +16,9 @@
 #       - preparing lists for frontend (num of nodes per level, keys per level and edges)
 #
 # when executed by main
-from Backend import node
+#from Backend import node
 # debugging
-#import node
+import node
 from collections import deque
 
 class BTree:
@@ -544,6 +544,18 @@ class BTree:
         if len(nodeWithKey.keys) >= (self.k + 1) :
             nodeWithKey.keys.remove(key)
             deleted = True
+        # Node will have underflow!
+        else:
+            # check if neighbours can give keys
+            leftNeighbour = self.getNodeWithId(self.rootNode, nodeWithKey.id - 1)
+            rightNeighbour = self.getNodeWithId(self.rootNode, nodeWithKey.id + 1)
+            # check if left neighbour can give key
+            if len(leftNeighbour.keys) >= (self.k + 1) and not None:
+                # take key from left neighbour
+                print('test')
+            elif len(rightNeighbour.keys) >= (self.k + 1) and not None:
+                # take key from right neighbour
+                print('test')
         # set keys per level list -> has to be copy of list because every key list can be different!
         self.getKeysPerLevel()
         keysPerLevelBeforeInsert = self.keysPerLevel[:]
@@ -576,6 +588,16 @@ class BTree:
             return None
         #go to node in which key maybe is 
         return self.searchKey(key, nextNode.children[i])
+    
+    def getNodeWithId(self, startNode, nodeId):
+        if startNode.id == nodeId:
+            return startNode
+        else:
+            for child in startNode.children:
+                result = self.getNodeWithId(child, nodeId)
+                if result is not None:
+                    return result
+
 
 
     # print tree

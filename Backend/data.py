@@ -15,9 +15,9 @@
 #
 
 # when executed by main
-from Backend import bTree
+#from Backend import bTree
 # debugging
-#import bTree
+import bTree
 
 class Backend:
     def __init__(self, k):
@@ -184,19 +184,20 @@ class Backend:
         self.animationList.append(0)
         self.treeList = self.btree.reset()
 
-# testData = Backend(2)
-# testData.insertKeyIntoTree(3)
-# testData.insertKeyIntoTree(4)
-# testData.insertKeyIntoTree(5)
-# testData.insertKeyIntoTree(1)
-# testData.insertKeyIntoTree(2)
-# testData.insertKeyIntoTree(7)
-# testData.insertKeyIntoTree(99)
-# testData.insertKeyIntoTree(12)
-# testData.insertKeyIntoTree(13)
-# testData.insertKeyIntoTree(27)
-# testData.insertKeyIntoTree(30)
-# testData.insertKeyIntoTree(42)
+testData = Backend(2)
+testData.insertKeyIntoTree(3)
+testData.insertKeyIntoTree(4)
+testData.insertKeyIntoTree(5)
+testData.insertKeyIntoTree(1)
+testData.insertKeyIntoTree(2)
+testData.insertKeyIntoTree(7)
+testData.insertKeyIntoTree(99)
+testData.insertKeyIntoTree(12)
+testData.insertKeyIntoTree(13)
+testData.insertKeyIntoTree(27)
+testData.insertKeyIntoTree(30)
+testData.insertKeyIntoTree(42)
+testData.deleteKeyFromTree(13)
 # testData.insertKeyIntoTree(59)
 # testData.insertKeyIntoTree(69)
 # testData.insertKeyIntoTree(75)
