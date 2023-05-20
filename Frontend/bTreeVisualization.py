@@ -749,18 +749,20 @@ class BTreeVisualization:
                     # first check if the walkthrough is not the first one
                     # first one is root comparison
                     if anim.walkthrough < len(anim.startingNode) - 1:
+                        # paint ref green
+                        self.colorRefList[anim.destinationNode[anim.walkthrough - 1] * (2 * self.k + 1) + anim.refInsideStartingNode[anim.walkthrough]] = "green"
                         # only color the ref green if the node is going down in the next part-animation
-                        if (anim.startingNode[anim.walkthrough + 1] < anim.destinationNode[anim.walkthrough + 1]):
+                        ##if (anim.startingNode[anim.walkthrough + 1] < anim.destinationNode[anim.walkthrough + 1]):
                             # if the key would be the highest in the node
-                            if anim.flagNewKeyHighest:
+                            ##if anim.flagNewKeyHighest:
                                 # paint the outer right ref green 
                                 # = the found path
-                                self.colorRefList[anim.destinationNode[anim.walkthrough - 1] * (2 * self.k + 1) + anim.highlightedKey + 1] = "green"
+                                ##self.colorRefList[anim.destinationNode[anim.walkthrough - 1] * (2 * self.k + 1) + anim.highlightedKey + 1] = "green"
                             # if the key is not the highest in the node
-                            else:
+                            ##else:
                                 # paint the ref left from the higher key green
                                 # = the found path
-                                self.colorRefList[anim.destinationNode[anim.walkthrough - 1] * (2 * self.k + 1) + anim.highlightedKey] = "green"
+                                ##self.colorRefList[anim.destinationNode[anim.walkthrough - 1] * (2 * self.k + 1) + anim.highlightedKey] = "green"
                     # reset highlighted key
                     anim.highlightedKey = 0        
                 # wait a bit if there is no other animation left

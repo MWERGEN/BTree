@@ -364,48 +364,97 @@ class Input:
             self.random_amount_legs_label.grid(column=18, row=0, sticky="W")
             self.random_amount_legs_field.grid(column=18, row=1, sticky="W")
             
+    # gets input and transforms input to commands
     def confirm_input(self, *args):
-        input = self.simple_input_field.get()
-        self.separate_input(input)
-        print('confirm clicked')
-        # if self.action.get() == 1:
-        #     self.Graph.insert(int(self.simple_input_field.get()))
-        # elif self.action.get() == 2:
-        #     self.Graph.search(int(self.simple_input_field.get()))
-        # elif self.action.get() == 3:
-        #     self.Graph.delete(int(self.simple_input_field.get()))
-        
+        # simple input is chosen
+        if self.mode.get() == 1:
+            # get current string in input field
+            input = self.simple_input_field.get()
+            # separate input and collect the operations
+            self.separate_input(input)
+        elif self.mode.get() == 3:
+            # get current strings in input fields
+            input_from = self.random_from_field.get()
+            input_to = self.random_to_field.get()
+            input_legs = self.random_amount_legs_field.get()
+            self.separate_input_random(input_from, input_to, input_legs)
+    
+    # function to reset the graph
     def update_settings(self, *args):
+        # reset the graph
         self.Graph.reset()
         print("reset")
         
+    # gets called when user browses for files
     def browse_files(self, *args):
+        # open file dialog
         filename = filedialog.askopenfilename(
             initialdir="/",
             title="Select a CSV file",
+            # only search for csv files
             filetypes=[("CSV files", "*.csv")]
         )
+        # string to ask the user for acceptance of the csv inputs
         message_str = "Do you want to perform the following operations:\n\n"
+        # open chosen file
         with open(filename, 'r') as file:
+            # reader to read the whole input file
             reader = csv.reader(file)
+            # iterate over all rows in the csv file
             for row in reader:
-                self.csv_input.append(row)
-                if row[0] == 'i':
-                    message_str += "insert " + str(row[1] + "\n")
-                elif row[0] == 's':
-                    message_str += "search " + str(row[1] + "\n")
-                elif row[0] == 'd':
-                    message_str += "delete " + str(row[1] + "\n")
+                # only rows with two elements (operation and input int) are valid
+                if len(row) == 2:
+                    # save each row -> will be checked later
+                    self.csv_input.append(row)
+                    # if input is chosen and the input is an int
+                    if row[0] == 'i' and row[1].isdigit():
+                        # generate message string with operation and input
+                        message_str += "insert " + str(row[1] + "\n")
+                    # if search is chosen and the searched key is an int
+                    elif row[0] == 's' and row[1].isdigit():
+                        # generate message string with operation and input
+                        message_str += "search " + str(row[1] + "\n")
+                    # if delete is chosen and the key to be deleted is an int
+                    elif row[0] == 'd' and row[1].isdigit():
+                        # generate message string with operation and input
+                        message_str += "delete " + str(row[1] + "\n")
+            # open a new dialog window
             self.second_window = tk.Toplevel(self.window)
+            # label to ask for confirmation of csv
             label = tk.Label(self.second_window, text=message_str, font=("Arial", 18))
             label.pack()
+            # button to accept the csv
             button = tk.Button(self.second_window, text="Yes, let's go!", command=self.csv_second_window)
             button.pack()
 
+    # function to be called when a csv is selected
+    # checks each row of csv
+    # if correct syntax: saves operation for performing it later
     def csv_second_window(self):
+        # iterate over all rows in the csv file
         for row in self.csv_input:
-            if row[0] == 'i':
-                self.commandList.append((1, int(row[1])))
+            if len(row) == 2:
+                # read operation (valid: 'i' or 's' or 'd')
+                operation = row[0]
+                # read input
+                number = row[1]
+                # check for input and if number is an int
+                if operation == 'i' and number.isdigit():
+                    # only allow inputs between 1 and 9999
+                    if int(number) >= 1 and int(number) <= 9999:
+                        # add input command with requested number to command List
+                        self.commandList.append((1, int(number)))
+                elif operation == 's' and number.isdigit():
+                    # only allow inputs between 1 and 9999
+                    if int(number) >= 1 and int(number) <= 9999:
+                        # add search command with requested number to command List
+                        self.commandList.append((2, int(number)))
+                elif operation == 'd' and number.isdigit():
+                    # only allow inputs between 1 and 9999
+                    if int(number) >= 1 and int(number) <= 9999:
+                        # add delete command with requested number to command List
+                        self.commandList.append((3, int(number)))
+        # destroy second window
         self.second_window.destroy()
 
     # takes the input
@@ -473,3 +522,33 @@ class Input:
         if not invalid:
             self.commandList.extend(inputNums)
             print(self.commandList)
+
+    # takes the input
+    # checks if input is valid 
+    # only allows ints
+    # also interval is limited from 1 to 9999
+    # if valid: creates an int list with all random int inputs
+    def separate_input_random(self, input_from, input_to, input_legs):
+        if input_from.isdigit() and input_to.isdigit() and input_legs.isdigit():
+            i_from = int(input_from)
+            i_to = int(input_to)
+            i_legs = int(input_legs)
+            if i_from > 9999 or i_from < 1:
+                self.curr_action_label.configure(text="Invalid input! Choose number from 1 to 9999 for the field 'From'!", foreground="#FF6666")
+            elif i_to > 9999 or i_to < 1:
+                self.curr_action_label.configure(text="Invalid input! Choose number from 1 to 9999 for the field 'To'!", foreground="#FF6666")
+            elif i_legs < 1:
+                self.curr_action_label.configure(text="Invalid input! Choose at least one leg of random values!", foreground="#FF6666")
+            else:
+                ctr = 0
+                while ctr < i_legs:
+                    random_int = random.randint(i_from, i_to)
+                    self.commandList.append((1, random_int))
+                    print(random_int)
+                    ctr += 1
+                print(self.commandList)
+        else:
+            self.curr_action_label.configure(text="Invalid input! You can only input whole numbers!", foreground="#FF6666")
+                    
+
+
