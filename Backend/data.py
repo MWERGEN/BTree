@@ -15,9 +15,9 @@
 #
 
 # when executed by main
-from Backend import bTree
+#from Backend import bTree
 # debugging
-#import bTree
+import bTree
 
 class Backend:
     def __init__(self, k):
