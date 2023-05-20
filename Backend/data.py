@@ -186,7 +186,7 @@ class Backend:
 
 testData = Backend(2)
 for i in range(60):
-    if i == 50:
+    if i == 48:
         print('test')
     testData.insertKeyIntoTree(i)
 # testData.insertKeyIntoTree(3)

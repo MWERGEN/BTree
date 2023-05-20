@@ -497,6 +497,8 @@ class BTree:
                         i -= 1
                     # + 1 because insertion key must come after the first node key which is smaller
                     i += 1
+                    if len(node.children) - 1 < i:
+                        i -= 1
                     self.usedReferences.append(i)
                     targetNode = node.children[i].id
                     tempSource = node.id
