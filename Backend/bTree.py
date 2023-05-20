@@ -550,6 +550,7 @@ class BTree:
             deleted = True
         # Node will have underflow!
         else:
+            deleted = True
             # check if neighbours can give keys
             leftNeighbour = self.getNodeWithId(self.rootNode, nodeWithKey.id - 1)
             rightNeighbour = self.getNodeWithId(self.rootNode, nodeWithKey.id + 1)
