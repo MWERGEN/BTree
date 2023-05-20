@@ -59,7 +59,7 @@ class Backend:
         #levels = self.btree.countNodesPerLevel()
         #self.btree.numOfNodesPerLevel = levels.copy()
         self.treeNodesPerLevel = self.btree.numOfNodesPerLevelCopies
-        # set animation list 
+        # set animation list
         self.animationList = self.btree.animationList
         self.edgeLists = self.btree.edgeListCopies
         # set references 
@@ -187,7 +187,7 @@ class Backend:
 testData = Backend(2)
 for i in range(60):
     if i == 48:
-        print('test')
+      print('test')
     testData.insertKeyIntoTree(i)
 # testData.insertKeyIntoTree(3)
 # testData.insertKeyIntoTree(4)

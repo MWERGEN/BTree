@@ -152,6 +152,8 @@ class BTree:
                 self.animationList.append(1)
                 self.usedReferences.append(i)
                 self.usedKeys.append(key)
+                self.visitiedNodes[0].append(root.id)
+                self.visitiedNodes[1].append(root.children[i].id)
                 # check if node where key should go is full -> children[i] means all keys in this node are smaller!
                 if len(root.children[i].keys) == (2 * self.k):
                     # get the current keys per level of the tree
@@ -450,9 +452,7 @@ class BTree:
                             self.visitiedNodes[1].append(target)
                         else:
                             currentPos = source[-1]
-                            source.append(currentPos)
-                            target.append(node.id)
-                            source.append(currentPos)
+                            source.append(node.id)
                             target.append(node.id)
                     # animation for comparing 
                     self.animationList.append(1)
