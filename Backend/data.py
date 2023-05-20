@@ -108,10 +108,10 @@ class Backend:
         self.operands.append(self.searchedNodes)
         self.operands.append(keyFound)
         # search needs two tree lists so the animations works right
-        list = self.btree.getTreeListForSearch()
         temp = []
-        temp.append(list)
-        temp.append(list)
+        list = self.btree.getTreeListForSearch()
+        temp.append(list[0])
+        temp.append(list[0])
         self.treeList = temp
         print('test')
 
@@ -198,6 +198,7 @@ class Backend:
 # testData.insertKeyIntoTree(30)
 # testData.insertKeyIntoTree(42)
 # testData.insertKeyIntoTree(6)
+# testData.searchKeyInTree(7)
 # testData.deleteKeyFromTree(13)
 # testData.searchKeyInTree(42)
 # testData.insertKeyIntoTree(59)
