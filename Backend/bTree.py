@@ -16,9 +16,9 @@
 #       - preparing lists for frontend (num of nodes per level, keys per level and edges)
 #
 # when executed by main
-from Backend import node
+#from Backend import node
 # debugging
-#import node
+import node
 from collections import deque
 
 class BTree:
