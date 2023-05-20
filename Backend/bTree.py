@@ -686,6 +686,7 @@ class BTree:
                         # insert key to correct place
                         leftNeighbour.keys[i + 1] = currentKey
                 print('test')
+                self.updateNodeIds(self.rootNode)
             elif rightNeighbour is not None:
                 # remove key from node
                 # results in underflow
@@ -727,6 +728,7 @@ class BTree:
                         # insert key to correct place
                         rightNeighbour.keys[i + 1] = currentKey
                 print('test')
+                self.updateNodeIds(self.rootNode)
         # set keys per level list -> has to be copy of list because every key list can be different!
         self.getKeysPerLevel()
         keysPerLevelBeforeInsert = self.keysPerLevel[:]
