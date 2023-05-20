@@ -389,12 +389,19 @@ class Input:
             filetypes=[("CSV files", "*.csv")]
         )
         print(filename)
+        message_str = "Do you want to perform the following operations:\n\n"
         with open(filename, 'r') as file:
             reader = csv.reader(file)
             for row in reader:
                 self.csv_input.append(row)
+                if row[0] == 'i':
+                    message_str += "insert " + str(row[1] + "\n")
+                elif row[0] == 's':
+                    message_str += "search " + str(row[1] + "\n")
+                elif row[0] == 'd':
+                    message_str += "delete " + str(row[1] + "\n")
             self.second_window = tk.Toplevel(self.window)
-            label = tk.Label(self.second_window, text="Do you want to perform the following operations: ")
+            label = tk.Label(self.second_window, text=message_str, font=("Arial", 18))
             label.pack()
             button = tk.Button(self.second_window, text="Yes, let's go!", command=self.csv_second_window)
             button.pack()
