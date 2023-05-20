@@ -643,6 +643,51 @@ class BTree:
                     # insert key to correct place
                     nodeWithKey.keys[i + 1] = fillKey
                 print('test')
+            # neighbours don't have enough keys -> merge
+            # merge with left neighbour 
+            elif leftNeighbour is not None:
+                # remove key from node
+                # results in underflow
+                nodeWithKey.keys.remove(key)
+                # all keys which will be merged into left neighbour
+                leftKeys = nodeWithKey.keys
+                # key which goes from root into merged node
+                fillKey = parent.keys[childRef - 1]
+                # delete fill key from parent
+                parent.keys.remove(fillKey)
+                # delete underflow node
+                parent.children.remove(nodeWithKey)
+                # fill left neighbour
+                # first insert fill key
+                i = len(leftNeighbour.keys) - 1 
+                leftNeighbour.keys.append(None)
+                if i == 0 and leftNeighbour.keys[0] == None:
+                    leftNeighbour.keys[0] = fillKey
+                else:
+                    # compare every node key to insertion key 
+                    while i >= 0 and fillKey < leftNeighbour.keys[i]: 
+                        # shift key one place to the right
+                        leftNeighbour.keys[i + 1] = leftNeighbour.keys[i] 
+                        i -= 1
+                    # insert key to correct place
+                    leftNeighbour.keys[i + 1] = fillKey
+                # fill neighbour with every left key
+                for currentKey in leftKeys:
+                    i = len(leftNeighbour.keys) - 1 
+                    leftNeighbour.keys.append(None)
+                    if i == 0 and leftNeighbour.keys[0] == None:
+                        leftNeighbour.keys[0] = currentKey
+                    else:
+                        # compare every node key to insertion key 
+                        while i >= 0 and currentKey < leftNeighbour.keys[i]: 
+                            # shift key one place to the right
+                            leftNeighbour.keys[i + 1] = leftNeighbour.keys[i] 
+                            i -= 1
+                        # insert key to correct place
+                        leftNeighbour.keys[i + 1] = currentKey
+                print('test')
+            elif rightNeighbour is not None:
+                print('test')
         # set keys per level list -> has to be copy of list because every key list can be different!
         self.getKeysPerLevel()
         keysPerLevelBeforeInsert = self.keysPerLevel[:]
