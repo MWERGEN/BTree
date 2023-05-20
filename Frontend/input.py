@@ -6,7 +6,10 @@
 #
 #   Editors:
 #       1.  Tim Steiner on 10.04.23
-#       2.  Thorben Schabel 17.05.23
+#       2.  Thorben Schabel on 17.05.23
+#       3.  Marius Wergen on 18.05.23
+#       4.  Marius Wergen on 19.05.23
+#       5.  Marius Wergen on 20.05.23
 #
 ###############################################
 #
@@ -14,7 +17,9 @@
 #       - GUI for input 
 #
 
+import csv
 import random
+import datetime
 import tkinter as tk
 from tkinter import filedialog
 from tkinter import ttk
@@ -26,6 +31,7 @@ import threading
 
 class Input:
     def __init__(self) -> None:
+        self.saved_operations = []
         self.window = tk.Tk()
 
         self.window.columnconfigure(0, weight=1)
@@ -39,6 +45,9 @@ class Input:
         self.mode.set(1)  # initializing the choice, i.e. Python
         self.action = tk.IntVar()
         self.action.set(1)  # initializing the choice, i.e. Python
+
+        self.csv_input = []
+        self.second_window = 0
         
         # mode selection
         self.input_fields_frame = tk.Frame(master=self.window)
@@ -115,10 +124,9 @@ class Input:
         self.random_amount_legs_field.config(width=6)
         
         # confirm button that is always present
-        confirm_button = tk.Button(self.input_fields_frame, text="Confirm", command=self.confirm_input, bg="green")
-        confirm_button.grid(column=24, row=1)
+        self.confirm_button = tk.Button(self.input_fields_frame, text="Confirm", command=self.confirm_input, bg="green")
+        self.confirm_button.grid(column=24, row=1)
         
-        #self.mode.trace('w', self.mode_change)
         self.mode_change(self)
         
         # settings menu
@@ -130,10 +138,10 @@ class Input:
         self.settings_order_field = tk.Entry(self.settings_fields_frame, width=6)
         self.settings_order_field.grid(column=0, row=1, sticky="W")
         # Speed
-        self.settings_speed_label = tk.Label(self.settings_fields_frame, text="Speed:")
-        self.settings_speed_label.grid(column=2, row=0, sticky="W")
-        self.settings_speed_field = tk.Entry(self.settings_fields_frame, width=6)
-        self.settings_speed_field.grid(column=2, row=1, sticky="W")
+        #self.settings_speed_label = tk.Label(self.settings_fields_frame, text="Speed:")
+        #self.settings_speed_label.grid(column=2, row=0, sticky="W")
+        #self.settings_speed_field = tk.Entry(self.settings_fields_frame, width=6)
+        #self.settings_speed_field.grid(column=2, row=1, sticky="W")
         # Update button
         update_button = tk.Button(self.settings_fields_frame, text="Update", command=self.update_settings)
         update_button.grid(column=3, row=1)
@@ -145,19 +153,18 @@ class Input:
         #self.reset_button_frame.columnconfigure(0, weight=1)
         reset_button = tk.Button(self.reset_button_frame, text="Reset", command=self.update_settings, bg="red")
         reset_button.grid(column=0, row=4)
+        save_button = tk.Button(self.reset_button_frame, text="Save as CSV file", command=self.save_csv, bg="red")
+        save_button.grid(column=0, row=5)
         
         ##################
         ##################
         #   MATPLOTLIP   #
         ##################
         ##################
-        # insert matplotlib here
-        # should be row=1 and column=0 of self.window
 
         # frame for matplot content
         self.matplot_frame = tk.Frame(self.window)
         self.matplot_frame.grid(column=0, row=1, columnspan=3)
-        #self.matplot_frame.pack(fill=tk.BOTH, expand=True)
 
         animationList = [0]
         treeList = [[[1], [[]], [[]]]]
@@ -176,16 +183,15 @@ class Input:
         self.scale = tk.Scale(self.matplot_frame, from_=1, to=10, orient=tk.HORIZONTAL)
         self.scale.grid(column=0, row=0)
 
+        self.curr_action_label = tk.Label(self.matplot_frame, text="Let's build a balanced tree!", font=("Arial", 28), foreground="white",  background="gray")
+        self.curr_action_label.grid(column=0, row=0, sticky="W")
+
         self.canvas = FigureCanvasTkAgg(self.Graph.fig, master=self.matplot_frame)
         self.canvas.get_tk_widget().grid(column=0, row=1, sticky="WE")
-        #self.canvas.draw()
-
+        
         # Create a scrollbar
         scrollbar = ttk.Scrollbar(self.matplot_frame, orient=tk.VERTICAL, command=self.canvas.get_tk_widget().yview)
         scrollbar.grid(row=1, column=1, sticky="ns")
-        #self.canvas.get_tk_widget().configure(yscrollcommand=scrollbar.set)
-
-        #self.matplot_frame.bind("<Configure>", self.update_scroll_region)
 
         self.canvas.mpl_connect('motion_notify_event', self.on_mouse_motion)
 
@@ -204,6 +210,28 @@ class Input:
         # Configure the canvas size to fill the available space
         self.canvas.get_tk_widget().configure(width=self.window.winfo_width(), height=height)
         
+    def save_csv(self):
+        current_datetime = datetime.datetime.now()
+        current_datetime_str = current_datetime.strftime("%Y-%m-%d-%H_%M_%S")
+        # choose a filename to save the tree
+        filename = 'bTree' + current_datetime_str + '.csv'
+
+        formatted_operations = []
+        for i in self.saved_operations:
+            if i[0] == 1:
+                formatted_operations.append(('i', i[1]))
+            if i[0] == 2:
+                formatted_operations.append(('s', i[1]))
+            if i[0] == 3:
+                formatted_operations.append(('d', i[1]))
+
+        with open(filename, 'w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerows(formatted_operations)
+
+        self.curr_action_label.configure(text="Tree saved as \'" + filename + "\'", foreground="white")
+
+        
     # raises a counter all 10 milliseconds
     # used for correct timing of animation
     def countNext10Milliseconds(self):
@@ -221,11 +249,18 @@ class Input:
         if self.Graph.currentAnimation.type == 0 and self.commandList:
             if self.commandList[0][0] == 1:
                 self.Graph.insert(self.commandList[0][1])
+                self.curr_action_label.configure(text="Input " + str(self.commandList[0][1]), foreground="white")
+                self.saved_operations.append((self.commandList[0][0], self.commandList[0][1]))
             elif self.commandList[0][0] == 2:
                 self.Graph.search(self.commandList[0][1])
+                self.curr_action_label.configure(text="Search " + str(self.commandList[0][1]), foreground="white")
+                self.saved_operations.append((self.commandList[0][0], self.commandList[0][1]))
             elif self.commandList[0][0] == 3:
                 self.Graph.delete(self.commandList[0][1])
+                self.curr_action_label.configure(text="Delete " + str(self.commandList[0][1]), foreground="white")
+                self.saved_operations.append((self.commandList[0][0], self.commandList[0][1]))
             self.commandList.pop(0)
+            print(self.saved_operations)
         # schedule the next call to my_function in 1 second
         self.matplot_frame.after(10, self.countNext10Milliseconds)
 
@@ -269,7 +304,7 @@ class Input:
                 # advice for user
                 nodeOnHover = "Hover over a node to display its keys!"
             # display the label with the advice or the keys in the hovered node
-            labelHover = tk.Label(self.matplot_frame,text=nodeOnHover).grid(column=0, row=4)
+            labelHover = tk.Label(self.matplot_frame,text=nodeOnHover, font=("Arial", 18)).grid(column=0, row=4)
     
     def get_row_height(self, widget, row):
         # Get the number of rows and columns in the grid
@@ -304,6 +339,8 @@ class Input:
         self.random_to_field.grid_forget()
         self.random_amount_legs_label.grid_forget()
         self.random_amount_legs_field.grid_forget()
+
+        self.confirm_button.grid(column=24, row=1)
         
         # create suboptions belonging to main options
         if self.mode.get() == 1:
@@ -316,6 +353,7 @@ class Input:
             self.radio_action_delete.grid(column=12, row=3, sticky="W")
             
         elif self.mode.get() == 2:
+            self.confirm_button.grid_forget()
             self.select_csv_button.grid(column=6, row=1, sticky="W")
             
         elif self.mode.get() == 3:
@@ -342,13 +380,33 @@ class Input:
         print("reset")
         
     def browse_files(self, *args):
-        # TODO do something with file(name)
-        file_name = filedialog.askopenfilename(
+        filename = filedialog.askopenfilename(
             initialdir="/",
             title="Select a CSV file",
             filetypes=[("CSV files", "*.csv")]
         )
-        print(file_name)
+        message_str = "Do you want to perform the following operations:\n\n"
+        with open(filename, 'r') as file:
+            reader = csv.reader(file)
+            for row in reader:
+                self.csv_input.append(row)
+                if row[0] == 'i':
+                    message_str += "insert " + str(row[1] + "\n")
+                elif row[0] == 's':
+                    message_str += "search " + str(row[1] + "\n")
+                elif row[0] == 'd':
+                    message_str += "delete " + str(row[1] + "\n")
+            self.second_window = tk.Toplevel(self.window)
+            label = tk.Label(self.second_window, text=message_str, font=("Arial", 18))
+            label.pack()
+            button = tk.Button(self.second_window, text="Yes, let's go!", command=self.csv_second_window)
+            button.pack()
+
+    def csv_second_window(self):
+        for row in self.csv_input:
+            if row[0] == 'i':
+                self.commandList.append((1, int(row[1])))
+        self.second_window.destroy()
 
     # takes the input
     # checks if input is valid 
@@ -378,14 +436,14 @@ class Input:
                     # check if the current number is really an int
                     if currentNumStr.isdigit():
                         # only allow ints between 0 and 9999
-                        if int(currentNumStr) > 0 and int(currentNumStr) < 9999:
+                        if int(currentNumStr) > 0 and int(currentNumStr) <= 9999:
                             # append the current number as an int to the input List
                             inputNums.append((self.mode.get(), int(currentNumStr)))
                         # invalid int
                         else:
                             # set invalid flag
                             invalid = True
-                            print("invalid")
+                            self.curr_action_label.configure(text="Invalid input! Choose number from 1 to 9999!", foreground="#FF6666")
                     # reset the current number
                     currentNumStr = ""
                 # if the current char is an int
@@ -396,27 +454,22 @@ class Input:
                 else:
                     # set invalid flag
                     invalid = True
-                    print("invalid")
+                    self.curr_action_label.configure(text="Invalid input! Char \'" + str(input[index]) + "\' is not allowed.", foreground="#FF6666")
             # increment index for next char
             index += 1
         # check if the current number is a digit
         # if the last character in input is a digit -> it is not appended yet
         if currentNumStr.isdigit() and not invalid:
             # only allow ints between 0 and 9999
-            if int(currentNumStr) > 0 and int(currentNumStr) < 9999:
+            if int(currentNumStr) > 0 and int(currentNumStr) <= 9999:
                 # append the last number to the number list
                 inputNums.append((self.mode.get(), int(currentNumStr)))
             # invalid int
             else:
                 # set invalid flag
                 invalid = True
-                print("invalid")
+                self.curr_action_label.configure(text="Invalid input! Choose number from 1 to 9999!", foreground="#FF6666")
         # only continue with input if it is valid
         if not invalid:
             self.commandList.extend(inputNums)
             print(self.commandList)
-
-        
-#if __name__ == '__main__':
-#    input_obj = Input()
-
