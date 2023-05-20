@@ -16,9 +16,9 @@
 #       - preparing lists for frontend (num of nodes per level, keys per level and edges)
 #
 # when executed by main
-#from Backend import node
+from Backend import node
 # debugging
-import node
+#import node
 from collections import deque
 
 class BTree:
@@ -53,6 +53,7 @@ class BTree:
         self.usedKeys = []
         # list for searching algorithmn, contains all searched node ids
         self.searchedNodes = []
+        self.fullRoot = False
 
 
 
@@ -245,6 +246,8 @@ class BTree:
             self.keysPerLevelCopies.append([list(l) for l in keysPerLevelBeforeSplit])
         # fill parent with splitkey -> middle key
         self.insertNotFull(parent,copyOfSplitKey, source, target, True,False)
+        if len(parent.keys) == 2 * k + 1 and len(self.rootNode.keys) == 2 * k:
+            fromFullRoot = True
         if not fromFullRoot:
             self.visitiedNodes[0].append(target)
             self.visitiedNodes[1].append(target)
@@ -438,6 +441,7 @@ class BTree:
                     self.keysPerLevelCopies.append([list(l) for l in keysPerLevelBeforeFullRootSplit])
                     keysPerLevelBeforeFullRootSplit[listIndex].insert(valueIndex,copyOfSplitKey)
                     # split the full node
+                    self.fullRoot = True
                     self.splitRoot(temp,0,parent) 
                     #self.insertNotFull(temp,key, source, target)
                     source = self.rootNode.id
@@ -475,7 +479,7 @@ class BTree:
             else:
                 i = len(node.keys) - 1 
             if node.leaf or fromSplit:
-                if emptyNode:
+                if emptyNode and not self.fullRoot:
                     node.keys.append(key)
                     self.animationList.append(1)
                     self.usedKeys.append(key)
