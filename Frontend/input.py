@@ -14,6 +14,7 @@
 #       - GUI for input 
 #
 
+import csv
 import random
 import tkinter as tk
 from tkinter import filedialog
@@ -26,6 +27,7 @@ import threading
 
 class Input:
     def __init__(self) -> None:
+        self.saved_operations = []
         self.window = tk.Tk()
 
         self.window.columnconfigure(0, weight=1)
@@ -130,10 +132,10 @@ class Input:
         self.settings_order_field = tk.Entry(self.settings_fields_frame, width=6)
         self.settings_order_field.grid(column=0, row=1, sticky="W")
         # Speed
-        self.settings_speed_label = tk.Label(self.settings_fields_frame, text="Speed:")
-        self.settings_speed_label.grid(column=2, row=0, sticky="W")
-        self.settings_speed_field = tk.Entry(self.settings_fields_frame, width=6)
-        self.settings_speed_field.grid(column=2, row=1, sticky="W")
+        #self.settings_speed_label = tk.Label(self.settings_fields_frame, text="Speed:")
+        #self.settings_speed_label.grid(column=2, row=0, sticky="W")
+        #self.settings_speed_field = tk.Entry(self.settings_fields_frame, width=6)
+        #self.settings_speed_field.grid(column=2, row=1, sticky="W")
         # Update button
         update_button = tk.Button(self.settings_fields_frame, text="Update", command=self.update_settings)
         update_button.grid(column=3, row=1)
@@ -145,6 +147,8 @@ class Input:
         #self.reset_button_frame.columnconfigure(0, weight=1)
         reset_button = tk.Button(self.reset_button_frame, text="Reset", command=self.update_settings, bg="red")
         reset_button.grid(column=0, row=4)
+        save_button = tk.Button(self.reset_button_frame, text="Save as CSV file", command=self.save_csv, bg="red")
+        save_button.grid(column=0, row=5)
         
         ##################
         ##################
@@ -207,6 +211,23 @@ class Input:
         # Configure the canvas size to fill the available space
         self.canvas.get_tk_widget().configure(width=self.window.winfo_width(), height=height)
         
+    def save_csv(self):
+        filename = 'data.csv'
+
+        formatted_operations = []
+        for i in self.saved_operations:
+            if i[0] == 1:
+                formatted_operations.append(('i', i[1]))
+            if i[0] == 2:
+                formatted_operations.append(('s', i[1]))
+            if i[0] == 3:
+                formatted_operations.append(('d', i[1]))
+
+        with open(filename, 'w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerows(formatted_operations)
+
+        print("CSV file created successfully.")
     # raises a counter all 10 milliseconds
     # used for correct timing of animation
     def countNext10Milliseconds(self):
@@ -225,13 +246,17 @@ class Input:
             if self.commandList[0][0] == 1:
                 self.Graph.insert(self.commandList[0][1])
                 self.curr_action_label.configure(text="Input " + str(self.commandList[0][1]), foreground="white")
+                self.saved_operations.append((self.commandList[0][0], self.commandList[0][1]))
             elif self.commandList[0][0] == 2:
                 self.Graph.search(self.commandList[0][1])
                 self.curr_action_label.configure(text="Search " + str(self.commandList[0][1]), foreground="white")
+                self.saved_operations.append((self.commandList[0][0], self.commandList[0][1]))
             elif self.commandList[0][0] == 3:
                 self.Graph.delete(self.commandList[0][1])
                 self.curr_action_label.configure(text="Delete " + str(self.commandList[0][1]), foreground="white")
+                self.saved_operations.append((self.commandList[0][0], self.commandList[0][1]))
             self.commandList.pop(0)
+            print(self.saved_operations)
         # schedule the next call to my_function in 1 second
         self.matplot_frame.after(10, self.countNext10Milliseconds)
 
@@ -275,7 +300,7 @@ class Input:
                 # advice for user
                 nodeOnHover = "Hover over a node to display its keys!"
             # display the label with the advice or the keys in the hovered node
-            labelHover = tk.Label(self.matplot_frame,text=nodeOnHover).grid(column=0, row=4)
+            labelHover = tk.Label(self.matplot_frame,text=nodeOnHover, font=("Arial", 18)).grid(column=0, row=4)
     
     def get_row_height(self, widget, row):
         # Get the number of rows and columns in the grid
