@@ -16,9 +16,9 @@
 #       - preparing lists for frontend (num of nodes per level, keys per level and edges)
 #
 # when executed by main
-from Backend import node
+#from Backend import node
 # debugging
-#import node
+import node
 from collections import deque
 
 class BTree:
@@ -686,6 +686,9 @@ class BTree:
                         # insert key to correct place
                         leftNeighbour.keys[i + 1] = currentKey
                 print('test')
+                # parent is empty so delete it
+                if parent.keys == 0:
+                    self.rootNode = leftNeighbour
                 self.updateNodeIds(self.rootNode)
             elif rightNeighbour is not None:
                 # remove key from node
@@ -728,6 +731,9 @@ class BTree:
                         # insert key to correct place
                         rightNeighbour.keys[i + 1] = currentKey
                 print('test')
+                # parent is empty so delete it
+                if not parent.keys:
+                    self.rootNode = rightNeighbour
                 self.updateNodeIds(self.rootNode)
         # set keys per level list -> has to be copy of list because every key list can be different!
         self.getKeysPerLevel()
