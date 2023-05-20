@@ -555,7 +555,7 @@ class BTree:
             leftNeighbour = self.getNodeWithId(self.rootNode, nodeWithKey.id - 1)
             rightNeighbour = self.getNodeWithId(self.rootNode, nodeWithKey.id + 1)
             # check if left neighbour can give key
-            if len(leftNeighbour.keys) >= (self.k + 1) and not None:
+            if leftNeighbour is not None and len(leftNeighbour.keys) >= (self.k + 1):
                 # take key from left neighbour
                 # remove key from node
                 # results in underflow
@@ -600,7 +600,7 @@ class BTree:
                     # insert key to correct place
                     nodeWithKey.keys[i + 1] = fillKey
                 print('test')
-            elif len(rightNeighbour.keys) >= (self.k + 1) and not None:
+            elif rightNeighbour is not None and len(rightNeighbour.keys) >= (self.k + 1):
                 # remove key from node
                 # results in underflow
                 nodeWithKey.keys.remove(key)
@@ -687,6 +687,45 @@ class BTree:
                         leftNeighbour.keys[i + 1] = currentKey
                 print('test')
             elif rightNeighbour is not None:
+                # remove key from node
+                # results in underflow
+                nodeWithKey.keys.remove(key)
+                # all keys which will be merged into left neighbour
+                leftKeys = nodeWithKey.keys
+                # key which goes from root into merged node
+                fillKey = parent.keys[childRef]
+                # delete fill key from parent
+                parent.keys.remove(fillKey)
+                # delete underflow node
+                parent.children.remove(nodeWithKey)
+                # fill left neighbour
+                # first insert fill key
+                i = len(rightNeighbour.keys) - 1 
+                rightNeighbour.keys.append(None)
+                if i == 0 and rightNeighbour.keys[0] == None:
+                    rightNeighbour.keys[0] = fillKey
+                else:
+                    # compare every node key to insertion key 
+                    while i >= 0 and fillKey < rightNeighbour.keys[i]: 
+                        # shift key one place to the right
+                        rightNeighbour.keys[i + 1] = rightNeighbour.keys[i] 
+                        i -= 1
+                    # insert key to correct place
+                    rightNeighbour.keys[i + 1] = fillKey
+                # fill neighbour with every left key
+                for currentKey in leftKeys:
+                    i = len(rightNeighbour.keys) - 1 
+                    rightNeighbour.keys.append(None)
+                    if i == 0 and rightNeighbour.keys[0] == None:
+                        rightNeighbour.keys[0] = currentKey
+                    else:
+                        # compare every node key to insertion key 
+                        while i >= 0 and currentKey < rightNeighbour.keys[i]: 
+                            # shift key one place to the right
+                            rightNeighbour.keys[i + 1] = rightNeighbour.keys[i] 
+                            i -= 1
+                        # insert key to correct place
+                        rightNeighbour.keys[i + 1] = currentKey
                 print('test')
         # set keys per level list -> has to be copy of list because every key list can be different!
         self.getKeysPerLevel()
