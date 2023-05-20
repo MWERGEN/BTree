@@ -16,6 +16,7 @@
 
 import csv
 import random
+import datetime
 import tkinter as tk
 from tkinter import filedialog
 from tkinter import ttk
@@ -41,6 +42,9 @@ class Input:
         self.mode.set(1)  # initializing the choice, i.e. Python
         self.action = tk.IntVar()
         self.action.set(1)  # initializing the choice, i.e. Python
+
+        self.csv_input = []
+        self.second_window = 0
         
         # mode selection
         self.input_fields_frame = tk.Frame(master=self.window)
@@ -212,7 +216,10 @@ class Input:
         self.canvas.get_tk_widget().configure(width=self.window.winfo_width(), height=height)
         
     def save_csv(self):
-        filename = 'data.csv'
+        current_datetime = datetime.datetime.now()
+        current_datetime_str = current_datetime.strftime("%Y-%m-%d-%H_%M_%S")
+        # choose a filename to save the tree
+        filename = 'bTree' + current_datetime_str + '.csv'
 
         formatted_operations = []
         for i in self.saved_operations:
@@ -227,7 +234,9 @@ class Input:
             writer = csv.writer(file)
             writer.writerows(formatted_operations)
 
-        print("CSV file created successfully.")
+        self.curr_action_label.configure(text="Tree saved as \'" + filename + "\'", foreground="white")
+
+        
     # raises a counter all 10 milliseconds
     # used for correct timing of animation
     def countNext10Milliseconds(self):
@@ -374,12 +383,27 @@ class Input:
         
     def browse_files(self, *args):
         # TODO do something with file(name)
-        file_name = filedialog.askopenfilename(
+        filename = filedialog.askopenfilename(
             initialdir="/",
             title="Select a CSV file",
             filetypes=[("CSV files", "*.csv")]
         )
-        print(file_name)
+        print(filename)
+        with open(filename, 'r') as file:
+            reader = csv.reader(file)
+            for row in reader:
+                self.csv_input.append(row)
+            self.second_window = tk.Toplevel(self.window)
+            label = tk.Label(self.second_window, text="Do you want to perform the following operations: ")
+            label.pack()
+            button = tk.Button(self.second_window, text="Yes, let's go!", command=self.csv_second_window)
+            button.pack()
+
+    def csv_second_window(self):
+        for row in self.csv_input:
+            if row[0] == 'i':
+                self.commandList.append((1, int(row[1])))
+        self.second_window.destroy()
 
     # takes the input
     # checks if input is valid 
