@@ -858,11 +858,11 @@ class BTreeVisualization:
             self.colorKeyList[index] = "green"
             # stop the animation
             anim.flagOuterKeyReached = True
-        # a key was found that is higher than the key that is going to be added
+        # a key was found that is higher than the key that is searched for
         elif self.keyLabels[index] > anim.searchKey:
             # stop the animation
             anim.flagOuterKeyReached = True
-        # the key that is going to be added would be the highest key in the observed node
+        # the key that is searched for would be the highest key in the observed node
         elif anim.highlightedKey == len(self.keysList[ctrNode]) - 1:
             # stop the animation
             anim.flagOuterKeyReached = True
@@ -905,6 +905,7 @@ class BTreeVisualization:
                 else:
                     # update the graph
                     # -> needed for key
+                    anim.walkthrough = len(anim.types) - 1
                     anim.updateNewAnimation()
                     self.updateGraph()
                     self.initializeColorRefList()

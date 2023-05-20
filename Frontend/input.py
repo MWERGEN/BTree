@@ -173,7 +173,7 @@ class Input:
         self.matplot_frame.rowconfigure(0, weight=1)
 
         # create a scale widget for selecting the number
-        self.scale = tk.Scale(self.matplot_frame, from_=1, to=10, orient=tk.HORIZONTAL)
+        self.scale = tk.Scale(self.matplot_frame, from_=1, to=20, orient=tk.HORIZONTAL)
         self.scale.grid(column=0, row=0)
 
         self.canvas = FigureCanvasTkAgg(self.Graph.fig, master=self.matplot_frame)
