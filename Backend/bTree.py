@@ -625,6 +625,11 @@ class BTree:
                         self.insertNotFull(node.children[i], key, source, target, False,False)
 
 
+    # delete key inside tree
+    # different events can occour
+    # if there are enough keys inside the node (k + 1) just delete
+    # if not try to get keys from left or right neighbour
+    # if they don't have enough merge them
     def deleteKey(self,key, nextNode = None):
         # reset all attributes
         self.numOfNodesPerLevel = []
@@ -862,9 +867,14 @@ class BTree:
 
     def borrowKeyFromNeighbour(self, node):
         # check if neighbours can give keys
+        parent = self.getParent(node, self.rootNode)
         leftNeighbour = self.getNodeWithId(self.rootNode, node.id - 1)
         rightNeighbour = self.getNodeWithId(self.rootNode, node.id + 1)
-        parent = self.getParent(node, self.rootNode)
+        # check if nodes are really neighbours
+        if not leftNeighbour in parent.children:
+            leftNeighbour = None
+        if not rightNeighbour in parent.children:
+            rightNeighbour = None
         for index, child in enumerate(parent.children):
             if child == node:
                 childRef = index
@@ -878,6 +888,10 @@ class BTree:
                 # key from neighbour which will be inserted into parent
                 # is always first value
                 borrowKey = leftNeighbour.keys[-1]
+                # get ref which belongs to the node
+                childOfBorrowKey = rightNeighbour.children[-1]
+                rightNeighbour.children.remove(childOfBorrowKey)
+                node.children.insert(0, childOfBorrowKey)
                 # remove borrow key from neighbour
                 leftNeighbour.keys.remove(borrowKey)
                 # insert borrow key into parent
@@ -920,6 +934,10 @@ class BTree:
                 borrowKey = rightNeighbour.keys[0]
                 # remove borrow key from neighbour
                 rightNeighbour.keys.remove(borrowKey)
+                # get ref which belongs to the node
+                childOfBorrowKey = rightNeighbour.children[0]
+                rightNeighbour.children.remove(childOfBorrowKey)
+                node.children.append(childOfBorrowKey)
                 # insert borrow key into parent
                 # make space for one more key
                 i = len(parent.keys) - 1 
