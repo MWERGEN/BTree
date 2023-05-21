@@ -53,6 +53,7 @@ class BTree:
         self.usedKeys = []
         # list for searching algorithmn, contains all searched node ids
         self.searchedNodes = []
+        self.fullRoot = False
 
 
 
@@ -152,8 +153,10 @@ class BTree:
                 self.animationList.append(1)
                 self.usedReferences.append(i)
                 self.usedKeys.append(key)
+                self.visitiedNodes[0].append(root.id)
+                self.visitiedNodes[1].append(root.children[i].id)
                 # check if node where key should go is full -> children[i] means all keys in this node are smaller!
-                if len(root.children[i].keys) == (2 * self.k):
+                if root.children[i].leaf and len(root.children[i].keys) == (2 * self.k):
                     # get the current keys per level of the tree
                     nodePerLevelBeforeFullRootSplit = self.countNodesPerLevel()
                     self.numOfNodesPerLevelCopies.append(nodePerLevelBeforeFullRootSplit)
@@ -190,6 +193,8 @@ class BTree:
                     self.insertNotFull(root.children[i], key, source, target, False,False)
                     # key is inserted so animation is over -> 0
                     self.animationList.append(0)
+                    # root is no longer full
+                    self.fullRoot = False
         # case2
         else:
             # just insert key into node 
@@ -243,6 +248,8 @@ class BTree:
             self.keysPerLevelCopies.append([list(l) for l in keysPerLevelBeforeSplit])
         # fill parent with splitkey -> middle key
         self.insertNotFull(parent,copyOfSplitKey, source, target, True,False)
+        if len(parent.keys) == 2 * k + 1 and len(self.rootNode.keys) == 2 * k:
+            fromFullRoot = True
         if not fromFullRoot:
             self.visitiedNodes[0].append(target)
             self.visitiedNodes[1].append(target)
@@ -314,20 +321,26 @@ class BTree:
                         indexOfSplit = loopIndex
                 indexOfSplit -= 1
                 self.splitRoot(rootOfParent,indexOfSplit, splitNode)
+                print('test')
         if rootSplit:
             parentOfRootSplit = self.getParent(splitNode, self.rootNode)
+            # get index of split node
+            indexOfOrgSplitNode = parentOfRootSplit.children.index(splitNode)
             # take all greater keys and insert them from order to 2 * order - 1
             newNode.keys = splitNode.keys[middleIndex: 2 * k] 
             # take all smaller keys and insert them from 0 to order - 1
             splitNode.keys = splitNode.keys[0: middleIndex]
-            parentOfRootSplit.children.insert(index + 1, newNode)
+            parentOfRootSplit.children.insert(indexOfOrgSplitNode + 1, newNode)
             self.updateNodeIds(self.rootNode)
             nodePerLevelAfterRootSplit = self.countNodesPerLevel()
             self.numOfNodesPerLevelCopies.append(nodePerLevelAfterRootSplit)
             # set keys per level list -> has to be copy of list because every key list can be different!
-            self.getKeysPerLevel()
-            keysPerLevelAfterRootSplit = self.keysPerLevel[:]
-            self.keysPerLevelCopies.append([list(l) for l in keysPerLevelAfterRootSplit])
+            if not self.fullRoot:
+                self.getKeysPerLevel()
+                keysPerLevelAfterRootSplit = self.keysPerLevel[:]
+                self.keysPerLevelCopies.append([list(l) for l in keysPerLevelAfterRootSplit])
+            else:
+                self.keysPerLevelCopies.append(self.keysPerLevelCopies[-1])
             # edge list copy
             self.setEdgeList(self.rootNode)
             edgeListAfterRootSplit = self.edgeList[:]
@@ -355,33 +368,96 @@ class BTree:
         source = parent.id
         target = parent.id
         k = self.k
+        fullRoot = False
         # full node
         splitNode = parent.children[index]
-        indexOfOrgSplitNode = splitNode.children.index(willBeSplitt)
-        # second node where are all keys which are greater than the middle key will go
-        newNode = node.Node(splitNode.leaf) 
+        if not parent.keys and parent == self.rootNode:
+            indexOfOrgSplitNode = parent.children.index(splitNode)
+            fullRoot = True
+        else:
+            indexOfOrgSplitNode = splitNode.children.index(willBeSplitt)
         i = len(splitNode.keys) - 1
         middleIndex = int(len(splitNode.keys) / 2)
-        # add reference to node which holds all greater keys
-        parent.children.insert(index + 1, newNode) 
         # fill parent with splitkey -> middle key
         self.insertNotFull(parent,splitNode.keys[middleIndex], source, target, True, True)
+        # second node where are all keys which are greater than the middle key will go
+        newNode = node.Node(splitNode.leaf)
+        # add reference to node which holds all greater keys
+        parent.children.insert(index + 1, newNode) 
         del splitNode.keys[middleIndex]
         # take all greater keys and insert them from order to 2 * order - 1
         newNode.keys = splitNode.keys[middleIndex: 2 * k] 
         # take all smaller keys and insert them from 0 to order - 1
         splitNode.keys = splitNode.keys[0: middleIndex]
-        if indexOfOrgSplitNode < 2:
-            # give newNode with all greater keys all references to all greater children
-            newNode.children = splitNode.children[k : 2 * k + 1] 
-            # updte references to only smaller children
-            splitNode.children = splitNode.children[0: k]
-        else:
-            # give newNode with all greater keys all references to all greater children
-            newNode.children = splitNode.children[k + 1: 2 * k + 1] 
-            # updte references to only smaller children
+        if fullRoot:
+            newNode.children = splitNode.children[k + 1: 2 * k + 2]
             splitNode.children = splitNode.children[0: k + 1]
             print('test')
+        else:
+            if indexOfOrgSplitNode < 2:
+                # give newNode with all greater keys all references to all greater children
+                newNode.children = splitNode.children[k : 2 * k + 1] 
+                # updte references to only smaller children
+                splitNode.children = splitNode.children[0: k]
+            else:
+                # give newNode with all greater keys all references to all greater children
+                newNode.children = splitNode.children[k + 1: 2 * k + 1] 
+                # updte references to only smaller children
+                splitNode.children = splitNode.children[0: k + 1]
+                print('test')
+            # parent is also full
+            if len(parent.keys) == 2 * self.k + 1:
+                if parent == self.rootNode:
+                    rootSplit = True
+                    # split the full node
+                    self.fullRoot = True
+                    # new root node
+                    temp = node.Node()
+                    # reference to child which will hold all smaller keys!
+                    temp.children.insert(0, parent) 
+                    self.rootNode = temp
+                    # give root id 0
+                    self.updateNodeIds(self.rootNode)
+                    source = parent.id
+                    target = self.rootNode.id
+                    self.visitiedNodes[0].append(source)
+                    self.visitiedNodes[1].append(target)
+                    middleIndex = int(len(parent.keys) / 2)
+                    copyOfSplitKey = parent.keys[middleIndex]
+                    # edge list copy
+                    self.setEdgeList(self.rootNode)
+                    edgeListBeforeSplit = self.edgeList[:]
+                    if edgeListBeforeSplit:
+                        root = edgeListBeforeSplit[-1]
+                        if root:
+                            edge = edgeListBeforeSplit[-1]
+                            root.pop()
+                    self.edgeListCopies.append([list(l) for l in edgeListBeforeSplit])
+                    edgeListBeforeSplit[-1].append(edge)
+                    # get the current keys per level of the tree
+                    nodePerLevelBeforeFullRootSplit = self.countNodesPerLevel()
+                    self.numOfNodesPerLevelCopies.append(nodePerLevelBeforeFullRootSplit)
+                    # set keys per level list -> has to be copy of list because every key list can be different!
+                    self.getKeysPerLevel()
+                    keysPerLevelBeforeFullRootSplit = self.keysPerLevel[:]
+                    for lists in keysPerLevelBeforeFullRootSplit:
+                        if copyOfSplitKey in lists:
+                            listIndex = keysPerLevelBeforeFullRootSplit.index(lists)
+                            valueIndex = lists.index(copyOfSplitKey)
+                            lists.remove(copyOfSplitKey)
+                    self.keysPerLevelCopies.append([list(l) for l in keysPerLevelBeforeFullRootSplit])
+                    keysPerLevelBeforeFullRootSplit[listIndex].insert(valueIndex,copyOfSplitKey)
+                    self.splitRoot(temp,0,parent) 
+                    self.updateNodeIds(self.rootNode)
+                    #self.insertNotFull(temp,key, source, target)
+                    source = self.rootNode.id
+                    target = self.rootNode.id
+                    self.visitiedNodes[0].append(source)
+                    self.visitiedNodes[1].append(target)
+                    # there is a new node in the tree so update the ids of the nodes
+                    # this ensures that at every operation the node ids are correct
+                    self.updateNodeIds(self.rootNode)
+
 
     def getParent(self, searchNode, rootNode):
         if searchNode in rootNode.children:
@@ -409,7 +485,7 @@ class BTree:
             else:
                 i = len(node.keys) - 1 
             if node.leaf or fromSplit:
-                if emptyNode:
+                if emptyNode and not self.fullRoot:
                     node.keys.append(key)
                     self.animationList.append(1)
                     self.usedKeys.append(key)
@@ -434,6 +510,7 @@ class BTree:
                     node.keys.append(None)
                     if i == 0 and node.keys[0] == None:
                         node.keys[0] = key
+                        self.usedKeys.append(key)
                     else:
                         # compare every node key to insertion key 
                         while i >= 0 and key < node.keys[i]: 
@@ -448,9 +525,7 @@ class BTree:
                             self.visitiedNodes[1].append(target)
                         else:
                             currentPos = source[-1]
-                            source.append(currentPos)
-                            target.append(node.id)
-                            source.append(currentPos)
+                            source.append(node.id)
                             target.append(node.id)
                     # animation for comparing 
                     self.animationList.append(1)
@@ -459,18 +534,22 @@ class BTree:
                         self.getKeysPerLevel()
                         keysPerLevelBeforeInsert = self.keysPerLevel[:]
                         self.keysPerLevelCopies.append([list(l) for l in keysPerLevelBeforeInsert])
-                    # get current nodes per level
-                    nodePerLevelBefore = self.countNodesPerLevel()
-                    self.numOfNodesPerLevelCopies.append(nodePerLevelBefore)
-                    # there is a new node in the tree so update the ids of the nodes
-                    # this ensures that at every operation the node ids are correct
-                    self.updateNodeIds(self.rootNode)
-                    # edge list copy
-                    self.setEdgeList(self.rootNode)
-                    edgeListBeforeInsert = self.edgeList[:]
-                    self.edgeListCopies.append([list(l) for l in edgeListBeforeInsert])
-                    # used keys update
-                    self.usedKeys.append(key)
+                    if not self.fullRoot:
+                        # there is a new node in the tree so update the ids of the nodes
+                        # this ensures that at every operation the node ids are correct
+                        self.updateNodeIds(self.rootNode)
+                        if not self.fullRoot:
+                            # get current nodes per level
+                            nodePerLevelBefore = self.countNodesPerLevel()
+                            self.numOfNodesPerLevelCopies.append(nodePerLevelBefore)
+                        else:
+                            self.numOfNodesPerLevelCopies.append(self.numOfNodesPerLevelCopies[-1])
+                        # edge list copy
+                        self.setEdgeList(self.rootNode)
+                        edgeListBeforeInsert = self.edgeList[:]
+                        self.edgeListCopies.append([list(l) for l in edgeListBeforeInsert])
+                        # used keys update
+                        self.usedKeys.append(key)
             else:
                 # animation for traversing + comparing
                 self.animationList.append(1)
@@ -495,6 +574,8 @@ class BTree:
                         i -= 1
                     # + 1 because insertion key must come after the first node key which is smaller
                     i += 1
+                    if len(node.children) - 1 < i:
+                        i -= 1
                     self.usedReferences.append(i)
                     targetNode = node.children[i].id
                     tempSource = node.id
@@ -516,7 +597,6 @@ class BTree:
                         self.insertNotFull(node.children[i], key, source, target, False,False)
 
 
-    #TODO implement deleting key
     def deleteKey(self,key, nextNode = None):
         # reset all attributes
         self.numOfNodesPerLevel = []
@@ -540,10 +620,201 @@ class BTree:
         self.numOfNodesPerLevelCopies.append(nodePerLevelBefore)
         # use search to find node with key inside
         nodeWithKey = self.searchKey(key, nextNode)
+        parent = self.getParent(nodeWithKey, self.rootNode)
+        for index, child in enumerate(parent.children):
+            if child == nodeWithKey:
+                childRef = index
         # if node has more than k + 1 keys, just delete it
         if len(nodeWithKey.keys) >= (self.k + 1) :
             nodeWithKey.keys.remove(key)
             deleted = True
+        # Node will have underflow!
+        else:
+            deleted = True
+            # check if neighbours can give keys
+            leftNeighbour = self.getNodeWithId(self.rootNode, nodeWithKey.id - 1)
+            rightNeighbour = self.getNodeWithId(self.rootNode, nodeWithKey.id + 1)
+            # check if left neighbour can give key
+            if leftNeighbour is not None and len(leftNeighbour.keys) >= (self.k + 1):
+                # take key from left neighbour
+                # remove key from node
+                # results in underflow
+                nodeWithKey.keys.remove(key)
+                # key from parent which will be inserted to the underflow node
+                # - 1 because it is the left neighbour
+                fillKey = parent.keys[childRef - 1]
+                # key from neighbour which will be inserted into parent
+                # is always first value
+                borrowKey = leftNeighbour.keys[-1]
+                # remove borrow key from neighbour
+                leftNeighbour.keys.remove(borrowKey)
+                # insert borrow key into parent
+                # make space for one more key
+                i = len(parent.keys) - 1 
+                parent.keys.append(None)
+                if i == 0 and parent.keys[0] == None:
+                    parent.keys[0] = borrowKey
+                else:
+                    # compare every node key to insertion key 
+                    while i >= 0 and borrowKey < parent.keys[i]: 
+                        # shift key one place to the right
+                        parent.keys[i + 1] = parent.keys[i] 
+                        i -= 1
+                    # insert key to correct place
+                    parent.keys[i + 1] = borrowKey
+                # remove fill key from root
+                parent.keys.remove(fillKey)
+                # insert fill key into underflow node
+                # insert fill key into underflow node
+                # make space for one more key
+                i = len(nodeWithKey.keys) - 1 
+                nodeWithKey.keys.append(None)
+                if i == 0 and nodeWithKey.keys[0] == None:
+                    nodeWithKey.keys[0] = fillKey
+                else:
+                    # compare every node key to insertion key 
+                    while i >= 0 and fillKey < nodeWithKey.keys[i]: 
+                        # shift key one place to the right
+                        nodeWithKey.keys[i + 1] = nodeWithKey.keys[i] 
+                        i -= 1
+                    # insert key to correct place
+                    nodeWithKey.keys[i + 1] = fillKey
+                print('test')
+            elif rightNeighbour is not None and len(rightNeighbour.keys) >= (self.k + 1):
+                # remove key from node
+                # results in underflow
+                nodeWithKey.keys.remove(key)
+                # key from parent which will be inserted to the underflow node
+                fillKey = parent.keys[childRef]
+                # key from neighbour which will be inserted into parent
+                # is always first value
+                borrowKey = rightNeighbour.keys[0]
+                # remove borrow key from neighbour
+                rightNeighbour.keys.remove(borrowKey)
+                # insert borrow key into parent
+                # make space for one more key
+                i = len(parent.keys) - 1 
+                parent.keys.append(None)
+                if i == 0 and parent.keys[0] == None:
+                    parent.keys[0] = borrowKey
+                else:
+                    # compare every node key to insertion key 
+                    while i >= 0 and borrowKey < parent.keys[i]: 
+                        # shift key one place to the right
+                        parent.keys[i + 1] = parent.keys[i] 
+                        i -= 1
+                    # insert key to correct place
+                    parent.keys[i + 1] = borrowKey
+                # remove fill key from root
+                parent.keys.remove(fillKey)
+                # insert fill key into underflow node
+                # insert fill key into underflow node
+                # make space for one more key
+                i = len(nodeWithKey.keys) - 1 
+                nodeWithKey.keys.append(None)
+                if i == 0 and nodeWithKey.keys[0] == None:
+                    nodeWithKey.keys[0] = fillKey
+                else:
+                    # compare every node key to insertion key 
+                    while i >= 0 and fillKey < nodeWithKey.keys[i]: 
+                        # shift key one place to the right
+                        nodeWithKey.keys[i + 1] = nodeWithKey.keys[i] 
+                        i -= 1
+                    # insert key to correct place
+                    nodeWithKey.keys[i + 1] = fillKey
+                print('test')
+            # neighbours don't have enough keys -> merge
+            # merge with left neighbour 
+            elif leftNeighbour is not None:
+                # remove key from node
+                # results in underflow
+                nodeWithKey.keys.remove(key)
+                # all keys which will be merged into left neighbour
+                leftKeys = nodeWithKey.keys
+                # key which goes from root into merged node
+                fillKey = parent.keys[childRef - 1]
+                # delete fill key from parent
+                parent.keys.remove(fillKey)
+                # delete underflow node
+                parent.children.remove(nodeWithKey)
+                # fill left neighbour
+                # first insert fill key
+                i = len(leftNeighbour.keys) - 1 
+                leftNeighbour.keys.append(None)
+                if i == 0 and leftNeighbour.keys[0] == None:
+                    leftNeighbour.keys[0] = fillKey
+                else:
+                    # compare every node key to insertion key 
+                    while i >= 0 and fillKey < leftNeighbour.keys[i]: 
+                        # shift key one place to the right
+                        leftNeighbour.keys[i + 1] = leftNeighbour.keys[i] 
+                        i -= 1
+                    # insert key to correct place
+                    leftNeighbour.keys[i + 1] = fillKey
+                # fill neighbour with every left key
+                for currentKey in leftKeys:
+                    i = len(leftNeighbour.keys) - 1 
+                    leftNeighbour.keys.append(None)
+                    if i == 0 and leftNeighbour.keys[0] == None:
+                        leftNeighbour.keys[0] = currentKey
+                    else:
+                        # compare every node key to insertion key 
+                        while i >= 0 and currentKey < leftNeighbour.keys[i]: 
+                            # shift key one place to the right
+                            leftNeighbour.keys[i + 1] = leftNeighbour.keys[i] 
+                            i -= 1
+                        # insert key to correct place
+                        leftNeighbour.keys[i + 1] = currentKey
+                print('test')
+                # parent is empty so delete it
+                if parent.keys == 0:
+                    self.rootNode = leftNeighbour
+                self.updateNodeIds(self.rootNode)
+            elif rightNeighbour is not None:
+                # remove key from node
+                # results in underflow
+                nodeWithKey.keys.remove(key)
+                # all keys which will be merged into left neighbour
+                leftKeys = nodeWithKey.keys
+                # key which goes from root into merged node
+                fillKey = parent.keys[childRef]
+                # delete fill key from parent
+                parent.keys.remove(fillKey)
+                # delete underflow node
+                parent.children.remove(nodeWithKey)
+                # fill left neighbour
+                # first insert fill key
+                i = len(rightNeighbour.keys) - 1 
+                rightNeighbour.keys.append(None)
+                if i == 0 and rightNeighbour.keys[0] == None:
+                    rightNeighbour.keys[0] = fillKey
+                else:
+                    # compare every node key to insertion key 
+                    while i >= 0 and fillKey < rightNeighbour.keys[i]: 
+                        # shift key one place to the right
+                        rightNeighbour.keys[i + 1] = rightNeighbour.keys[i] 
+                        i -= 1
+                    # insert key to correct place
+                    rightNeighbour.keys[i + 1] = fillKey
+                # fill neighbour with every left key
+                for currentKey in leftKeys:
+                    i = len(rightNeighbour.keys) - 1 
+                    rightNeighbour.keys.append(None)
+                    if i == 0 and rightNeighbour.keys[0] == None:
+                        rightNeighbour.keys[0] = currentKey
+                    else:
+                        # compare every node key to insertion key 
+                        while i >= 0 and currentKey < rightNeighbour.keys[i]: 
+                            # shift key one place to the right
+                            rightNeighbour.keys[i + 1] = rightNeighbour.keys[i] 
+                            i -= 1
+                        # insert key to correct place
+                        rightNeighbour.keys[i + 1] = currentKey
+                print('test')
+                # parent is empty so delete it
+                if not parent.keys:
+                    self.rootNode = rightNeighbour
+                self.updateNodeIds(self.rootNode)
         # set keys per level list -> has to be copy of list because every key list can be different!
         self.getKeysPerLevel()
         keysPerLevelBeforeInsert = self.keysPerLevel[:]
@@ -576,6 +847,16 @@ class BTree:
             return None
         #go to node in which key maybe is 
         return self.searchKey(key, nextNode.children[i])
+    
+    def getNodeWithId(self, startNode, nodeId):
+        if startNode.id == nodeId:
+            return startNode
+        else:
+            for child in startNode.children:
+                result = self.getNodeWithId(child, nodeId)
+                if result is not None:
+                    return result
+
 
 
     # print tree

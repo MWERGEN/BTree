@@ -180,7 +180,7 @@ class Input:
         self.matplot_frame.rowconfigure(0, weight=1)
 
         # create a scale widget for selecting the number
-        self.scale = tk.Scale(self.matplot_frame, from_=1, to=10, orient=tk.HORIZONTAL)
+        self.scale = tk.Scale(self.matplot_frame, from_=1, to=20, orient=tk.HORIZONTAL)
         self.scale.grid(column=0, row=0)
 
         self.curr_action_label = tk.Label(self.matplot_frame, text="Let's build a balanced tree!", font=("Arial", 28), foreground="white",  background="gray")
@@ -487,7 +487,7 @@ class Input:
                         # only allow ints between 0 and 9999
                         if int(currentNumStr) > 0 and int(currentNumStr) <= 9999:
                             # append the current number as an int to the input List
-                            inputNums.append((self.mode.get(), int(currentNumStr)))
+                            inputNums.append((self.action.get(), int(currentNumStr)))
                         # invalid int
                         else:
                             # set invalid flag
@@ -512,7 +512,7 @@ class Input:
             # only allow ints between 0 and 9999
             if int(currentNumStr) > 0 and int(currentNumStr) <= 9999:
                 # append the last number to the number list
-                inputNums.append((self.mode.get(), int(currentNumStr)))
+                inputNums.append((self.action.get(), int(currentNumStr)))
             # invalid int
             else:
                 # set invalid flag

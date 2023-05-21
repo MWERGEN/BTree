@@ -59,7 +59,7 @@ class Backend:
         #levels = self.btree.countNodesPerLevel()
         #self.btree.numOfNodesPerLevel = levels.copy()
         self.treeNodesPerLevel = self.btree.numOfNodesPerLevelCopies
-        # set animation list 
+        # set animation list
         self.animationList = self.btree.animationList
         self.edgeLists = self.btree.edgeListCopies
         # set references 
@@ -108,10 +108,10 @@ class Backend:
         self.operands.append(self.searchedNodes)
         self.operands.append(keyFound)
         # search needs two tree lists so the animations works right
-        list = self.btree.getTreeListForSearch()
         temp = []
-        temp.append(list)
-        temp.append(list)
+        list = self.btree.getTreeListForSearch()
+        temp.append(list[0])
+        temp.append(list[0])
         self.treeList = temp
         print('test')
 
@@ -185,6 +185,10 @@ class Backend:
         self.treeList = self.btree.reset()
 
 # testData = Backend(2)
+# for i in range(1, 60):
+#     if i == 53:
+#         print('test')
+#     testData.insertKeyIntoTree(i)
 # testData.insertKeyIntoTree(3)
 # testData.insertKeyIntoTree(4)
 # testData.insertKeyIntoTree(5)
@@ -196,17 +200,14 @@ class Backend:
 # testData.insertKeyIntoTree(13)
 # testData.insertKeyIntoTree(27)
 # testData.insertKeyIntoTree(30)
-# testData.insertKeyIntoTree(42)
-# testData.insertKeyIntoTree(59)
-# testData.insertKeyIntoTree(69)
-# testData.insertKeyIntoTree(75)
-# testData.insertKeyIntoTree(88)
-# testData.insertKeyIntoTree(18)
-# testData.insertKeyIntoTree(24)
-# testData.insertKeyIntoTree(100)
-# testData.insertKeyIntoTree(101)
-# testData.insertKeyIntoTree(102)
-# testData.insertKeyIntoTree(103)
+# testData.insertKeyIntoTree(9)
+# testData.insertKeyIntoTree(10)
+# testData.insertKeyIntoTree(11)
+# testData.insertKeyIntoTree(14)
+# testData.insertKeyIntoTree(15)
+# testData.insertKeyIntoTree(16)
+# testData.insertKeyIntoTree(17)
+# print('test')
 # testData.insertKeyIntoTree(104)
 # testData.insertKeyIntoTree(105)
 # testData.insertKeyIntoTree(106)

@@ -310,9 +310,32 @@ class BTreeVisualization:
         self.currentAnimation = ani.Animation(animationList, treeList, operands)
 
     def search(self, key):
-        print("search key" + str(key))
+        self.backend.searchKeyInTree(key)
+        # get updated animation list
+        animationList = self.backend.animationList
+        # get updated tree List
+        treeList = self.backend.treeList
+        # get updated operands
+        operands = self.backend.operands
+        print(animationList)
+        print(treeList)
+        print(operands)
+        # create the animation for the insertion or the search
+        self.currentAnimation = ani.Animation(animationList, treeList, operands)
 
     def delete(self, key):
+        self.backend.deleteKeyFromTree(key)
+        # get updated animation list
+        animationList = self.backend.animationList
+        # get updated tree List
+        treeList = self.backend.treeList
+        # get updated operands
+        operands = self.backend.operands
+        print(animationList)
+        print(treeList)
+        print(operands)
+        # create the animation for the insertion or the search
+        self.currentAnimation = ani.Animation(animationList, treeList, operands)
         print("delete key" + str(key))
 
     def reset(self):
@@ -837,11 +860,11 @@ class BTreeVisualization:
             self.colorKeyList[index] = "green"
             # stop the animation
             anim.flagOuterKeyReached = True
-        # a key was found that is higher than the key that is going to be added
+        # a key was found that is higher than the key that is searched for
         elif self.keyLabels[index] > anim.searchKey:
             # stop the animation
             anim.flagOuterKeyReached = True
-        # the key that is going to be added would be the highest key in the observed node
+        # the key that is searched for would be the highest key in the observed node
         elif anim.highlightedKey == len(self.keysList[ctrNode]) - 1:
             # stop the animation
             anim.flagOuterKeyReached = True
@@ -884,6 +907,7 @@ class BTreeVisualization:
                 else:
                     # update the graph
                     # -> needed for key
+                    anim.walkthrough = len(anim.types) - 1
                     anim.updateNewAnimation()
                     self.updateGraph()
                     self.initializeColorRefList()
