@@ -813,7 +813,7 @@ class BTree:
                     leftNeighbour.children.append(currentChild)
                 print('test')
                 # parent is empty so delete it
-                if parent.keys == 0 and parent == self.rootNode:
+                if len(parent.keys) == 0 and parent == self.rootNode:
                     self.rootNode = leftNeighbour
                 self.updateNodeIds(self.rootNode)
             elif rightNeighbour is not None:
