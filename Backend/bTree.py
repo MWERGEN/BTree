@@ -193,6 +193,8 @@ class BTree:
                     self.insertNotFull(root.children[i], key, source, target, False,False)
                     # key is inserted so animation is over -> 0
                     self.animationList.append(0)
+                    # root is no longer full
+                    self.fullRoot = False
         # case2
         else:
             # just insert key into node 
@@ -333,9 +335,12 @@ class BTree:
             nodePerLevelAfterRootSplit = self.countNodesPerLevel()
             self.numOfNodesPerLevelCopies.append(nodePerLevelAfterRootSplit)
             # set keys per level list -> has to be copy of list because every key list can be different!
-            self.getKeysPerLevel()
-            keysPerLevelAfterRootSplit = self.keysPerLevel[:]
-            self.keysPerLevelCopies.append([list(l) for l in keysPerLevelAfterRootSplit])
+            if not self.fullRoot:
+                self.getKeysPerLevel()
+                keysPerLevelAfterRootSplit = self.keysPerLevel[:]
+                self.keysPerLevelCopies.append([list(l) for l in keysPerLevelAfterRootSplit])
+            else:
+                self.keysPerLevelCopies.append(self.keysPerLevelCopies[-1])
             # edge list copy
             self.setEdgeList(self.rootNode)
             edgeListAfterRootSplit = self.edgeList[:]
@@ -371,14 +376,14 @@ class BTree:
             fullRoot = True
         else:
             indexOfOrgSplitNode = splitNode.children.index(willBeSplitt)
-        # second node where are all keys which are greater than the middle key will go
-        newNode = node.Node(splitNode.leaf) 
         i = len(splitNode.keys) - 1
         middleIndex = int(len(splitNode.keys) / 2)
-        # add reference to node which holds all greater keys
-        parent.children.insert(index + 1, newNode) 
         # fill parent with splitkey -> middle key
         self.insertNotFull(parent,splitNode.keys[middleIndex], source, target, True, True)
+        # second node where are all keys which are greater than the middle key will go
+        newNode = node.Node(splitNode.leaf)
+        # add reference to node which holds all greater keys
+        parent.children.insert(index + 1, newNode) 
         del splitNode.keys[middleIndex]
         # take all greater keys and insert them from order to 2 * order - 1
         newNode.keys = splitNode.keys[middleIndex: 2 * k] 
@@ -404,6 +409,8 @@ class BTree:
             if len(parent.keys) == 2 * self.k + 1:
                 if parent == self.rootNode:
                     rootSplit = True
+                    # split the full node
+                    self.fullRoot = True
                     # new root node
                     temp = node.Node()
                     # reference to child which will hold all smaller keys!
@@ -440,9 +447,8 @@ class BTree:
                             lists.remove(copyOfSplitKey)
                     self.keysPerLevelCopies.append([list(l) for l in keysPerLevelBeforeFullRootSplit])
                     keysPerLevelBeforeFullRootSplit[listIndex].insert(valueIndex,copyOfSplitKey)
-                    # split the full node
-                    self.fullRoot = True
                     self.splitRoot(temp,0,parent) 
+                    self.updateNodeIds(self.rootNode)
                     #self.insertNotFull(temp,key, source, target)
                     source = self.rootNode.id
                     target = self.rootNode.id
@@ -504,6 +510,7 @@ class BTree:
                     node.keys.append(None)
                     if i == 0 and node.keys[0] == None:
                         node.keys[0] = key
+                        self.usedKeys.append(key)
                     else:
                         # compare every node key to insertion key 
                         while i >= 0 and key < node.keys[i]: 
@@ -527,18 +534,22 @@ class BTree:
                         self.getKeysPerLevel()
                         keysPerLevelBeforeInsert = self.keysPerLevel[:]
                         self.keysPerLevelCopies.append([list(l) for l in keysPerLevelBeforeInsert])
-                    # get current nodes per level
-                    nodePerLevelBefore = self.countNodesPerLevel()
-                    self.numOfNodesPerLevelCopies.append(nodePerLevelBefore)
-                    # there is a new node in the tree so update the ids of the nodes
-                    # this ensures that at every operation the node ids are correct
-                    self.updateNodeIds(self.rootNode)
-                    # edge list copy
-                    self.setEdgeList(self.rootNode)
-                    edgeListBeforeInsert = self.edgeList[:]
-                    self.edgeListCopies.append([list(l) for l in edgeListBeforeInsert])
-                    # used keys update
-                    self.usedKeys.append(key)
+                    if not self.fullRoot:
+                        # there is a new node in the tree so update the ids of the nodes
+                        # this ensures that at every operation the node ids are correct
+                        self.updateNodeIds(self.rootNode)
+                        if not self.fullRoot:
+                            # get current nodes per level
+                            nodePerLevelBefore = self.countNodesPerLevel()
+                            self.numOfNodesPerLevelCopies.append(nodePerLevelBefore)
+                        else:
+                            self.numOfNodesPerLevelCopies.append(self.numOfNodesPerLevelCopies[-1])
+                        # edge list copy
+                        self.setEdgeList(self.rootNode)
+                        edgeListBeforeInsert = self.edgeList[:]
+                        self.edgeListCopies.append([list(l) for l in edgeListBeforeInsert])
+                        # used keys update
+                        self.usedKeys.append(key)
             else:
                 # animation for traversing + comparing
                 self.animationList.append(1)
@@ -586,7 +597,6 @@ class BTree:
                         self.insertNotFull(node.children[i], key, source, target, False,False)
 
 
-    #TODO implement deleting key
     def deleteKey(self,key, nextNode = None):
         # reset all attributes
         self.numOfNodesPerLevel = []
