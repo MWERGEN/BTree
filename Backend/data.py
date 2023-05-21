@@ -182,7 +182,9 @@ class Backend:
         self.searchedNodes = []
         # animation list for reset is just 0
         self.animationList.append(0)
-        self.treeList = self.btree.reset()
+        temp = self.btree.reset()
+        self.treeList.append(temp)
+
 
 # testData = Backend(2)
 # for i in range(1, 110):

@@ -143,7 +143,7 @@ class Input:
         #self.settings_speed_field = tk.Entry(self.settings_fields_frame, width=6)
         #self.settings_speed_field.grid(column=2, row=1, sticky="W")
         # Update button
-        update_button = tk.Button(self.settings_fields_frame, text="Update", command=self.update_settings)
+        update_button = tk.Button(self.settings_fields_frame, text="Update", command=self.update_order)
         update_button.grid(column=3, row=1)
         
         
@@ -151,7 +151,7 @@ class Input:
         self.reset_button_frame = tk.Frame(master=self.window)
         self.reset_button_frame.grid(column=0, row=3, columnspan=3, sticky="SE")
         #self.reset_button_frame.columnconfigure(0, weight=1)
-        reset_button = tk.Button(self.reset_button_frame, text="Reset", command=self.update_settings, bg="red")
+        reset_button = tk.Button(self.reset_button_frame, text="Reset", command=self.reset, bg="red")
         reset_button.grid(column=0, row=4)
         save_button = tk.Button(self.reset_button_frame, text="Save as CSV file", command=self.save_csv, bg="red")
         save_button.grid(column=0, row=5)
@@ -380,10 +380,18 @@ class Input:
             self.separate_input_random(input_from, input_to, input_legs)
     
     # function to reset the graph
-    def update_settings(self, *args):
+    def reset(self, *args):
         # reset the graph
         self.Graph.reset()
         print("reset")
+
+    def update_order(self):
+        if self.settings_order_field.isdigit():
+            if int(self.settings_order_field) >= 2:
+                self.Graph.reset()
+                self.Graph.changeK(int(self.settings_order_field))
+                self.commandList = self.saved_operations
+                print("saved ops: " + self.commandList)
         
     # gets called when user browses for files
     def browse_files(self, *args):

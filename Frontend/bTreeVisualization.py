@@ -336,16 +336,23 @@ class BTreeVisualization:
         print(operands)
         # create the animation for the insertion or the search
         self.currentAnimation = ani.Animation(animationList, treeList, operands)
-        print("delete key" + str(key))
 
+    # resets the whole Tree
     def reset(self):
-        # self.backend.reset()
-        animationList = [0]
-        treeList = [[[1], [[]], [[]]]]
-        operands = []
+        self.backend.resetTree()
+        animationList = self.backend.animationList
+        treeList = self.backend.treeList
+        operands = self.backend.operands
+        print(animationList)
+        print(treeList)
+        print(operands)
         self.currentAnimation = ani.Animation(animationList, treeList, operands)
         self.currentAnimation.updateNewAnimation()
         self.updateGraph()
+
+    def changeK(self, newK):
+        self.k = newK
+        self.backend.changeK(newK)
 
     # initializes all keys with a lightblue background
     def initializeColorKeyList(self):
