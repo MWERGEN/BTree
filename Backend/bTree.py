@@ -16,9 +16,9 @@
 #       - preparing lists for frontend (num of nodes per level, keys per level and edges)
 #
 # when executed by main
-#from Backend import node
+from Backend import node
 # debugging
-import node
+#import node
 from collections import deque
 
 class BTree:
@@ -873,7 +873,7 @@ class BTree:
                     self.rootNode = rightNeighbour
                 self.updateNodeIds(self.rootNode)
         #  check if parent has underflow after delete
-        if not parent== self.rootNode and len(parent.keys) < self.k:
+        if not parent== self.rootNode and len(parent.keys) < self.k and not len(parent.keys) == 0:
             # try to get key from neighbours
             if not self.borrowKeyFromNeighbour(parent):
                 # merge node with parent
