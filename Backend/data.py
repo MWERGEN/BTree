@@ -15,9 +15,9 @@
 #
 
 # when executed by main
-from Backend import bTree
+#from Backend import bTree
 # debugging
-#import bTree
+import bTree
 
 class Backend:
     def __init__(self, k):
@@ -193,30 +193,36 @@ class Backend:
         # make sure everything is changed
         self.resetTree()
 
-# testData = Backend(2)
+testData = Backend(2)
 # for i in range(1, 110):
 #     if i == 80:
 #         print('test')
 #     testData.insertKeyIntoTree(i)
-# testData.insertKeyIntoTree(3)
-# testData.insertKeyIntoTree(4)
-# testData.insertKeyIntoTree(5)
-# testData.insertKeyIntoTree(1)
-# testData.insertKeyIntoTree(2)
-# testData.insertKeyIntoTree(7)
-# testData.insertKeyIntoTree(99)
-# testData.insertKeyIntoTree(12)
-# testData.insertKeyIntoTree(13)
-# testData.insertKeyIntoTree(27)
-# testData.insertKeyIntoTree(30)
-# testData.insertKeyIntoTree(9)
-# testData.insertKeyIntoTree(10)
-# testData.insertKeyIntoTree(11)
-# testData.insertKeyIntoTree(14)
-# testData.insertKeyIntoTree(15)
-# testData.insertKeyIntoTree(16)
-# testData.insertKeyIntoTree(17)
-# print('test')
+testData.insertKeyIntoTree(3)
+testData.insertKeyIntoTree(4)
+testData.insertKeyIntoTree(5)
+testData.insertKeyIntoTree(1)
+testData.insertKeyIntoTree(2)
+testData.insertKeyIntoTree(7)
+testData.insertKeyIntoTree(99)
+testData.insertKeyIntoTree(12)
+testData.insertKeyIntoTree(13)
+testData.insertKeyIntoTree(27)
+testData.insertKeyIntoTree(30)
+testData.insertKeyIntoTree(9)
+testData.insertKeyIntoTree(10)
+testData.insertKeyIntoTree(11)
+testData.insertKeyIntoTree(14)
+testData.insertKeyIntoTree(15)
+testData.insertKeyIntoTree(16)
+testData.insertKeyIntoTree(17)
+testData.insertKeyIntoTree(100)
+testData.insertKeyIntoTree(101)
+testData.insertKeyIntoTree(102)
+testData.deleteKeyFromTree(9)
+testData.deleteKeyFromTree(17)
+testData.deleteKeyFromTree(11)
+print('test')
 # testData.insertKeyIntoTree(104)
 # testData.insertKeyIntoTree(105)
 # testData.insertKeyIntoTree(106)
