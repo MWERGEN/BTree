@@ -667,6 +667,10 @@ class BTree:
             # check if neighbours can give keys
             leftNeighbour = self.getNodeWithId(self.rootNode, nodeWithKey.id - 1)
             rightNeighbour = self.getNodeWithId(self.rootNode, nodeWithKey.id + 1)
+            if not leftNeighbour in parent.children:
+                leftNeighbour = None
+            if not rightNeighbour in parent.children:
+                rightNeighbour = None
             # check if left neighbour can give key
             if leftNeighbour is not None and len(leftNeighbour.keys) >= (self.k + 1):
                 # take key from left neighbour
@@ -818,6 +822,8 @@ class BTree:
                 nodeWithKey.keys.remove(key)
                 # all keys which will be merged into left neighbour
                 leftKeys = nodeWithKey.keys
+                # all left children
+                leftChildren = nodeWithKey.children
                 # key which goes from root into merged node
                 fillKey = parent.keys[childRef]
                 # delete fill key from parent
@@ -852,6 +858,15 @@ class BTree:
                             i -= 1
                         # insert key to correct place
                         rightNeighbour.keys[i + 1] = currentKey
+                if len(leftChildren) == self.k + 1:
+                    for key in leftChildren[-1].keys:
+                        leftChildren[-2].keys.append(key)
+                    del leftChildren[-1]
+                # append all children
+                temp = 0
+                for currentChild in leftChildren:
+                    rightNeighbour.children.insert(temp,currentChild)
+                    temp += 1
                 print('test')
                 # parent is empty so delete it
                 if not parent.keys and parent == self.rootNode:
