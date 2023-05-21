@@ -186,6 +186,13 @@ class Backend:
         self.treeList.append(temp)
 
 
+    def changeK(self,k):
+        # delete old tree and create new one with new k
+        self.btree = None
+        self.btree = bTree.BTree(k)
+        # make sure everything is changed
+        self.resetTree()
+
 # testData = Backend(2)
 # for i in range(1, 110):
 #     if i == 80:
