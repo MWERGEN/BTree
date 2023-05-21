@@ -843,6 +843,9 @@ class BTree:
                 if not parent.keys:
                     self.rootNode = rightNeighbour
                 self.updateNodeIds(self.rootNode)
+        #  check if parent has underflow after delete
+        if not parent== self.rootNode and len(parent.keys) < self.k:
+            self.borrowKeyFromNeighbour(parent)
         # set keys per level list -> has to be copy of list because every key list can be different!
         self.getKeysPerLevel()
         keysPerLevelBeforeInsert = self.keysPerLevel[:]
@@ -855,7 +858,100 @@ class BTree:
         nodePerLevelBefore = self.countNodesPerLevel()
         self.numOfNodesPerLevelCopies.append(nodePerLevelBefore)
         return deleted
+    
 
+    def borrowKeyFromNeighbour(self, node):
+        # check if neighbours can give keys
+        leftNeighbour = self.getNodeWithId(self.rootNode, node.id - 1)
+        rightNeighbour = self.getNodeWithId(self.rootNode, node.id + 1)
+        parent = self.getParent(node, self.rootNode)
+        for index, child in enumerate(parent.children):
+            if child == node:
+                childRef = index
+        if not node == self.rootNode:
+            # check if left neighbour can give key
+            if leftNeighbour is not None and len(leftNeighbour.keys) >= (self.k + 1):
+                # take key from left neighbour
+                # key from parent which will be inserted to the underflow node
+                # - 1 because it is the left neighbour
+                fillKey = parent.keys[childRef - 1]
+                # key from neighbour which will be inserted into parent
+                # is always first value
+                borrowKey = leftNeighbour.keys[-1]
+                # remove borrow key from neighbour
+                leftNeighbour.keys.remove(borrowKey)
+                # insert borrow key into parent
+                # make space for one more key
+                i = len(parent.keys) - 1 
+                parent.keys.append(None)
+                if i == 0 and parent.keys[0] == None:
+                    parent.keys[0] = borrowKey
+                else:
+                    # compare every node key to insertion key 
+                    while i >= 0 and borrowKey < parent.keys[i]: 
+                        # shift key one place to the right
+                        parent.keys[i + 1] = parent.keys[i] 
+                        i -= 1
+                    # insert key to correct place
+                    parent.keys[i + 1] = borrowKey
+                # remove fill key from root
+                parent.keys.remove(fillKey)
+                # insert fill key into underflow node
+                # insert fill key into underflow node
+                # make space for one more key
+                i = len(node.keys) - 1 
+                node.keys.append(None)
+                if i == 0 and node.keys[0] == None:
+                    node.keys[0] = fillKey
+                else:
+                    # compare every node key to insertion key 
+                    while i >= 0 and fillKey < node.keys[i]: 
+                        # shift key one place to the right
+                        node.keys[i + 1] = node.keys[i] 
+                        i -= 1
+                    # insert key to correct place
+                    node.keys[i + 1] = fillKey
+                print('test')
+            elif rightNeighbour is not None and len(rightNeighbour.keys) >= (self.k + 1):
+                # key from parent which will be inserted to the underflow node
+                fillKey = parent.keys[childRef]
+                # key from neighbour which will be inserted into parent
+                # is always first value
+                borrowKey = rightNeighbour.keys[0]
+                # remove borrow key from neighbour
+                rightNeighbour.keys.remove(borrowKey)
+                # insert borrow key into parent
+                # make space for one more key
+                i = len(parent.keys) - 1 
+                parent.keys.append(None)
+                if i == 0 and parent.keys[0] == None:
+                    parent.keys[0] = borrowKey
+                else:
+                    # compare every node key to insertion key 
+                    while i >= 0 and borrowKey < parent.keys[i]: 
+                        # shift key one place to the right
+                        parent.keys[i + 1] = parent.keys[i] 
+                        i -= 1
+                    # insert key to correct place
+                    parent.keys[i + 1] = borrowKey
+                # remove fill key from root
+                parent.keys.remove(fillKey)
+                # insert fill key into underflow node
+                # insert fill key into underflow node
+                # make space for one more key
+                i = len(node.keys) - 1 
+                node.keys.append(None)
+                if i == 0 and node.keys[0] == None:
+                    node.keys[0] = fillKey
+                else:
+                    # compare every node key to insertion key 
+                    while i >= 0 and fillKey < node.keys[i]: 
+                        # shift key one place to the right
+                        node.keys[i + 1] = node.keys[i] 
+                        i -= 1
+                    # insert key to correct place
+                    node.keys[i + 1] = fillKey
+                print('test')
 
 
     # search key in node
