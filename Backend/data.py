@@ -15,9 +15,9 @@
 #
 
 # when executed by main
-from Backend import bTree
+#from Backend import bTree
 # debugging
-#import bTree
+import bTree
 
 class Backend:
     def __init__(self, k):
@@ -220,6 +220,8 @@ testData.insertKeyIntoTree(100)
 testData.insertKeyIntoTree(101)
 testData.insertKeyIntoTree(102)
 testData.deleteKeyFromTree(9)
+testData.deleteKeyFromTree(17)
+testData.deleteKeyFromTree(11)
 print('test')
 # testData.insertKeyIntoTree(104)
 # testData.insertKeyIntoTree(105)
