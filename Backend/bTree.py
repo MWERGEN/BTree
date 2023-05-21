@@ -54,6 +54,7 @@ class BTree:
         # list for searching algorithmn, contains all searched node ids
         self.searchedNodes = []
         self.fullRoot = False
+        self.intoRoot = False
 
 
 
@@ -457,6 +458,32 @@ class BTree:
                     # there is a new node in the tree so update the ids of the nodes
                     # this ensures that at every operation the node ids are correct
                     self.updateNodeIds(self.rootNode)
+                else:
+                    source = parent.id
+                    target = self.rootNode.id
+                    k = self.k
+                    fullRoot = False
+                    # full node
+                    splitNode = parent
+                    splitIndex = self.rootNode.children.index(splitNode)
+                    i = len(splitNode.keys) - 1
+                    middleIndex = int(len(splitNode.keys) / 2)
+                    # fill parent with splitkey -> middle key
+                    self.intoRoot = True
+                    self.insertNotFull(self.rootNode,splitNode.keys[middleIndex], source, target, True, True)
+                    # second node where are all keys which are greater than the middle key will go
+                    newNode = node.Node(splitNode.leaf)
+                    # add reference to node which holds all greater keys
+                    self.rootNode.children.insert(splitIndex + 1, newNode)
+                    del splitNode.keys[middleIndex]
+                    # take all greater keys and insert them from order to 2 * order - 1
+                    newNode.keys = splitNode.keys[middleIndex: 2 * k] 
+                    # take all smaller keys and insert them from 0 to order - 1
+                    splitNode.keys = splitNode.keys[0: middleIndex]
+                    newNode.children = splitNode.children[k + 1: 2 * k + 2]
+                    splitNode.children = splitNode.children[0: k + 1]
+                    self.intoRoot = False
+                    print('test')
 
 
     def getParent(self, searchNode, rootNode):
@@ -527,8 +554,9 @@ class BTree:
                             currentPos = source[-1]
                             source.append(node.id)
                             target.append(node.id)
-                    # animation for comparing 
-                    self.animationList.append(1)
+                    if not self.intoRoot:
+                        # animation for comparing 
+                        self.animationList.append(1)
                     if not fromSplit:
                         # get the current keys per level of the tree
                         self.getKeysPerLevel()
