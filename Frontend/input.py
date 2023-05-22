@@ -392,11 +392,16 @@ class Input:
     
     # function to reset the graph
     def reset(self, *args):
-        # reset the animations
-        self.saved_operations = []
-        self.commandList = []
-        # reset the graph
-        self.Graph.reset()
+        if self.Graph.currentAnimation.type == 0 and not self.commandList:
+            # reset the animations
+            self.saved_operations = []
+            self.commandList = []
+            # reset the graph
+            self.Graph.reset()
+        else:
+            # error message
+            self.curr_action_label.configure(text="You can only reset the tree when all operations are finished!", foreground="#FF6666")
+
 
     # user updates the order
     def update_order(self):
