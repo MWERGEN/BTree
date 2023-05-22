@@ -186,6 +186,9 @@ class Input:
         self.curr_action_label = tk.Label(self.matplot_frame, text="Let's build a balanced tree!", font=("Arial", 28), foreground="white",  background="gray")
         self.curr_action_label.grid(column=0, row=0, sticky="W")
 
+        self.page_views_label = tk.Label(self.matplot_frame, text="Page views: 0", font=("Arial", 28), foreground="white",  background="gray")
+        self.page_views_label.grid(column=0, row=0, sticky="E")
+
         self.canvas = FigureCanvasTkAgg(self.Graph.fig, master=self.matplot_frame)
         self.canvas.get_tk_widget().grid(column=0, row=1, sticky="WE")
         
@@ -246,21 +249,29 @@ class Input:
         # get the selected speed from the user
         # pass it to the bTreeVisualization
         self.Graph.speed = self.scale.get()
-        if self.Graph.currentAnimation.type == 0 and self.commandList:
-            if self.commandList[0][0] == 1:
-                self.Graph.insert(self.commandList[0][1])
-                self.curr_action_label.configure(text="Input " + str(self.commandList[0][1]), foreground="white")
-                self.saved_operations.append((self.commandList[0][0], self.commandList[0][1]))
-            elif self.commandList[0][0] == 2:
-                self.Graph.search(self.commandList[0][1])
-                self.curr_action_label.configure(text="Search " + str(self.commandList[0][1]), foreground="white")
-                self.saved_operations.append((self.commandList[0][0], self.commandList[0][1]))
-            elif self.commandList[0][0] == 3:
-                self.Graph.delete(self.commandList[0][1])
-                self.curr_action_label.configure(text="Delete " + str(self.commandList[0][1]), foreground="white")
-                self.saved_operations.append((self.commandList[0][0], self.commandList[0][1]))
-            self.commandList.pop(0)
-            print(self.saved_operations)
+        if self.Graph.currentAnimation.type == 0:
+            if self.commandList:
+                self.Graph.searchFinished = False
+                if self.commandList[0][0] == 1:
+                    self.Graph.insert(self.commandList[0][1])
+                    self.curr_action_label.configure(text="Input " + str(self.commandList[0][1]), foreground="white")
+                    self.saved_operations.append((self.commandList[0][0], self.commandList[0][1]))
+                elif self.commandList[0][0] == 2:
+                    self.Graph.search(self.commandList[0][1])
+                    self.curr_action_label.configure(text="Search " + str(self.commandList[0][1]), foreground="white")
+                    self.saved_operations.append((self.commandList[0][0], self.commandList[0][1]))
+                elif self.commandList[0][0] == 3:
+                    self.Graph.delete(self.commandList[0][1])
+                    self.curr_action_label.configure(text="Delete " + str(self.commandList[0][1]), foreground="white")
+                    self.saved_operations.append((self.commandList[0][0], self.commandList[0][1]))
+                self.commandList.pop(0)
+            elif self.Graph.searchFinished:
+                if self.Graph.searchFound:
+                    self.curr_action_label.configure(text="The key was found in the tree!", foreground="white")
+                else:
+                    self.curr_action_label.configure(text="The key was not found in the tree!", foreground="#FF6666")
+        page_views_string = "Page views: " + str(self.Graph.pageViews)
+        self.page_views_label.configure(text=page_views_string, foreground="white")
         # schedule the next call to my_function in 1 second
         self.matplot_frame.after(10, self.countNext10Milliseconds)
 

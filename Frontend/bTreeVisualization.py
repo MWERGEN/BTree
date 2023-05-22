@@ -145,6 +145,12 @@ class BTreeVisualization:
         self.backend = data.Backend(2)
         # time counter for correct timing of animations
         self.timeCounter = 0
+        # indicates that a search is finished
+        self.searchFinished = False
+        # indicates that a search was positive
+        self.searchFound = False
+        # number of page views
+        self.pageViews = 0
 
     def insert17_button_clicked(self):
         # self.currentAnimation = self.backendObj.insert(17)
@@ -280,6 +286,7 @@ class BTreeVisualization:
         self.calcEdges()
 
     def insert(self, key):
+        self.pageViews = 1
         # flag indicates if the key to be inserted is already in the tree
         duplicate = False
         # iterate over all keys
@@ -293,23 +300,21 @@ class BTreeVisualization:
         if not duplicate:
             # perform insertion in backend
             self.backend.insertKeyIntoTree(key)
-        #else:
+        else:
             # visualize search for the duplicate
             # in order to underline that it is a duplicate
-            #self.backend.searchKeyInTree(key)
+            self.backend.searchKeyInTree(key)
         # get updated animation list
         animationList = self.backend.animationList
         # get updated tree List
         treeList = self.backend.treeList
         # get updated operands
         operands = self.backend.operands
-        print(animationList)
-        print(treeList)
-        print(operands)
         # create the animation for the insertion or the search
         self.currentAnimation = ani.Animation(animationList, treeList, operands)
 
     def search(self, key):
+        self.pageViews = 1
         self.backend.searchKeyInTree(key)
         # get updated animation list
         animationList = self.backend.animationList
@@ -317,13 +322,15 @@ class BTreeVisualization:
         treeList = self.backend.treeList
         # get updated operands
         operands = self.backend.operands
-        print(animationList)
-        print(treeList)
-        print(operands)
         # create the animation for the insertion or the search
         self.currentAnimation = ani.Animation(animationList, treeList, operands)
+        # remember the result of the search
+        self.searchFound = operands[2]
+        print("s: ")
+        print(self.searchFound)
 
     def delete(self, key):
+        self.pageViews = 1
         self.backend.deleteKeyFromTree(key)
         # get updated animation list
         animationList = self.backend.animationList
@@ -339,6 +346,7 @@ class BTreeVisualization:
         print("delete key" + str(key))
 
     def reset(self):
+        self.pageViews = 0
         # self.backend.reset()
         animationList = [0]
         treeList = [[[1], [[]], [[]]]]
@@ -754,6 +762,8 @@ class BTreeVisualization:
                 if (anim.walkthrough + 1) < len(anim.destinationNode):
                     # switch to the next animation
                     anim.walkthrough += 1
+                    if anim.walkthrough != len(anim.destinationNode) - 1:
+                        self.pageViews += 1
                     # reset destination
                     #anim.destinationRefY = 0
                     # reset highlighted key
@@ -884,9 +894,9 @@ class BTreeVisualization:
             if anim.flagOuterKeyReached:
                 # if there is still another part of the animation, trigger it
                 if (anim.walkthrough + 1) < len(anim.checkNodes):
+                    self.pageViews += 1
                     # switch to the next animation = next node
-                    anim.walkthrough += 1                ##'########## !!!!!!!!!!!!!!!!!!!!!!!!!!
-                    print(anim.walkthrough)
+                    anim.walkthrough += 1
                     # ref-coloring
                     # if the key would be the highest in the node
                     if anim.flagNewKeyHighest:
@@ -911,6 +921,8 @@ class BTreeVisualization:
                     anim.updateNewAnimation()
                     self.updateGraph()
                     self.initializeColorRefList()
+                    # remember that there was a search and that it is over now
+                    self.searchFinished = True
 
     # draw whole tree including all part graphs
     def _update_graph(self, frame):
