@@ -381,9 +381,12 @@ class Input:
     
     # function to reset the graph
     def update_settings(self, *args):
+        # reset the animations
+        self.saved_operations = []
+        self.commandList = []
         # reset the graph
         self.Graph.reset()
-        print("reset")
+        
         
     # gets called when user browses for files
     def browse_files(self, *args):
@@ -421,8 +424,15 @@ class Input:
             # open a new dialog window
             self.second_window = tk.Toplevel(self.window)
             # label to ask for confirmation of csv
-            label = tk.Label(self.second_window, text=message_str, font=("Arial", 18))
-            label.pack()
+            text_widget = tk.Text(self.second_window, font=("Arial", 18))
+            text_widget.insert(tk.END, message_str)
+            text_widget.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
+            # Create a Scrollbar widget
+            scrollbar = tk.Scrollbar(self.second_window, command=text_widget.yview)
+            # Configure the Text widget to use the Scrollbar
+            text_widget.config(yscrollcommand=scrollbar.set)
+            scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+            text_widget.pack()
             # button to accept the csv
             button = tk.Button(self.second_window, text="Yes, let's go!", command=self.csv_second_window)
             button.pack()

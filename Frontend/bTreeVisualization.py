@@ -583,7 +583,7 @@ class BTreeVisualization:
     # moves a new key from one node to another
     # width and height are w and h from the subplot
     # -> used for custom font size
-    def animation1(self, width, height):
+    def animation1(self, width, height, numOfLevels):
         # save current animation in temp anim
         # used for better overview in complex code
         anim = self.currentAnimation
@@ -820,7 +820,7 @@ class BTreeVisualization:
                 vertex_frame_color="red",
                 # formula for dynamically resizing the labels, so they are perfectly fitting into the node
                 # width and height depend on the axes of the graph
-                vertex_label_size = 0.92 * math.sqrt(width) * math.sqrt(height),
+                vertex_label_size = (3 / numOfLevels) * math.sqrt(width) * math.sqrt(0.4 * height),
                 # append style
                 **self.visual_style, 
             )
@@ -979,7 +979,6 @@ class BTreeVisualization:
             **self.visual_style
         )
         numOfLevels = len(self.currentAnimation.nodesList)
-        print(numOfLevels)
         # define Keys-plot
         ig.plot(
             # keys graph
@@ -1001,7 +1000,7 @@ class BTreeVisualization:
         # check which animation is currently performed
         if self.currentAnimation.type == 1:
             # insert
-            self.animation1(width, height)
+            self.animation1(width, height, numOfLevels)
         elif self.currentAnimation.type == 2:
             # search
             self.animation2()
