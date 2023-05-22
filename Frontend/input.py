@@ -133,7 +133,7 @@ class Input:
         self.settings_fields_frame = tk.Frame(master=self.window)
         self.settings_fields_frame.grid(column=1, row=0, sticky="NE")
         # Order
-        self.settings_order_label = tk.Label(self.settings_fields_frame, text="Order:")
+        self.settings_order_label = tk.Label(self.settings_fields_frame, text="Order (k):")
         self.settings_order_label.grid(column=0, row=0, sticky="W")
         self.settings_order_field = tk.Entry(self.settings_fields_frame, width=6)
         self.settings_order_field.grid(column=0, row=1, sticky="W")
@@ -143,7 +143,7 @@ class Input:
         #self.settings_speed_field = tk.Entry(self.settings_fields_frame, width=6)
         #self.settings_speed_field.grid(column=2, row=1, sticky="W")
         # Update button
-        update_button = tk.Button(self.settings_fields_frame, text="Update", command=self.update_settings)
+        update_button = tk.Button(self.settings_fields_frame, text="Update", command=self.update_order)
         update_button.grid(column=3, row=1)
         
         
@@ -151,7 +151,7 @@ class Input:
         self.reset_button_frame = tk.Frame(master=self.window)
         self.reset_button_frame.grid(column=0, row=3, columnspan=3, sticky="SE")
         #self.reset_button_frame.columnconfigure(0, weight=1)
-        reset_button = tk.Button(self.reset_button_frame, text="Reset", command=self.update_settings, bg="red")
+        reset_button = tk.Button(self.reset_button_frame, text="Reset", command=self.reset, bg="red")
         reset_button.grid(column=0, row=4)
         save_button = tk.Button(self.reset_button_frame, text="Save as CSV file", command=self.save_csv, bg="red")
         save_button.grid(column=0, row=5)
@@ -391,13 +391,35 @@ class Input:
             self.separate_input_random(input_from, input_to, input_legs)
     
     # function to reset the graph
-    def update_settings(self, *args):
+    def reset(self, *args):
         # reset the animations
         self.saved_operations = []
         self.commandList = []
         # reset the graph
         self.Graph.reset()
-        
+
+    # user updates the order
+    def update_order(self):
+        # order inputted by the user
+        order = self.settings_order_field.get()
+        # check if user has inputted an int
+        if order.isdigit():
+            # only allow orders at least 2
+            if int(order) >= 2:
+                # call graph method for changing the order with new order
+                self.Graph.changeK(int(order))
+                # after the change -> perform all orders that have been done yet again
+                self.commandList = self.saved_operations
+                # reset the animations that have been done yet
+                self.saved_operations = []
+                # message for user
+                self.curr_action_label.configure(text="Order (k) changed!", foreground="white")
+            else:
+                # error message
+                self.curr_action_label.configure(text="Invalid input! Choose a k at least 2.", foreground="#FF6666")
+        else:
+            # error message
+            self.curr_action_label.configure(text="Invalid input! Please only insert integers as k!", foreground="#FF6666")
         
     # gets called when user browses for files
     def browse_files(self, *args):
@@ -541,8 +563,8 @@ class Input:
                 self.curr_action_label.configure(text="Invalid input! Choose number from 1 to 9999!", foreground="#FF6666")
         # only continue with input if it is valid
         if not invalid:
+            # save all inputs in list
             self.commandList.extend(inputNums)
-            print(self.commandList)
 
     # takes the input
     # checks if input is valid 
@@ -550,25 +572,39 @@ class Input:
     # also interval is limited from 1 to 9999
     # if valid: creates an int list with all random int inputs
     def separate_input_random(self, input_from, input_to, input_legs):
+        # check if all input values are integers
         if input_from.isdigit() and input_to.isdigit() and input_legs.isdigit():
+            # save the inputs as ints in temporal vars
             i_from = int(input_from)
             i_to = int(input_to)
             i_legs = int(input_legs)
+            # from is invalid
             if i_from > 9999 or i_from < 1:
+                # error message
                 self.curr_action_label.configure(text="Invalid input! Choose number from 1 to 9999 for the field 'From'!", foreground="#FF6666")
+            # to is invalid
             elif i_to > 9999 or i_to < 1:
+                # error message
                 self.curr_action_label.configure(text="Invalid input! Choose number from 1 to 9999 for the field 'To'!", foreground="#FF6666")
+            # number of randoms is invalid
             elif i_legs < 1:
+                # error message
                 self.curr_action_label.configure(text="Invalid input! Choose at least one leg of random values!", foreground="#FF6666")
+            # all inputs are fine
             else:
+                # counter while loop
                 ctr = 0
+                # number of legs times
                 while ctr < i_legs:
+                    # get a random int in the interval the user has requested
                     random_int = random.randint(i_from, i_to)
+                    # add this random as an insert to the command list
                     self.commandList.append((1, random_int))
-                    print(random_int)
+                    # raise counter
                     ctr += 1
-                print(self.commandList)
+        # something else as ints was inputted
         else:
+            # error message
             self.curr_action_label.configure(text="Invalid input! You can only input whole numbers!", foreground="#FF6666")
                     
 
