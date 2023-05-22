@@ -920,9 +920,12 @@ class BTreeVisualization:
         bbox = self.ax.get_window_extent().transformed(self.fig.dpi_scale_trans.inverted())
         # get the width and height of the subplot in pixels
         width, height = bbox.width, bbox.height
-        if len(self.nodesList) == 1:
-            height *= 5
-            width *= 5
+        if len(self.currentAnimation.nodesList) == 1:
+            height *= 2.5
+            width *= 2.5
+        elif len(self.currentAnimation.nodesList) == 2: 
+            height *= 1.5
+            width *= 1.5
         # Remove plot elements from the previous frame
         self.ax.clear()
         # background color for subplot area
@@ -975,6 +978,8 @@ class BTreeVisualization:
             # append style
             **self.visual_style
         )
+        numOfLevels = len(self.currentAnimation.nodesList)
+        print(numOfLevels)
         # define Keys-plot
         ig.plot(
             # keys graph
@@ -989,7 +994,7 @@ class BTreeVisualization:
             vertex_color = self.colorKeyList,
             # formula for dynamically resizing the labels, so they are perfectly fitting into the node
             # width and height depend on the axes of the graph
-            vertex_label_size = 0.98 * math.sqrt(width) * math.sqrt(height),
+            vertex_label_size = (3 / numOfLevels) * math.sqrt(width) * math.sqrt(0.4 * height),
             # append style
             **self.visual_style, 
         )
