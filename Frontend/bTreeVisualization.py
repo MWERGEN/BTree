@@ -145,6 +145,12 @@ class BTreeVisualization:
         self.backend = data.Backend(2)
         # time counter for correct timing of animations
         self.timeCounter = 0
+        # indicates that a search is finished
+        self.searchFinished = False
+        # indicates that a search was positive
+        self.searchFound = False
+        # number of page views
+        self.pageViews = 0
 
     # resets all values of the graph in order to print it again in a different form
     def updateGraph(self):
@@ -213,6 +219,7 @@ class BTreeVisualization:
         self.calcEdges()
 
     def insert(self, key):
+        self.pageViews = 1
         # flag indicates if the key to be inserted is already in the tree
         duplicate = False
         # iterate over all keys
@@ -226,10 +233,10 @@ class BTreeVisualization:
         if not duplicate:
             # perform insertion in backend
             self.backend.insertKeyIntoTree(key)
-        #else:
+        else:
             # visualize search for the duplicate
             # in order to underline that it is a duplicate
-            #self.backend.searchKeyInTree(key)
+            self.backend.searchKeyInTree(key)
         # get updated animation list
         animationList = self.backend.animationList
         # get updated tree List
@@ -240,6 +247,7 @@ class BTreeVisualization:
         self.currentAnimation = ani.Animation(animationList, treeList, operands)
 
     def search(self, key):
+        self.pageViews = 1
         self.backend.searchKeyInTree(key)
         # get updated animation list
         animationList = self.backend.animationList
@@ -249,8 +257,13 @@ class BTreeVisualization:
         operands = self.backend.operands
         # create the animation for the insertion or the search
         self.currentAnimation = ani.Animation(animationList, treeList, operands)
+        # remember the result of the search
+        self.searchFound = operands[2]
+        print("s: ")
+        print(self.searchFound)
 
     def delete(self, key):
+        self.pageViews = 1
         self.backend.deleteKeyFromTree(key)
         # get updated animation list
         animationList = self.backend.animationList
@@ -272,6 +285,7 @@ class BTreeVisualization:
         # get new operands list
         operands = self.backend.operands
         # create new updated animation
+        self.pageViews = 0
         self.currentAnimation = ani.Animation(animationList, treeList, operands)
         # apply changes
         self.currentAnimation.updateNewAnimation()
@@ -531,7 +545,7 @@ class BTreeVisualization:
     # moves a new key from one node to another
     # width and height are w and h from the subplot
     # -> used for custom font size
-    def animation1(self, width, height):
+    def animation1(self, width, height, numOfLevels):
         # save current animation in temp anim
         # used for better overview in complex code
         anim = self.currentAnimation
@@ -702,6 +716,8 @@ class BTreeVisualization:
                 if (anim.walkthrough + 1) < len(anim.destinationNode):
                     # switch to the next animation
                     anim.walkthrough += 1
+                    if anim.walkthrough != len(anim.destinationNode) - 1:
+                        self.pageViews += 1
                     # reset destination
                     #anim.destinationRefY = 0
                     # reset highlighted key
@@ -768,7 +784,7 @@ class BTreeVisualization:
                 vertex_frame_color="red",
                 # formula for dynamically resizing the labels, so they are perfectly fitting into the node
                 # width and height depend on the axes of the graph
-                vertex_label_size = 0.92 * math.sqrt(width) * math.sqrt(height),
+                vertex_label_size = (3 / numOfLevels) * math.sqrt(width) * math.sqrt(0.4 * height),
                 # append style
                 **self.visual_style, 
             )
@@ -832,6 +848,7 @@ class BTreeVisualization:
             if anim.flagOuterKeyReached:
                 # if there is still another part of the animation, trigger it
                 if (anim.walkthrough + 1) < len(anim.checkNodes):
+                    self.pageViews += 1
                     # switch to the next animation = next node
                     anim.walkthrough += 1
                     # ref-coloring
@@ -858,6 +875,8 @@ class BTreeVisualization:
                     anim.updateNewAnimation()
                     self.updateGraph()
                     self.initializeColorRefList()
+                    # remember that there was a search and that it is over now
+                    self.searchFinished = True
 
     # draw whole tree including all part graphs
     def _update_graph(self, frame):
@@ -867,9 +886,12 @@ class BTreeVisualization:
         bbox = self.ax.get_window_extent().transformed(self.fig.dpi_scale_trans.inverted())
         # get the width and height of the subplot in pixels
         width, height = bbox.width, bbox.height
-        if len(self.nodesList) == 1:
-            height *= 5
-            width *= 5
+        if len(self.currentAnimation.nodesList) == 1:
+            height *= 2.5
+            width *= 2.5
+        elif len(self.currentAnimation.nodesList) == 2: 
+            height *= 1.5
+            width *= 1.5
         # Remove plot elements from the previous frame
         self.ax.clear()
         # background color for subplot area
@@ -922,6 +944,7 @@ class BTreeVisualization:
             # append style
             **self.visual_style
         )
+        numOfLevels = len(self.currentAnimation.nodesList)
         # define Keys-plot
         ig.plot(
             # keys graph
@@ -936,14 +959,14 @@ class BTreeVisualization:
             vertex_color = self.colorKeyList,
             # formula for dynamically resizing the labels, so they are perfectly fitting into the node
             # width and height depend on the axes of the graph
-            vertex_label_size = 0.98 * math.sqrt(width) * math.sqrt(height),
+            vertex_label_size = (3 / numOfLevels) * math.sqrt(width) * math.sqrt(0.4 * height),
             # append style
             **self.visual_style, 
         )
         # check which animation is currently performed
         if self.currentAnimation.type == 1:
             # insert
-            self.animation1(width, height)
+            self.animation1(width, height, numOfLevels)
         elif self.currentAnimation.type == 2:
             # search
             self.animation2()

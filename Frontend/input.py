@@ -186,6 +186,9 @@ class Input:
         self.curr_action_label = tk.Label(self.matplot_frame, text="Let's build a balanced tree!", font=("Arial", 28), foreground="white",  background="gray")
         self.curr_action_label.grid(column=0, row=0, sticky="W")
 
+        self.page_views_label = tk.Label(self.matplot_frame, text="Page views: 0", font=("Arial", 28), foreground="white",  background="gray")
+        self.page_views_label.grid(column=0, row=0, sticky="E")
+
         self.canvas = FigureCanvasTkAgg(self.Graph.fig, master=self.matplot_frame)
         self.canvas.get_tk_widget().grid(column=0, row=1, sticky="WE")
         
@@ -246,20 +249,29 @@ class Input:
         # get the selected speed from the user
         # pass it to the bTreeVisualization
         self.Graph.speed = self.scale.get()
-        if self.Graph.currentAnimation.type == 0 and self.commandList:
-            if self.commandList[0][0] == 1:
-                self.Graph.insert(self.commandList[0][1])
-                self.curr_action_label.configure(text="Input " + str(self.commandList[0][1]), foreground="white")
-                self.saved_operations.append((self.commandList[0][0], self.commandList[0][1]))
-            elif self.commandList[0][0] == 2:
-                self.Graph.search(self.commandList[0][1])
-                self.curr_action_label.configure(text="Search " + str(self.commandList[0][1]), foreground="white")
-                self.saved_operations.append((self.commandList[0][0], self.commandList[0][1]))
-            elif self.commandList[0][0] == 3:
-                self.Graph.delete(self.commandList[0][1])
-                self.curr_action_label.configure(text="Delete " + str(self.commandList[0][1]), foreground="white")
-                self.saved_operations.append((self.commandList[0][0], self.commandList[0][1]))
-            self.commandList.pop(0)
+        if self.Graph.currentAnimation.type == 0:
+            if self.commandList:
+                self.Graph.searchFinished = False
+                if self.commandList[0][0] == 1:
+                    self.Graph.insert(self.commandList[0][1])
+                    self.curr_action_label.configure(text="Input " + str(self.commandList[0][1]), foreground="white")
+                    self.saved_operations.append((self.commandList[0][0], self.commandList[0][1]))
+                elif self.commandList[0][0] == 2:
+                    self.Graph.search(self.commandList[0][1])
+                    self.curr_action_label.configure(text="Search " + str(self.commandList[0][1]), foreground="white")
+                    self.saved_operations.append((self.commandList[0][0], self.commandList[0][1]))
+                elif self.commandList[0][0] == 3:
+                    self.Graph.delete(self.commandList[0][1])
+                    self.curr_action_label.configure(text="Delete " + str(self.commandList[0][1]), foreground="white")
+                    self.saved_operations.append((self.commandList[0][0], self.commandList[0][1]))
+                self.commandList.pop(0)
+            elif self.Graph.searchFinished:
+                if self.Graph.searchFound:
+                    self.curr_action_label.configure(text="The key was found in the tree!", foreground="white")
+                else:
+                    self.curr_action_label.configure(text="The key was not found in the tree!", foreground="#FF6666")
+        page_views_string = "Page views: " + str(self.Graph.pageViews)
+        self.page_views_label.configure(text=page_views_string, foreground="white")
         # schedule the next call to my_function in 1 second
         self.matplot_frame.after(10, self.countNext10Milliseconds)
 
@@ -380,6 +392,9 @@ class Input:
     
     # function to reset the graph
     def reset(self, *args):
+        # reset the animations
+        self.saved_operations = []
+        self.commandList = []
         # reset the graph
         self.Graph.reset()
 
@@ -405,7 +420,6 @@ class Input:
         else:
             # error message
             self.curr_action_label.configure(text="Invalid input! Please only insert integers as k!", foreground="#FF6666")
-
         
     # gets called when user browses for files
     def browse_files(self, *args):
@@ -443,8 +457,15 @@ class Input:
             # open a new dialog window
             self.second_window = tk.Toplevel(self.window)
             # label to ask for confirmation of csv
-            label = tk.Label(self.second_window, text=message_str, font=("Arial", 18))
-            label.pack()
+            text_widget = tk.Text(self.second_window, font=("Arial", 18))
+            text_widget.insert(tk.END, message_str)
+            text_widget.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
+            # Create a Scrollbar widget
+            scrollbar = tk.Scrollbar(self.second_window, command=text_widget.yview)
+            # Configure the Text widget to use the Scrollbar
+            text_widget.config(yscrollcommand=scrollbar.set)
+            scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+            text_widget.pack()
             # button to accept the csv
             button = tk.Button(self.second_window, text="Yes, let's go!", command=self.csv_second_window)
             button.pack()
