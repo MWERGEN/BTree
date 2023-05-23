@@ -5,11 +5,15 @@
 #   Task: 
 #
 #   Editors:
-#       1.  Tim Steiner on 10.04.23
-#       2.  Thorben Schabel on 17.05.23
-#       3.  Marius Wergen on 18.05.23
-#       4.  Marius Wergen on 19.05.23
-#       5.  Marius Wergen on 20.05.23
+#       1.      Tim Steiner on 10.04.23
+#       2.      Thorben Schabel on 17.05.23
+#       3.      Marius Wergen on 18.05.23
+#       4.      Marius Wergen on 19.05.23
+#       5.      Marius Wergen on 20.05.23
+#       6.      Marius Wergen on 21.05.23
+#       7.      Marius Wergen on 22.05.23
+#       8.      Marius Wergen on 23.05.23
+#       9.      Marius Wergen on 24.05.23
 #
 ###############################################
 #
@@ -33,6 +37,7 @@ class Input:
     def __init__(self) -> None:
         self.saved_operations = []
         self.window = tk.Tk()
+        self.window.title("Balanced Tree Visualization Tool")
 
         self.window.columnconfigure(0, weight=1)
         self.window.columnconfigure(1, weight=1)
@@ -183,7 +188,7 @@ class Input:
         self.scale = tk.Scale(self.matplot_frame, from_=1, to=20, orient=tk.HORIZONTAL)
         self.scale.grid(column=0, row=0)
 
-        self.curr_action_label = tk.Label(self.matplot_frame, text="Let's build a balanced tree!", font=("Arial", 28), foreground="white",  background="gray")
+        self.curr_action_label = tk.Label(self.matplot_frame, text="Let's go!", font=("Arial", 28), foreground="white",  background="gray")
         self.curr_action_label.grid(column=0, row=0, sticky="W")
 
         self.page_views_label = tk.Label(self.matplot_frame, text="Page views: 0", font=("Arial", 28), foreground="white",  background="gray")
