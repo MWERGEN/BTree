@@ -19,6 +19,13 @@
 #       12.     Marius Wergen on 14.05.23
 #       13.     Marius Wergen on 15.05.23
 #       14.     Marius Wergen on 17.05.23
+#       15.     Marius Wergen on 18.05.23
+#       16.     Marius Wergen on 19.05.23
+#       17.     Marius Wergen on 20.05.23
+#       18.     Marius Wergen on 21.05.23
+#       19.     Marius Wergen on 22.05.23
+#       20.     Marius Wergen on 23.05.23
+#       21.     Marius Wergen on 24.05.23
 #
 ###############################################
 #
@@ -27,8 +34,6 @@
 #
 
 # library imports
-import random
-import time
 import math
 import numpy as np
 import igraph as ig
@@ -233,18 +238,18 @@ class BTreeVisualization:
         if not duplicate:
             # perform insertion in backend
             self.backend.insertKeyIntoTree(key)
+            # get updated animation list
+            animationList = self.backend.animationList
+            # get updated tree List
+            treeList = self.backend.treeList
+            # get updated operands
+            operands = self.backend.operands
+            # create the animation for the insertion or the search
+            self.currentAnimation = ani.Animation(animationList, treeList, operands)
         else:
             # visualize search for the duplicate
             # in order to underline that it is a duplicate
-            self.backend.searchKeyInTree(key)
-        # get updated animation list
-        animationList = self.backend.animationList
-        # get updated tree List
-        treeList = self.backend.treeList
-        # get updated operands
-        operands = self.backend.operands
-        # create the animation for the insertion or the search
-        self.currentAnimation = ani.Animation(animationList, treeList, operands)
+            self.search(key)
 
     def search(self, key):
         self.pageViews = 1
@@ -255,6 +260,9 @@ class BTreeVisualization:
         treeList = self.backend.treeList
         # get updated operands
         operands = self.backend.operands
+        print(animationList)
+        print(treeList)
+        print(operands)
         # create the animation for the insertion or the search
         self.currentAnimation = ani.Animation(animationList, treeList, operands)
         # remember the result of the search
@@ -271,8 +279,13 @@ class BTreeVisualization:
         treeList = self.backend.treeList
         # get updated operands
         operands = self.backend.operands
+        print(animationList)
+        print(treeList)
+        print(operands)
         # create the animation for the insertion or the search
         self.currentAnimation = ani.Animation(animationList, treeList, operands)
+        # remember the result of the search
+        self.searchFound = operands[2]
 
     # resets the whole Tree
     def reset(self):
@@ -969,7 +982,20 @@ class BTreeVisualization:
             self.animation1(width, height, numOfLevels)
         elif self.currentAnimation.type == 2:
             # search
-            self.animation2()
+            try:
+                # when there are two levels and the root would be empty after delete
+                # -> result will be one node
+                # there appears an error which is not possible to appear but he does
+                # so we catch this one case
+                self.animation2()
+            # case appears
+            except:
+                # we skip the animation and just append the result of the delete
+                self.currentAnimation.walkthrough = 1
+                # update the animation
+                self.currentAnimation.updateNewAnimation()
+                # update the graph
+                self.updateGraph()
         # count all elements of the graph
         nhandles = 2 + 2 * len(self.keyLabels) + len(self.xGNodes) + len(self.xGRefs) + len(self.xGRefsAid) + len(self.edgesListTupel)
         # choose all children from the graph to display the whole graph
