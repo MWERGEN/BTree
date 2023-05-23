@@ -199,6 +199,7 @@ class Input:
         self.canvas.mpl_connect('motion_notify_event', self.on_mouse_motion)
 
         self.Graph.initializeGraph()
+        self.search_key = 0
 
         self.commandList = []
 
@@ -254,22 +255,27 @@ class Input:
                 self.Graph.searchFinished = False
                 if self.commandList[0][0] == 1:
                     self.Graph.insert(self.commandList[0][1])
+                    self.search_key = self.commandList[0][1]
                     self.curr_action_label.configure(text="Input " + str(self.commandList[0][1]), foreground="white")
                     self.saved_operations.append((self.commandList[0][0], self.commandList[0][1]))
                 elif self.commandList[0][0] == 2:
                     self.Graph.search(self.commandList[0][1])
+                    self.search_key = self.commandList[0][1]
                     self.curr_action_label.configure(text="Search " + str(self.commandList[0][1]), foreground="white")
                     self.saved_operations.append((self.commandList[0][0], self.commandList[0][1]))
                 elif self.commandList[0][0] == 3:
                     self.Graph.delete(self.commandList[0][1])
+                    self.search_key = self.commandList[0][1]
                     self.curr_action_label.configure(text="Delete " + str(self.commandList[0][1]), foreground="white")
                     self.saved_operations.append((self.commandList[0][0], self.commandList[0][1]))
                 self.commandList.pop(0)
             elif self.Graph.searchFinished:
                 if self.Graph.searchFound:
-                    self.curr_action_label.configure(text="The key was found in the tree!", foreground="white")
+                    text = "The key " + str(self.search_key) + " was found in the tree!"
+                    self.curr_action_label.configure(text=text, foreground="white")
                 else:
-                    self.curr_action_label.configure(text="The key was not found in the tree!", foreground="#FF6666")
+                    text = "The key " + str(self.search_key) + " was NOT found in the tree!"
+                    self.curr_action_label.configure(text=text, foreground="#FF6666")
         page_views_string = "Page views: " + str(self.Graph.pageViews)
         self.page_views_label.configure(text=page_views_string, foreground="white")
         # schedule the next call to my_function in 1 second
