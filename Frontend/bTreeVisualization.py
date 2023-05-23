@@ -977,7 +977,20 @@ class BTreeVisualization:
             self.animation1(width, height, numOfLevels)
         elif self.currentAnimation.type == 2:
             # search
-            self.animation2()
+            try:
+                # when there are two levels and the root would be empty after delete
+                # -> result will be one node
+                # there appears an error which is not possible to appear but he does
+                # so we catch this one case
+                self.animation2()
+            # case appears
+            except:
+                # we skip the animation and just append the result of the delete
+                self.currentAnimation.walkthrough = 1
+                # update the animation
+                self.currentAnimation.updateNewAnimation()
+                # update the graph
+                self.updateGraph()
         # count all elements of the graph
         nhandles = 2 + 2 * len(self.keyLabels) + len(self.xGNodes) + len(self.xGRefs) + len(self.xGRefsAid) + len(self.edgesListTupel)
         # choose all children from the graph to display the whole graph
