@@ -34,8 +34,6 @@
 #
 
 # library imports
-import random
-import time
 import math
 import numpy as np
 import igraph as ig
@@ -240,18 +238,18 @@ class BTreeVisualization:
         if not duplicate:
             # perform insertion in backend
             self.backend.insertKeyIntoTree(key)
+            # get updated animation list
+            animationList = self.backend.animationList
+            # get updated tree List
+            treeList = self.backend.treeList
+            # get updated operands
+            operands = self.backend.operands
+            # create the animation for the insertion or the search
+            self.currentAnimation = ani.Animation(animationList, treeList, operands)
         else:
             # visualize search for the duplicate
             # in order to underline that it is a duplicate
-            self.backend.searchKeyInTree(key)
-        # get updated animation list
-        animationList = self.backend.animationList
-        # get updated tree List
-        treeList = self.backend.treeList
-        # get updated operands
-        operands = self.backend.operands
-        # create the animation for the insertion or the search
-        self.currentAnimation = ani.Animation(animationList, treeList, operands)
+            self.search(key)
 
     def search(self, key):
         self.pageViews = 1
