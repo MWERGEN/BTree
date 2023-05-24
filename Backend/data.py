@@ -195,7 +195,10 @@ class Backend:
         # make sure everything is changed
         self.resetTree()
 
-# testData = Backend(2)
+testData = Backend(2)
+testData.insertKeyIntoTree(3)
+testData.deleteKeyFromTree(3)
+print('test')
 # # # # # # for i in range(1, 110):
 # # # # # #     if i == 80:
 # # # # # #         print('test')

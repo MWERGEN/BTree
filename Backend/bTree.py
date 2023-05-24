@@ -16,9 +16,9 @@
 #       - preparing lists for frontend (num of nodes per level, keys per level and edges)
 #
 # when executed by main
-#from Backend import node
+from Backend import node
 # debugging
-import node
+#import node
 from collections import deque
 
 class BTree:
@@ -898,38 +898,38 @@ class BTree:
         return deleted
     
     def deleteKeyFromRoot(self, key):
-        # root node has only one key
-        if len(self.rootNode.keys) == 1:
-            # merge both children
-            # left child will be new root
-            newRoot = self.rootNode.children[0]
-            # take all keys from right child
-            leftKeys = self.rootNode.children[1].keys
-            # take all children from right child
-            leftChildren = self.rootNode.children[1].children
-           # fill neighbour with every left key
-            for currentKey in leftKeys:
-                i = len(newRoot.keys) - 1 
-                newRoot.keys.append(None)
-                if i == 0 and newRoot.keys[0] == None:
-                    newRoot.keys[0] = currentKey
-                else:
-                    # compare every node key to insertion key 
-                    while i >= 0 and currentKey < newRoot.keys[i]: 
-                        # shift key one place to the right
-                        newRoot.keys[i + 1] = newRoot.keys[i] 
-                        i -= 1
-                    # insert key to correct place
-                    newRoot.keys[i + 1] = currentKey 
-            # give new root every child of right child
-            for currentChild in leftChildren:
-                newRoot.children.append(currentChild)
-            self.rootNode = newRoot
-        # root has more than 1 key
+        # root has no children so just remove key
+        if not self.rootNode.children:
+            self.rootNode.keys.remove(key)
         else:
-            # root has no children so just remove key
-            if not self.rootNode.children:
-                self.rootNode.keys.remove(key)
+            # root node has only one key
+            if len(self.rootNode.keys) == 1:
+                # merge both children
+                # left child will be new root
+                newRoot = self.rootNode.children[0]
+                # take all keys from right child
+                leftKeys = self.rootNode.children[1].keys
+                # take all children from right child
+                leftChildren = self.rootNode.children[1].children
+            # fill neighbour with every left key
+                for currentKey in leftKeys:
+                    i = len(newRoot.keys) - 1 
+                    newRoot.keys.append(None)
+                    if i == 0 and newRoot.keys[0] == None:
+                        newRoot.keys[0] = currentKey
+                    else:
+                        # compare every node key to insertion key 
+                        while i >= 0 and currentKey < newRoot.keys[i]: 
+                            # shift key one place to the right
+                            newRoot.keys[i + 1] = newRoot.keys[i] 
+                            i -= 1
+                        # insert key to correct place
+                        newRoot.keys[i + 1] = currentKey 
+                # give new root every child of right child
+                for currentChild in leftChildren:
+                    newRoot.children.append(currentChild)
+                self.rootNode = newRoot
+            # root has more than 1 key
             else:
                 keyIndex = self.rootNode.keys.index(key)
                 mergeChild = self.rootNode.children[keyIndex]
