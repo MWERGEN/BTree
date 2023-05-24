@@ -829,28 +829,31 @@ class BTreeVisualization:
             ctrNode += 1
         # add to the index the rank of the ref inside the node
         index += anim.highlightedKey
-        # paint the observed key red to indicate that it is being observed
-        self.colorKeyList[index] = "red"
-        # the searched key was found
-        if self.keyLabels[index] == anim.searchKey:
-            # mark the found key green
-            self.colorKeyList[index] = "green"
-            # stop the animation
+        if self.colorKeyList:
+            # paint the observed key red to indicate that it is being observed
+            self.colorKeyList[index] = "red"
+            # the searched key was found
+            if self.keyLabels[index] == anim.searchKey:
+                # mark the found key green
+                self.colorKeyList[index] = "green"
+                # stop the animation
+                anim.flagOuterKeyReached = True
+            # a key was found that is higher than the key that is searched for
+            elif self.keyLabels[index] > anim.searchKey:
+                # stop the animation
+                anim.flagOuterKeyReached = True
+            # the key that is searched for would be the highest key in the observed node
+            elif anim.highlightedKey == len(self.keysList[ctrNode]) - 1:
+                # stop the animation
+                anim.flagOuterKeyReached = True
+                # indicate that it would be the highest key inside the node
+                anim.flagNewKeyHighest = True
+            # observe one key all 50 to 500 milliseconds (depending on users selection)
+            elif self.timeCounter != 0 and self.timeCounter % round(50 / self.speed) == 0:
+                # after 30 frames, switch to the following key
+                anim.highlightedKey += 1
+        else:
             anim.flagOuterKeyReached = True
-        # a key was found that is higher than the key that is searched for
-        elif self.keyLabels[index] > anim.searchKey:
-            # stop the animation
-            anim.flagOuterKeyReached = True
-        # the key that is searched for would be the highest key in the observed node
-        elif anim.highlightedKey == len(self.keysList[ctrNode]) - 1:
-            # stop the animation
-            anim.flagOuterKeyReached = True
-            # indicate that it would be the highest key inside the node
-            anim.flagNewKeyHighest = True
-        # observe one key all 50 to 500 milliseconds (depending on users selection)
-        elif self.timeCounter != 0 and self.timeCounter % round(50 / self.speed) == 0:
-            # after 30 frames, switch to the following key
-            anim.highlightedKey += 1
         # make all keys lightblue again all 50 to 500 milliseconds (depending on users selection)
         if self.timeCounter != 0 and self.timeCounter % round(50 / self.speed) == 0:
             # reset counter for next animation
