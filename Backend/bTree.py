@@ -374,7 +374,10 @@ class BTree:
         # full node
         splitNode = parent.children[index]
         if not parent.keys and parent == self.rootNode:
-            indexOfOrgSplitNode = splitNode.children.index(willBeSplitt)
+            if not willBeSplitt in splitNode.children:
+                indexOfOrgSplitNode = parent.children.index(splitNode)
+            else:
+                indexOfOrgSplitNode = splitNode.children.index(willBeSplitt)
             fullRoot = True
         else:
             indexOfOrgSplitNode = splitNode.children.index(willBeSplitt)
