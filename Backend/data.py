@@ -15,9 +15,9 @@
 #
 
 # when executed by main
-from Backend import bTree
+#from Backend import bTree
 # debugging
-#import bTree
+import bTree
 
 class Backend:
     def __init__(self, k):
@@ -157,9 +157,11 @@ class Backend:
         else:
             # search needs two tree lists so the animations works right
             self.searchedNodes = self.btree.searchedNodes
+            temp = []
             list = self.btree.getTreeListForSearch()
-            self.treeList.append(list)
-            self.treeList.append(list)
+            temp.append(list[0])
+            temp.append(list[0])
+            self.treeList = temp
             self.operands.append(key)
             self.operands.append(self.searchedNodes)
             self.operands.append(keyFound)
@@ -193,7 +195,7 @@ class Backend:
         # make sure everything is changed
         self.resetTree()
 
-# testData = Backend(2)
+testData = Backend(2)
 # # # # # for i in range(1, 110):
 # # # # #     if i == 80:
 # # # # #         print('test')
@@ -204,10 +206,10 @@ class Backend:
 # testData.insertKeyIntoTree(35)
 # testData.insertKeyIntoTree(40)
 # testData.insertKeyIntoTree(45)
-# testData.insertKeyIntoTree(1)
-# testData.insertKeyIntoTree(2)
-# testData.insertKeyIntoTree(3)
-# testData.insertKeyIntoTree(4)
+testData.insertKeyIntoTree(1)
+testData.insertKeyIntoTree(2)
+testData.insertKeyIntoTree(3)
+testData.insertKeyIntoTree(4)
 # testData.insertKeyIntoTree(50)
 # testData.insertKeyIntoTree(41)
 # testData.insertKeyIntoTree(14)
