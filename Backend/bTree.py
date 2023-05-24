@@ -215,6 +215,7 @@ class BTree:
         #source = []
         #target = []
         k = self.k
+        self.splitIndex = index
         self.updateNodeIds(self.rootNode)
         source = parent.children[index].id
         target = parent.id 
@@ -373,7 +374,7 @@ class BTree:
         # full node
         splitNode = parent.children[index]
         if not parent.keys and parent == self.rootNode:
-            indexOfOrgSplitNode = parent.children.index(splitNode)
+            indexOfOrgSplitNode = splitNode.children.index(willBeSplitt)
             fullRoot = True
         else:
             indexOfOrgSplitNode = splitNode.children.index(willBeSplitt)
@@ -391,8 +392,16 @@ class BTree:
         # take all smaller keys and insert them from 0 to order - 1
         splitNode.keys = splitNode.keys[0: middleIndex]
         if fullRoot:
-            newNode.children = splitNode.children[k + 1: 2 * k + 2]
-            splitNode.children = splitNode.children[0: k + 1]
+            if indexOfOrgSplitNode < self.k:
+                # give newNode with all greater keys all references to all greater children
+                newNode.children = splitNode.children[k : 2 * k + 1] 
+                # updte references to only smaller children
+                splitNode.children = splitNode.children[0: k]
+            else:
+                # give newNode with all greater keys all references to all greater children
+                newNode.children = splitNode.children[k + 1: 2 * k + 1] 
+                # updte references to only smaller children
+                splitNode.children = splitNode.children[0: k + 1]
             print('test')
         else:
             if indexOfOrgSplitNode < self.k:
