@@ -490,6 +490,10 @@ class Input:
     # checks each row of csv
     # if correct syntax: saves operation for performing it later
     def csv_second_window(self):
+        # reset graph first
+        self.Graph.currentAnimation.type = 0
+        self.commandList = []
+        self.reset()
         # iterate over all rows in the csv file
         for row in self.csv_input:
             if len(row) == 2:
