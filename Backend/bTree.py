@@ -332,7 +332,14 @@ class BTree:
             newNode.keys = splitNode.keys[middleIndex: 2 * k] 
             # take all smaller keys and insert them from 0 to order - 1
             splitNode.keys = splitNode.keys[0: middleIndex]
-            parentOfRootSplit.children.insert(indexOfOrgSplitNode + 1, newNode)
+            # get neighbour
+            tempParent = self.getParent(parentOfRootSplit,self.rootNode)
+            neighbour = self.getNodeWithId(self.rootNode,parentOfRootSplit.id + 1)
+            # check if really neighbour
+            if neighbour in tempParent.children and indexOfOrgSplitNode == self.k:
+                neighbour.children.insert(0,newNode)
+            else:
+                parentOfRootSplit.children.insert(indexOfOrgSplitNode + 1, newNode)
             self.updateNodeIds(self.rootNode)
             nodePerLevelAfterRootSplit = self.countNodesPerLevel()
             self.numOfNodesPerLevelCopies.append(nodePerLevelAfterRootSplit)
