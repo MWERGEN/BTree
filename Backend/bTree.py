@@ -409,7 +409,7 @@ class BTree:
                 # give newNode with all greater keys all references to all greater children
                 newNode.children = splitNode.children[k + 1 : 2 * k + 2] 
                 # updte references to only smaller children
-                splitNode.children = splitNode.children[0: k + 1]
+                splitNode.children = splitNode.children[0: k]
                 print('test')
             else:
                 # give newNode with all greater keys all references to all greater children
