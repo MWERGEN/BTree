@@ -407,9 +407,10 @@ class BTree:
         if fullRoot:
             if indexOfOrgSplitNode < self.k:
                 # give newNode with all greater keys all references to all greater children
-                newNode.children = splitNode.children[k : 2 * k + 1] 
+                newNode.children = splitNode.children[k + 1 : 2 * k + 2] 
                 # updte references to only smaller children
-                splitNode.children = splitNode.children[0: k]
+                splitNode.children = splitNode.children[0: k + 1]
+                print('test')
             else:
                 # give newNode with all greater keys all references to all greater children
                 newNode.children = splitNode.children[k + 1: 2 * k + 2] 
