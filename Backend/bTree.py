@@ -688,8 +688,12 @@ class BTree:
                     childRef = index
             # if node has more than k + 1 keys, just delete it
             if len(nodeWithKey.keys) >= (self.k + 1) :
+                indexOfKey = nodeWithKey.keys.index(key)
                 nodeWithKey.keys.remove(key)
                 deleted = True
+                # take care of children!!!
+                if not nodeWithKey.leaf:
+                    self.takeCareOfChildren(nodeWithKey,indexOfKey)
             # Node will have underflow!
             else:
                 deleted = True
@@ -1183,6 +1187,52 @@ class BTree:
                         # insert key to correct place
                         rightNeighbour.keys[i + 1] = currentKey
                 print('test')
+
+    def takeCareOfChildren(self,node,index):
+        smallerChild = node.children[index]
+        greaterChild = node.children[index + 1]
+        if len(smallerChild.keys) >= self.k + 1:
+            borrowKey = smallerChild.keys[-1]
+            indexOfBorrowKey = smallerChild.keys.index(borrowKey)
+            del smallerChild.keys[-1]
+            node.keys.insert(index,borrowKey)
+            # check if children have to be fixed
+            if not smallerChild.leaf:
+                self.takeCareOfChildren(smallerChild,indexOfBorrowKey)
+        elif len(greaterChild.keys) >= self.k + 1:
+            borrowKey = greaterChild.keys[0]
+            indexOfBorrowKey = greaterChild.keys.index(borrowKey)
+            del greaterChild.keys[0]
+            node.keys.insert(index,borrowKey)
+            # check if children have to be fixed
+            if not greaterChild.leaf:
+                self.takeCareOfChildren(greaterChild,indexOfBorrowKey)
+        # merge 
+        else:
+            leftKeys = greaterChild.keys
+            for currentKey in leftKeys:
+                i = len(smallerChild.keys) - 1 
+                smallerChild.keys.append(None)
+                if i == 0 and smallerChild.keys[0] == None:
+                    smallerChild.keys[0] = currentKey
+                else:
+                    # compare every node key to insertion key 
+                    while i >= 0 and currentKey < smallerChild.keys[i]: 
+                        # shift key one place to the right
+                        smallerChild.keys[i + 1] = smallerChild.keys[i] 
+                        i -= 1
+                    # insert key to correct place
+                    smallerChild.keys[i + 1] = currentKey
+            node.children.remove(greaterChild)
+            self.updateNodeIds(self.rootNode)
+            if not greaterChild.leaf:
+                leftChildren = greaterChild.children
+                for child in leftChildren:
+                    node.children.append(child)
+
+
+
+
 
 
     # search key in node
