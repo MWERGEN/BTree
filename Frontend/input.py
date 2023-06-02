@@ -598,30 +598,38 @@ class Input:
             i_from = int(input_from)
             i_to = int(input_to)
             i_legs = int(input_legs)
-            # from is invalid
-            if i_from > 9999 or i_from < 1:
+            # invalid input:
+            # form is higher than to
+            if i_from >= i_to:
                 # error message
-                self.curr_action_label.configure(text="Invalid input! Choose number from 1 to 9999 for the field 'From'!", foreground="#FF6666")
-            # to is invalid
-            elif i_to > 9999 or i_to < 1:
-                # error message
-                self.curr_action_label.configure(text="Invalid input! Choose number from 1 to 9999 for the field 'To'!", foreground="#FF6666")
-            # number of randoms is invalid
-            elif i_legs < 1:
-                # error message
-                self.curr_action_label.configure(text="Invalid input! Choose at least one leg of random values!", foreground="#FF6666")
-            # all inputs are fine
+                self.curr_action_label.configure(text="Invalid input! 'From' has to be lower than 'To'", foreground="#FF6666")
+            # maybe valid
+            # to is higher than from
             else:
-                # counter while loop
-                ctr = 0
-                # number of legs times
-                while ctr < i_legs:
-                    # get a random int in the interval the user has requested
-                    random_int = random.randint(i_from, i_to)
-                    # add this random as an insert to the command list
-                    self.commandList.append((1, random_int))
-                    # raise counter
-                    ctr += 1
+                # from is invalid
+                if i_from > 9999 or i_from < 1:
+                    # error message
+                    self.curr_action_label.configure(text="Invalid input! Choose number from 1 to 9999 for the field 'From'!", foreground="#FF6666")
+                # to is invalid
+                elif i_to > 9999 or i_to < 1:
+                    # error message
+                    self.curr_action_label.configure(text="Invalid input! Choose number from 1 to 9999 for the field 'To'!", foreground="#FF6666")
+                # number of randoms is invalid
+                elif i_legs < 1:
+                    # error message
+                    self.curr_action_label.configure(text="Invalid input! Choose at least one leg of random values!", foreground="#FF6666")
+                # all inputs are fine
+                else:
+                    # counter while loop
+                    ctr = 0
+                    # number of legs times
+                    while ctr < i_legs:
+                        # get a random int in the interval the user has requested
+                        random_int = random.randint(i_from, i_to)
+                        # add this random as an insert to the command list
+                        self.commandList.append((1, random_int))
+                        # raise counter
+                        ctr += 1
         # something else as ints was inputted
         else:
             # error message
