@@ -407,7 +407,7 @@ class BTree:
         if fullRoot:
             if indexOfOrgSplitNode < self.k:
                 # give newNode with all greater keys all references to all greater children
-                newNode.children = splitNode.children[k + 1 : 2 * k + 2] 
+                newNode.children = splitNode.children[k : 2 * k + 2] 
                 # updte references to only smaller children
                 splitNode.children = splitNode.children[0: k]
                 print('test')
@@ -964,7 +964,8 @@ class BTree:
                         self.updateNodeIds(self.rootNode)
                 elif len(mergeChild.keys) >= self.k + 1:
                     borrowKey = mergeChild.children[-1].keys[-1]
-                    lastIndex = mergeChild.children[-1].keys.index(borrowKey)
+                    lastKey = mergeChild.keys[-1]
+                    lastIndex = mergeChild.keys.index(lastKey)
                     del mergeChild.children[-1].keys[-1]
                     self.rootNode.keys.insert(keyIndex,borrowKey)
                     if len(mergeChild.children[-1].keys) < self.k:
@@ -972,7 +973,7 @@ class BTree:
                         mergeChild.children[-1].keys.insert(0, keyFromParent)
                         del mergeChild.keys[-1]
                         self.takeCareOfChildren(mergeChild,lastIndex)
-                    if not mergeChild.leaf:
+                    if not mergeChild.children[-1].leaf:
                         self.takeCareOfChildren(mergeChild,lastIndex)
                 elif len(otherChild.keys) >= self.k + 1:
                     borrowKey = otherChild.children[0].keys[0]
@@ -987,14 +988,18 @@ class BTree:
                     if not otherChild.children[0]:
                         self.takeCareOfChildren(otherChild.children[0], 0)
                 elif len(mergeChild.children[-1].keys) >= self. k + 1:
-                    borrowKey = mergeChild.keys[-1]
-                    lastIndex = mergeChild.keys.index(borrowKey)
-                    del mergeChild.keys[-1]
-                    self.rootNode.keys.insert(keyIndex,borrowKey)
-                    firstKey = mergeChild.children[-1].keys[0]
-                    mergeChild.keys.append(firstKey)
+                    borrowKey = mergeChild.children[-1].keys[-1]
+                    lastIndex = mergeChild.children[-1].keys.index(borrowKey)
                     del mergeChild.children[-1].keys[-1]
-                    if not mergeChild.children[-1]:
+                    self.rootNode.keys.insert(keyIndex,borrowKey)
+                    del mergeChild.children[-1].keys[0]
+                    if len(mergeChild.children[-1].keys) < self.k:
+                        keyFromParent = mergeChild.keys[-1]
+                        indexFromParent = mergeChild.keys.index(keyFromParent)
+                        mergeChild.children[-1].keys.insert(0,keyFromParent)
+                        del mergeChild.keys[0]
+                        self.takeCareOfChildren(mergeChild,indexFromParent)
+                    if not mergeChild.children[-1].leaf:
                         self.takeCareOfChildren(mergeChild.children[-1], 0)
                 elif len(otherChild.children[0].keys) >= self.k + 1:
                     borrowKey = otherChild.children[0].keys[0]
@@ -1005,7 +1010,7 @@ class BTree:
                         otherChild.children[0].keys.append(keyFromParent)
                         del otherChild.keys[0]
                         self.takeCareOfChildren(otherChild,0)
-                    if not otherChild.children[0]:
+                    if not otherChild.children[0].leaf:
                         self.takeCareOfChildren(otherChild.children[0], 0)
                 else:
                     # merge both children
@@ -1290,7 +1295,7 @@ class BTree:
 
     def takeCareOfChildren(self,node,index):
         smallerChild = node.children[index]
-        greaterChild = node.children[index + 1]
+        greaterChild = node.children[index + 1] 
         if len(node.keys) < self.k:
             parentOfNode = self.getParent(node, self.rootNode)
             idOfNode = parentOfNode.children.index(node)
