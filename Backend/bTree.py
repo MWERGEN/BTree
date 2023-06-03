@@ -921,25 +921,48 @@ class BTree:
                         deleted = True
                         # left neighbour can give key
                         if not leftNeighbour is None and len(leftNeighbour.keys) >= self.k + 1:
-                            borrowKey = leftNeighbour.children[-1]
+                            borrowKey = leftNeighbour.children[-1].keys[-1]
+                            indexOfLastKey = len(leftNeighbour.keys) - 1
+                            del leftNeighbour.children[-1].keys[-1]
+                            leftNeighbour.children[-1].keys.insert(0, leftNeighbour.keys[-1])
+                            del leftNeighbour.keys[-1]
+                            self.takeCareOfChildren(leftNeighbour,indexOfLastKey)
                             rootKey = parent.keys[0]
                             parent.keys.insert(0,borrowKey)
                             parent.keys.remove(rootKey)
-                            biggestKey = nodeWithKey.children[0].keys[-1]
-                            nodeWithKey.children[0].keys.insert(0,rootKey)
-                            del nodeWithKey.children[0].keys[-1]
-                            nodeWithKey.keys.insert(0, biggestKey)
+                            biggestKey = nodeWithKey.children[indexOfKey].keys[-1]
+                            index = nodeWithKey.children[indexOfKey].keys.index(biggestKey)
+                            nodeWithKey.children[0].keys.insert(0, rootKey)
+                            changeKey = nodeWithKey.children[0].keys[-1]
+                            nodeWithKey.children[0].keys.remove(changeKey)
+                            nodeWithKey.keys.insert(0, changeKey)
+                            if indexOfKey >= len(nodeWithKey.keys) - 1:
+                                del nodeWithKey.children[indexOfKey].keys[-1]
+                                nodeWithKey.children[indexOfKey].keys.insert(0,nodeWithKey.keys[indexOfKey])
+                                del nodeWithKey.keys[indexOfKey]
+                                nodeWithKey.keys.append(biggestKey)
                         # right neighbour can give key
                         elif not rightNeighbour is None and len(rightNeighbour.keys) >= self.k + 1:
-                            borrowKey = rightNeighbour.children[0]
+                            borrowKey = rightNeighbour.children[0].keys[0]
+                            del rightNeighbour.children[0].keys[0]
+                            rightNeighbour.children[0].keys.append(rightNeighbour.keys[0])
+                            del rightNeighbour.keys[0]
+                            self.takeCareOfChildren(rightNeighbour,0)
                             rootKey = parent.keys[0]
                             parent.keys.insert(0,borrowKey)
                             parent.keys.remove(rootKey)
                             biggestKey = nodeWithKey.children[-1].keys[0]
                             index = nodeWithKey.children[-1].keys.index(biggestKey)
-                            nodeWithKey.children[-1].keys.insert(index, rootKey)
-                            del nodeWithKey.children[-1].keys[0]
-                            nodeWithKey.keys.insert(indexOfKey, biggestKey)
+                            nodeWithKey.children[-1].keys.append(rootKey)
+                            changeKey = nodeWithKey.children[indexOfKey + 1].keys[0]
+                            nodeWithKey.children[indexOfKey + 1].keys.remove(changeKey)
+                            nodeWithKey.keys.insert(indexOfKey, changeKey)
+                            if indexOfKey < len(nodeWithKey.keys) - 1:
+                                del nodeWithKey.children[-1].keys[0]
+                                nodeWithKey.children[indexOfKey + 1].keys.append(nodeWithKey.keys[indexOfKey + 1])
+                                del nodeWithKey.keys[indexOfKey + 1]
+                                nodeWithKey.keys.insert(indexOfKey + 1, biggestKey)
+                            print('test')
                         # merge with neighbour
                         else:
                             # check which node is not none
