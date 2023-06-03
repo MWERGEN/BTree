@@ -196,11 +196,11 @@ class Backend:
         self.resetTree()
 
 # testData = Backend(2)
-# for i in range(1,10):     
+# for i in range(1,18):     
 #     if i == 1:
 #         print('test')
 #     testData.insertKeyIntoTree(i)
-# testData.deleteKeyFromTree(6)
+# testData.deleteKeyFromTree(9)
 # testData.insertKeyIntoTree(10)
 # testData.insertKeyIntoTree(20)
 # testData.insertKeyIntoTree(30)

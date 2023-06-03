@@ -943,20 +943,70 @@ class BTree:
                 del self.rootNode.keys[keyIndex]
                 mergeChild = self.rootNode.children[keyIndex]
                 otherChild = self.rootNode.children[keyIndex + 1]
-                if len(mergeChild.keys) >= self.k + 1:
+                if mergeChild.leaf:
+                    if len(mergeChild.keys) >= self.k + 1:
+                        borrowKey = mergeChild.keys[-1]
+                        mergeChild.keys.remove(borrowKey)
+                        self.rootNode.keys.insert(keyIndex,borrowKey)
+                    elif len(otherChild.keys) >= self.k + 1:
+                        borrowKey = otherChild.keys[0]
+                        otherChild.keys.remove(borrowKey)
+                        self.rootNode.keys.insert(keyIndex,borrowKey)
+                    else:
+                        # merge both children
+                        # left child will be new root
+                        newRoot = self.rootNode.children[0]
+                        # take all keys from right child
+                        leftKeys = self.rootNode.children[1].keys
+                        for key in leftKeys:
+                            newRoot.keys.append(key)
+                        self.rootNode = newRoot
+                        self.updateNodeIds(self.rootNode)
+                elif len(mergeChild.keys) >= self.k + 1:
+                    borrowKey = mergeChild.children[-1].keys[-1]
+                    lastIndex = mergeChild.children[-1].keys.index(borrowKey)
+                    del mergeChild.children[-1].keys[-1]
+                    self.rootNode.keys.insert(keyIndex,borrowKey)
+                    if len(mergeChild.children[-1].keys) < self.k:
+                        keyFromParent = mergeChild.keys[-1]
+                        mergeChild.children[-1].keys.insert(0, keyFromParent)
+                        del mergeChild.keys[-1]
+                        self.takeCareOfChildren(mergeChild,lastIndex)
+                    if not mergeChild.leaf:
+                        self.takeCareOfChildren(mergeChild,lastIndex)
+                elif len(otherChild.keys) >= self.k + 1:
+                    borrowKey = otherChild.children[0].keys[0]
+                    lastIndex = otherChild.children[0].keys.index(borrowKey)
+                    del otherChild.children[0].keys[0]
+                    self.rootNode.keys.insert(keyIndex,borrowKey)
+                    if len(otherChild.children[0].keys) < self.k:
+                        keyFromParent = otherChild.keys[0]
+                        otherChild.children[0].keys.append(keyFromParent)
+                        del otherChild.keys[0]
+                        self.takeCareOfChildren(otherChild,0)
+                    if not otherChild.children[0]:
+                        self.takeCareOfChildren(otherChild.children[0], 0)
+                elif len(mergeChild.children[-1].keys) >= self. k + 1:
                     borrowKey = mergeChild.keys[-1]
                     lastIndex = mergeChild.keys.index(borrowKey)
                     del mergeChild.keys[-1]
                     self.rootNode.keys.insert(keyIndex,borrowKey)
-                    if not mergeChild.leaf:
-                        self.takeCareOfChildren(mergeChild,lastIndex)
-                elif len(otherChild.keys) >= self.k + 1:
-                    borrowKey = otherChild.keys[0]
-                    firstIndex = otherChild.keys.index(borrowKey)
-                    del otherChild.keys[0]
+                    firstKey = mergeChild.children[-1].keys[0]
+                    mergeChild.keys.append(firstKey)
+                    del mergeChild.children[-1].keys[-1]
+                    if not mergeChild.children[-1]:
+                        self.takeCareOfChildren(mergeChild.children[-1], 0)
+                elif len(otherChild.children[0].keys) >= self.k + 1:
+                    borrowKey = otherChild.children[0].keys[0]
+                    del otherChild.children[0].keys[0]
                     self.rootNode.keys.insert(keyIndex,borrowKey)
-                    if not otherChild.leaf:
-                        self.takeCareOfChildren(otherChild,firstIndex)
+                    if len(otherChild.children[0].keys) < self.k:
+                        keyFromParent = otherChild.keys[0]
+                        otherChild.children[0].keys.append(keyFromParent)
+                        del otherChild.keys[0]
+                        self.takeCareOfChildren(otherChild,0)
+                    if not otherChild.children[0]:
+                        self.takeCareOfChildren(otherChild.children[0], 0)
                 else:
                     # merge both children
                     # left child will be new root
@@ -964,6 +1014,10 @@ class BTree:
                     # take all keys from right child
                     leftKeys = self.rootNode.children[1].keys
                     # take all children from right child
+                    # the last of first node and the first of second node will be merged!
+                    lastChildOfMerge = self.rootNode.children[0].children[-1]
+                    firstChildOfMerge = self.rootNode.children[1].children[0]
+                    #self.rootNode.children[1].children.remove(firstChildOfMerge)
                     leftChildren = self.rootNode.children[1].children
                     # fill neighbour with every left key
                     for currentKey in leftKeys:
@@ -982,7 +1036,12 @@ class BTree:
                     # give new root every child of right child
                     for currentChild in leftChildren:
                         newRoot.children.append(currentChild)
+                    # merge together
+                    for key in firstChildOfMerge.keys:
+                        lastChildOfMerge.keys.append(key)
+                    del newRoot.children[self.k + 1]
                     self.rootNode = newRoot
+                    self.updateNodeIds(self.rootNode)
             # root has more than 1 key
             else:
                 keyIndex = self.rootNode.keys.index(key)
