@@ -962,7 +962,39 @@ class BTree:
                                 nodeWithKey.children[indexOfKey + 1].keys.append(nodeWithKey.keys[indexOfKey + 1])
                                 del nodeWithKey.keys[indexOfKey + 1]
                                 nodeWithKey.keys.insert(indexOfKey + 1, biggestKey)
-                            print('test')
+                        elif not leftNeighbour is None and len(leftNeighbour.children[-1].keys) >= self. k + 1:
+                            borrowKey = leftNeighbour.children[-1].keys[-1]
+                            lastIndex = leftNeighbour.children[-1].keys.index(borrowKey)
+                            del leftNeighbour.children[-1].keys[-1]
+                            keyFromParent = parent.keys[childRef - 1]
+                            parent.keys.remove(keyFromParent)
+                            parent.keys.insert(indexOfKey,borrowKey)
+                            nodeWithKey.keys.insert(indexOfKey, keyFromParent)
+                            del leftNeighbour.children[-1].keys[0]
+                            if len(leftNeighbour.children[-1].keys) < self.k:
+                                keyFromParent = leftNeighbour.keys[-1]
+                                indexFromParent = leftNeighbour.keys.index(keyFromParent)
+                                leftNeighbour.children[-1].keys.insert(0,keyFromParent)
+                                del leftNeighbour.keys[0]
+                                self.takeCareOfChildren(leftNeighbour,indexFromParent)
+                            if not leftNeighbour.children[-1].leaf:
+                                self.takeCareOfChildren(leftNeighbour.children[-1], 0)
+                        elif not rightNeighbour is None and len(rightNeighbour.children[0].keys) >= self.k + 1:
+                            borrowKey = rightNeighbour.children[0].keys[0]
+                            del rightNeighbour.children[0].keys[0]
+                            keyFromParent = parent.keys[childRef]
+                            parent.keys.remove(keyFromParent)
+                            parent.keys.insert(indexOfKey,borrowKey)
+                            nodeWithKey.children[-1].keys.append(keyFromParent)
+                            nodeWithKey.keys.insert(indexOfKey, nodeWithKey.children[-1].keys[0])
+                            del nodeWithKey.children[-1].keys[0]
+                            if len(rightNeighbour.children[0].keys) < self.k:
+                                keyFromParent = rightNeighbour.keys[0]
+                                rightNeighbour.children[0].keys.append(keyFromParent)
+                                del rightNeighbour.keys[0]
+                                self.takeCareOfChildren(rightNeighbour,0)
+                            if not rightNeighbour.children[0].leaf:
+                                self.takeCareOfChildren(rightNeighbour.children[0], 0)
                         # merge with neighbour
                         else:
                             # check which node is not none
