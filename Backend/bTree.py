@@ -1069,6 +1069,8 @@ class BTree:
                         self.takeCareOfChildren(otherChild,firstIndex)
                 else:
                     leftKeys = otherChild.keys
+                    leftChildren = otherChild.children
+                    firstChildOfMerge = otherChild.children[0]
                     # delete other child
                     del self.rootNode.children[keyIndex + 1]
                     # fill merge child with every left key
@@ -1084,7 +1086,15 @@ class BTree:
                                 mergeChild.keys[i + 1] = mergeChild.keys[i] 
                                 i -= 1
                             # insert key to correct place
-                            mergeChild.keys[i + 1] = currentKey 
+                            mergeChild.keys[i + 1] = currentKey
+                    for key in firstChildOfMerge.keys:
+                        mergeChild.children[-1].keys.append(key)
+                    for child in leftChildren:
+                        mergeChild.children.append(child)
+                    mergeChild.children.remove(firstChildOfMerge)
+                    self.updateNodeIds(self.rootNode)
+                    print('test')
+                    
                 self.updateNodeIds(self.rootNode)
                 print('test')
 
