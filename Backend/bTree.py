@@ -907,18 +907,74 @@ class BTree:
                             self.rootNode = rightNeighbour
                         self.updateNodeIds(self.rootNode)
                 else:
-                    indexOfKey = nodeWithKey.keys.index(key)
-                    nodeWithKey.keys.remove(key)
-                    deleted = True
-                    # take care of children!!!
-                    if not nodeWithKey.leaf:
-                        self.takeCareOfChildren(nodeWithKey,indexOfKey)
-            #  check if parent has underflow after delete
-            if not parent== self.rootNode and len(parent.keys) < self.k and not len(parent.keys) == 0:
-                # try to get key from neighbours
-                if not self.borrowKeyFromNeighbour(parent):
-                    # merge node with parent
-                    self.mergeNode(parent)
+                    # root with only one key
+                    if len(parent.keys) == 1:
+                        # check if neighbours can give keys
+                        leftNeighbour = self.getNodeWithId(self.rootNode, nodeWithKey.id - 1)
+                        rightNeighbour = self.getNodeWithId(self.rootNode, nodeWithKey.id + 1)
+                        if not leftNeighbour in parent.children:
+                            leftNeighbour = None
+                        if not rightNeighbour in parent.children:
+                            rightNeighbour = None
+                        indexOfKey = nodeWithKey.keys.index(key)
+                        nodeWithKey.keys.remove(key)
+                        deleted = True
+                        # left neighbour can give key
+                        if not leftNeighbour is None and len(leftNeighbour.keys) >= self.k + 1:
+                            borrowKey = leftNeighbour.children[-1]
+                            rootKey = parent.keys[0]
+                            parent.keys.insert(0,borrowKey)
+                            parent.keys.remove(rootKey)
+                            biggestKey = nodeWithKey.children[0].keys[-1]
+                            nodeWithKey.children[0].keys.insert(0,rootKey)
+                            del nodeWithKey.children[0].keys[-1]
+                            nodeWithKey.keys.insert(0, biggestKey)
+                        # right neighbour can give key
+                        elif not rightNeighbour is None and len(rightNeighbour.keys) >= self.k + 1:
+                            borrowKey = rightNeighbour.children[0]
+                            rootKey = parent.keys[0]
+                            parent.keys.insert(0,borrowKey)
+                            parent.keys.remove(rootKey)
+                            biggestKey = nodeWithKey.children[-1].keys[0]
+                            index = nodeWithKey.children[-1].keys.index(biggestKey)
+                            nodeWithKey.children[-1].keys.insert(index, rootKey)
+                            del nodeWithKey.children[-1].keys[0]
+                            nodeWithKey.keys.insert(indexOfKey, biggestKey)
+                        # merge with neighbour
+                        else:
+                            # check which node is not none
+                            if not leftNeighbour is None:
+                                mergeNode = leftNeighbour
+                                mergeNode.keys.append(parent.keys[0])
+                                leftKeys = nodeWithKey.keys
+                                leftChildren = nodeWithKey.children
+                                lastChild = mergeNode.children[-1]
+                                firstChild = nodeWithKey.children[0]
+                                for key in leftKeys:
+                                    mergeNode.keys.append(key)
+                                for key in firstChild.keys:
+                                    lastChild.keys.append(key)
+                                for child in leftChildren:
+                                    mergeNode.children.append(child)
+                                mergeNode.children.remove(firstChild)
+                                self.rootNode = mergeNode
+                                self.updateNodeIds(self.rootNode)
+                            else:
+                                mergeNode = rightNeighbour
+                                nodeWithKey.keys.append(parent.keys[0])
+                                leftKeys = mergeNode.keys
+                                leftChildren = mergeNode.children
+                                lastChild = nodeWithKey.children[-1]
+                                firstChild = mergeNode.children[0]
+                                for key in leftKeys:
+                                    nodeWithKey.keys.append(key)
+                                for key in firstChild.keys:
+                                    lastChild.keys.append(key)
+                                for child in leftChildren:
+                                    nodeWithKey.children.append(child)
+                                nodeWithKey.children.remove(firstChild)
+                                self.rootNode = nodeWithKey
+                                self.updateNodeIds(self.rootNode)
         # set keys per level list -> has to be copy of list because every key list can be different!
         self.getKeysPerLevel()
         keysPerLevelBeforeInsert = self.keysPerLevel[:]
@@ -1070,7 +1126,8 @@ class BTree:
                 else:
                     leftKeys = otherChild.keys
                     leftChildren = otherChild.children
-                    firstChildOfMerge = otherChild.children[0]
+                    if not otherChild.leaf:
+                        firstChildOfMerge = otherChild.children[0]
                     # delete other child
                     del self.rootNode.children[keyIndex + 1]
                     # fill merge child with every left key
@@ -1087,16 +1144,14 @@ class BTree:
                                 i -= 1
                             # insert key to correct place
                             mergeChild.keys[i + 1] = currentKey
-                    for key in firstChildOfMerge.keys:
-                        mergeChild.children[-1].keys.append(key)
-                    for child in leftChildren:
-                        mergeChild.children.append(child)
-                    mergeChild.children.remove(firstChildOfMerge)
+                    if not otherChild.leaf:
+                        for key in firstChildOfMerge.keys:
+                            mergeChild.children[-1].keys.append(key)
+                        for child in leftChildren:
+                            mergeChild.children.append(child)
+                        mergeChild.children.remove(firstChildOfMerge)
                     self.updateNodeIds(self.rootNode)
                     print('test')
-                    
-                self.updateNodeIds(self.rootNode)
-                print('test')
 
 
     
@@ -1107,10 +1162,12 @@ class BTree:
         leftNeighbour = self.getNodeWithId(self.rootNode, node.id - 1)
         rightNeighbour = self.getNodeWithId(self.rootNode, node.id + 1)
         # check if nodes are really neighbours
-        if not leftNeighbour in parent.children:
-            leftNeighbour = None
-        if not rightNeighbour in parent.children:
-            rightNeighbour = None
+        if not leftNeighbour is None:
+            if not leftNeighbour in parent.children:
+                leftNeighbour = None
+        if not rightNeighbour is None:
+            if not rightNeighbour in parent.children:
+                rightNeighbour = None
         for index, child in enumerate(parent.children):
             if child == node:
                 childRef = index
