@@ -591,7 +591,10 @@ class Input:
     # only allows ints
     # also interval is limited from 1 to 9999
     # if valid: creates an int list with all random int inputs
-    def separate_input_random(self, input_from, input_to, input_legs):
+    def separate_input_random(self, inp_from, inp_to, inp_legs):
+        input_from = inp_from.replace(" ", "")
+        input_to = inp_to.replace(" ", "")
+        input_legs = inp_legs.replace(" ", "")
         # check if all input values are integers
         if input_from.isdigit() and input_to.isdigit() and input_legs.isdigit():
             # save the inputs as ints in temporal vars
