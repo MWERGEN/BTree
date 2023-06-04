@@ -436,9 +436,11 @@ class Input:
                 # message for user
                 self.curr_action_label.configure(text="Order (k) changed!", foreground="white")
             else:
+                self.Graph.searchFinished = False
                 # error message
                 self.curr_action_label.configure(text="Invalid input! Choose a k at least 2.", foreground="#FF6666")
         else:
+            self.Graph.searchFinished = False
             # error message
             self.curr_action_label.configure(text="Invalid input! Please only insert integers as k!", foreground="#FF6666")
         
@@ -560,6 +562,7 @@ class Input:
                         else:
                             # set invalid flag
                             invalid = True
+                            self.Graph.searchFinished = False
                             self.curr_action_label.configure(text="Invalid input! Choose number from 1 to 9999!", foreground="#FF6666")
                     # reset the current number
                     currentNumStr = ""
@@ -571,6 +574,7 @@ class Input:
                 else:
                     # set invalid flag
                     invalid = True
+                    self.Graph.searchFinished = False
                     self.curr_action_label.configure(text="Invalid input! Char \'" + str(input[index]) + "\' is not allowed.", foreground="#FF6666")
             # increment index for next char
             index += 1
@@ -585,6 +589,7 @@ class Input:
             else:
                 # set invalid flag
                 invalid = True
+                self.Graph.searchFinished = False
                 self.curr_action_label.configure(text="Invalid input! Choose number from 1 to 9999!", foreground="#FF6666")
         # only continue with input if it is valid
         if not invalid:
@@ -609,6 +614,7 @@ class Input:
             # invalid input:
             # form is higher than to
             if i_from >= i_to:
+                self.Graph.searchFinished = False
                 # error message
                 self.curr_action_label.configure(text="Invalid input! 'From' has to be lower than 'To'", foreground="#FF6666")
             # maybe valid
@@ -616,14 +622,17 @@ class Input:
             else:
                 # from is invalid
                 if i_from > 9999 or i_from < 1:
+                    self.Graph.searchFinished = False
                     # error message
                     self.curr_action_label.configure(text="Invalid input! Choose number from 1 to 9999 for the field 'From'!", foreground="#FF6666")
                 # to is invalid
                 elif i_to > 9999 or i_to < 1:
+                    self.Graph.searchFinished = False
                     # error message
                     self.curr_action_label.configure(text="Invalid input! Choose number from 1 to 9999 for the field 'To'!", foreground="#FF6666")
                 # number of randoms is invalid
                 elif i_legs < 1:
+                    self.Graph.searchFinished = False
                     # error message
                     self.curr_action_label.configure(text="Invalid input! Choose at least one leg of random values!", foreground="#FF6666")
                 # all inputs are fine
@@ -640,5 +649,6 @@ class Input:
                         ctr += 1
         # something else as ints was inputted
         else:
+            self.Graph.searchFinished = False
             # error message
             self.curr_action_label.configure(text="Invalid input! You can only input whole numbers!", foreground="#FF6666")
