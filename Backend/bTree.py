@@ -908,7 +908,6 @@ class BTree:
                         self.updateNodeIds(self.rootNode)
                 else:
                     # root with only one key
-                    if len(parent.keys) == 1:
                         # check if neighbours can give keys
                         leftNeighbour = self.getNodeWithId(self.rootNode, nodeWithKey.id - 1)
                         rightNeighbour = self.getNodeWithId(self.rootNode, nodeWithKey.id + 1)
@@ -927,8 +926,8 @@ class BTree:
                             leftNeighbour.children[-1].keys.insert(0, leftNeighbour.keys[-1])
                             del leftNeighbour.keys[-1]
                             self.takeCareOfChildren(leftNeighbour,indexOfLastKey)
-                            rootKey = parent.keys[0]
-                            parent.keys.insert(0,borrowKey)
+                            rootKey = parent.keys[childRef]
+                            parent.keys.insert(childRef,borrowKey)
                             parent.keys.remove(rootKey)
                             biggestKey = nodeWithKey.children[indexOfKey].keys[-1]
                             index = nodeWithKey.children[indexOfKey].keys.index(biggestKey)
@@ -948,8 +947,8 @@ class BTree:
                             rightNeighbour.children[0].keys.append(rightNeighbour.keys[0])
                             del rightNeighbour.keys[0]
                             self.takeCareOfChildren(rightNeighbour,0)
-                            rootKey = parent.keys[0]
-                            parent.keys.insert(0,borrowKey)
+                            rootKey = parent.keys[childRef]
+                            parent.keys.insert(childRef,borrowKey)
                             parent.keys.remove(rootKey)
                             biggestKey = nodeWithKey.children[-1].keys[0]
                             index = nodeWithKey.children[-1].keys.index(biggestKey)
