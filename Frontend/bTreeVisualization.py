@@ -26,11 +26,16 @@
 #       19.     Marius Wergen on 22.05.23
 #       20.     Marius Wergen on 23.05.23
 #       21.     Marius Wergen on 24.05.23
+#       22.     Marius Wergen on 28.05.23
+#       23.     Marius Wergen on 04.06.23
 #
 ###############################################
 #
 #   File description:
 #       - visualization of the B-tree
+#           -> calculates the position and size of all nodes of the tree
+#           -> performs the animations 
+#           -> calls the backend functionality
 #
 
 # library imports
@@ -51,7 +56,6 @@ from Frontend import anim as ani
 
 
 class BTreeVisualization:
-
     # constructor
     def __init__(self, k, keyWidth, refWidth, minNodeDistance, currentAnimation):
         # save passed animation for current animation
@@ -223,7 +227,9 @@ class BTreeVisualization:
         # calculate the edges' relationships
         self.calcEdges()
 
+    # function for inserting a new key
     def insert(self, key):
+        # reinitialize counter for page views
         self.pageViews = 1
         # flag indicates if the key to be inserted is already in the tree
         duplicate = False
@@ -246,13 +252,17 @@ class BTreeVisualization:
             operands = self.backend.operands
             # create the animation for the insertion or the search
             self.currentAnimation = ani.Animation(animationList, treeList, operands)
+        # key is duplicate
         else:
             # visualize search for the duplicate
             # in order to underline that it is a duplicate
             self.search(key)
 
+    # function for searching a key in the tree
     def search(self, key):
+        # reinitialize counter for page views
         self.pageViews = 1
+        # call backend function for search
         self.backend.searchKeyInTree(key)
         # get updated animation list
         animationList = self.backend.animationList
@@ -260,18 +270,16 @@ class BTreeVisualization:
         treeList = self.backend.treeList
         # get updated operands
         operands = self.backend.operands
-        print(animationList)
-        print(treeList)
-        print(operands)
         # create the animation for the insertion or the search
         self.currentAnimation = ani.Animation(animationList, treeList, operands)
         # remember the result of the search
         self.searchFound = operands[2]
-        print("s: ")
-        print(self.searchFound)
 
+    # function for deleting a key from the tree
     def delete(self, key):
+        # reinitialize counter for page views
         self.pageViews = 1
+        # call backend function for delete
         self.backend.deleteKeyFromTree(key)
         # get updated animation list
         animationList = self.backend.animationList
@@ -279,9 +287,6 @@ class BTreeVisualization:
         treeList = self.backend.treeList
         # get updated operands
         operands = self.backend.operands
-        print(animationList)
-        print(treeList)
-        print(operands)
         # create the animation for the insertion or the search
         self.currentAnimation = ani.Animation(animationList, treeList, operands)
         # remember the result of the search
@@ -324,6 +329,7 @@ class BTreeVisualization:
 
     # initializes all keys with a lightblue background
     def initializeColorKeyList(self):
+        # reinitialize color list of refs
         self.colorKeyList = []
         # for n keys, we need a list with n times the color
         for i in self.xGKeys:
@@ -340,6 +346,7 @@ class BTreeVisualization:
 
     # takes all labels and makes them bold
     def formatLabels(self):
+        # reinitializes list for labels
         self.keyLabelsFormatted = []
         # iterate over all labels
         for i in self.keyLabels:
@@ -568,13 +575,16 @@ class BTreeVisualization:
             self.timeCounter = 0
             # prevent counter to be resetted every iteration
             anim.resetted = True
-            anim.updateNewAnimation()                                   ### !!!!!!!!!!!!!!!!!!!!
+            # apply changes
+            anim.updateNewAnimation()
             self.updateGraph()
         # if the starting node is lower than the destination node
         # -> means that the key should move upwards
         if (anim.startingNode[anim.walkthrough] < anim.destinationNode[anim.walkthrough]):
+            # node going upwards
             anim.upwards = True
         else:
+            # node going downwards
             anim.upwards = False
         
         # moving node is going up
@@ -1013,9 +1023,8 @@ class BTreeVisualization:
         # updating function is _update_graph
         # blitting is deactivated to enable the graph to grow and shrink dynamically
         anim = animation.FuncAnimation(self.fig, self._update_graph, interval=1, blit=False, cache_frame_data=False)
+        # start the animation
         anim._start()
-        # start the tkinter window
-        #tk.mainloop()
 
     def initializeGraph(self):
         # predefine 4 nodes 

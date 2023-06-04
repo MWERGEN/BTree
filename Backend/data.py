@@ -14,10 +14,8 @@
 #       - user data from the GUI
 #
 
-# when executed by main
+# local imports
 from Backend import bTree
-# debugging
-#import bTree
 
 class Backend:
     def __init__(self, k):
