@@ -14,46 +14,51 @@
 #       7.      Marius Wergen on 22.05.23
 #       8.      Marius Wergen on 23.05.23
 #       9.      Marius Wergen on 24.05.23
+#       10.     Marius Wergen on 28.05.23
+#       11.     Marius Wergen on 04.06.23
 #
 ###############################################
 #
 #   File description:
 #       - GUI for input 
+#           -> contains the btreevisualization object
+#           -> handles user input
+#           -> draws all gui elements
 #
 
+# library inputs
 import csv
 import random
 import datetime
 import tkinter as tk
-from tkinter import filedialog
 from tkinter import ttk
-from Frontend import bTreeVisualization as bt
+from tkinter import filedialog
 from Frontend import anim as ani
+from Frontend import bTreeVisualization as bt
 from matplotlib.backend_bases import key_press_handler
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
-import threading
 
 class Input:
+    # constructor
     def __init__(self) -> None:
+        # initialize tkinter window
         self.saved_operations = []
         self.window = tk.Tk()
         self.window.title("Balanced Tree Visualization Tool")
-
+        # generate columns
         self.window.columnconfigure(0, weight=1)
         self.window.columnconfigure(1, weight=1)
         self.window.columnconfigure(2, weight=1)
         self.window.rowconfigure(0, weight=1)
         self.window.rowconfigure(1, weight=1)
         self.window.rowconfigure(2, weight=1)
-
+        # configure window
         self.mode = tk.IntVar()
         self.mode.set(1)  # initializing the choice, i.e. Python
         self.action = tk.IntVar()
         self.action.set(1)  # initializing the choice, i.e. Python
-
         self.csv_input = []
         self.second_window = 0
-        
         # mode selection
         self.input_fields_frame = tk.Frame(master=self.window)
         self.input_fields_frame.grid(column=0, row=0, sticky="NW")
@@ -81,18 +86,11 @@ class Input:
                                             variable=self.mode, 
                                             command=self.mode_change,
                                             value=3).grid(column=0, row=3, columnspan=5, sticky="W")
-        
         # elements of "Simple" mode
         self.simple_input_label = tk.Label(self.input_fields_frame, text="Input:")
         self.simple_input_field = tk.Entry(self.input_fields_frame, width=6)
         self.simple_input_field.config(width=6)
-        
         self.simple_action_label = tk.Label(self.input_fields_frame, text="Action:")
-        #self.simple_action = tk.StringVar()
-        #self.simple_action_select = tk.OptionMenu(self.input_fields_frame, self.simple_action, *["Insert", "Delete", "Search"])
-        #self.simple_action_select.config(width=6)
-        ### Radio Buttons for action-selection
-        # standard: simple mode = insert, search, delete a specific key
         self.radio_action_insert = tk.Radiobutton(self.input_fields_frame, 
                                                     text="Insert",
                                                     padx = 20, 
@@ -113,10 +111,8 @@ class Input:
                                                     variable=self.action, 
                                                     command=self.mode_change,
                                                     value=3)
-
         # elements of "CSV" mode
         self.select_csv_button = tk.Button(self.input_fields_frame, text = "Browse Files", command = self.browse_files)
-        
         # elements of "Random" mode
         self.random_from_label = tk.Label(self.input_fields_frame, text="From:")
         self.random_from_field = tk.Entry(self.input_fields_frame, width=6)
@@ -127,13 +123,11 @@ class Input:
         self.random_amount_legs_label = tk.Label(self.input_fields_frame, text="Amount of legs:")
         self.random_amount_legs_field = tk.Entry(self.input_fields_frame, width=6)
         self.random_amount_legs_field.config(width=6)
-        
         # confirm button that is always present
         self.confirm_button = tk.Button(self.input_fields_frame, text="Confirm", command=self.confirm_input, bg="green")
         self.confirm_button.grid(column=24, row=1)
-        
+        # apply modes
         self.mode_change(self)
-        
         # settings menu
         self.settings_fields_frame = tk.Frame(master=self.window)
         self.settings_fields_frame.grid(column=1, row=0, sticky="NE")
@@ -142,16 +136,9 @@ class Input:
         self.settings_order_label.grid(column=0, row=0, sticky="W")
         self.settings_order_field = tk.Entry(self.settings_fields_frame, width=6)
         self.settings_order_field.grid(column=0, row=1, sticky="W")
-        # Speed
-        #self.settings_speed_label = tk.Label(self.settings_fields_frame, text="Speed:")
-        #self.settings_speed_label.grid(column=2, row=0, sticky="W")
-        #self.settings_speed_field = tk.Entry(self.settings_fields_frame, width=6)
-        #self.settings_speed_field.grid(column=2, row=1, sticky="W")
         # Update button
         update_button = tk.Button(self.settings_fields_frame, text="Update", command=self.update_order)
         update_button.grid(column=3, row=1)
-        
-        
         # reset button
         self.reset_button_frame = tk.Frame(master=self.window)
         self.reset_button_frame.grid(column=0, row=3, columnspan=3, sticky="SE")
@@ -170,74 +157,76 @@ class Input:
         # frame for matplot content
         self.matplot_frame = tk.Frame(self.window)
         self.matplot_frame.grid(column=0, row=1, columnspan=3)
-
+        # animation
         animationList = [0]
         treeList = [[[1], [[]], [[]]]]
         operands = []
-
         animation = ani.Animation(animationList, treeList, operands)
         self.Graph = bt.BTreeVisualization(2, 0.2, 0.03, 0.1, animation)
-        #self.Graph.initializeTK()
-
+        # elements for matplotlib time-counter
         self.matplot_frame.counter = 0
         self.matplot_frame.after(10, self.countNext10Milliseconds)
         self.matplot_frame.columnconfigure(0, weight=1)
         self.matplot_frame.rowconfigure(0, weight=1)
-
         # create a scale widget for selecting the number
         self.scale = tk.Scale(self.matplot_frame, from_=1, to=20, orient=tk.HORIZONTAL)
         self.scale.grid(column=0, row=0)
-
+        # message label
         self.curr_action_label = tk.Label(self.matplot_frame, text="Let's go!", font=("Arial", 28), foreground="white",  background="gray")
         self.curr_action_label.grid(column=0, row=0, sticky="W")
-
+        # page views label
         self.page_views_label = tk.Label(self.matplot_frame, text="Page views: 0", font=("Arial", 28), foreground="white",  background="gray")
         self.page_views_label.grid(column=0, row=0, sticky="E")
-
+        # igraph canvas
         self.canvas = FigureCanvasTkAgg(self.Graph.fig, master=self.matplot_frame)
         self.canvas.get_tk_widget().grid(column=0, row=1, sticky="WE")
-        
         # Create a scrollbar
         scrollbar = ttk.Scrollbar(self.matplot_frame, orient=tk.VERTICAL, command=self.canvas.get_tk_widget().yview)
         scrollbar.grid(row=1, column=1, sticky="ns")
-
+        # mouse motion event
         self.canvas.mpl_connect('motion_notify_event', self.on_mouse_motion)
-
+        # initialize the graph at first
         self.Graph.initializeGraph()
         self.search_key = 0
-
+        # list to save all commands
         self.commandList = []
-
         # Bind the event handler to window resize event
         self.matplot_frame.bind("<Configure>", self.on_window_resize)
+        # call tkinter mainloop
         tk.mainloop()
 
+    # function for resizing the window
     def on_window_resize(self, event):
-        self.canvas.get_tk_widget().configure(width=(self.window.winfo_width() * 0.95), height=(self.window.winfo_height() * 0.75))
-
-    def resize_canvas(self, width, height):
-        # Configure the canvas size to fill the available space
-        self.canvas.get_tk_widget().configure(width=self.window.winfo_width(), height=height)
+        # resize canvas dynamically so it is always visible
+        self.canvas.get_tk_widget().configure(width=(self.window.winfo_width() * 0.95), height=(self.window.winfo_height() * 0.68))
         
+    # function for saving tree in a csv file
     def save_csv(self):
+        # get current timestamp
         current_datetime = datetime.datetime.now()
+        # format timestamp to string
         current_datetime_str = current_datetime.strftime("%Y-%m-%d-%H_%M_%S")
         # choose a filename to save the tree
         filename = 'bTree' + current_datetime_str + '.csv'
-
+        # list to contain formatted operations
         formatted_operations = []
+        # iterate over all saved operations
         for i in self.saved_operations:
+            # input operation
             if i[0] == 1:
+                # append to list
                 formatted_operations.append(('i', i[1]))
-            if i[0] == 2:
-                formatted_operations.append(('s', i[1]))
+            # delete operation
             if i[0] == 3:
+                # append to list
                 formatted_operations.append(('d', i[1]))
-
+        # open the new csv file
         with open(filename, 'w', newline='') as file:
+            # writer to write in the file
             writer = csv.writer(file)
+            # input saved operations in file
             writer.writerows(formatted_operations)
-
+        # write message that save was successful
         self.curr_action_label.configure(text="Tree saved as \'" + filename + "\'", foreground="white")
 
         
@@ -255,32 +244,48 @@ class Input:
         # get the selected speed from the user
         # pass it to the bTreeVisualization
         self.Graph.speed = self.scale.get()
+        # no animation is currently running
         if self.Graph.currentAnimation.type == 0:
+            # there are commands to be executed
             if self.commandList:
+                # no search finished because of new operation
                 self.Graph.searchFinished = False
+                # insert operation
                 if self.commandList[0][0] == 1:
+                    # perform insert operation
                     self.Graph.insert(self.commandList[0][1])
                     self.search_key = self.commandList[0][1]
                     self.curr_action_label.configure(text="Input " + str(self.commandList[0][1]), foreground="white")
                     self.saved_operations.append((self.commandList[0][0], self.commandList[0][1]))
+                # search operation
                 elif self.commandList[0][0] == 2:
+                    # perform search operation
                     self.Graph.search(self.commandList[0][1])
                     self.search_key = self.commandList[0][1]
                     self.curr_action_label.configure(text="Search " + str(self.commandList[0][1]), foreground="white")
                     self.saved_operations.append((self.commandList[0][0], self.commandList[0][1]))
+                # delete operation
                 elif self.commandList[0][0] == 3:
+                    # perform delete operation
                     self.Graph.delete(self.commandList[0][1])
                     self.search_key = self.commandList[0][1]
                     self.curr_action_label.configure(text="Delete " + str(self.commandList[0][1]), foreground="white")
                     self.saved_operations.append((self.commandList[0][0], self.commandList[0][1]))
+                # pop the operation that was just performed
                 self.commandList.pop(0)
+            # a search was just finished
             elif self.Graph.searchFinished:
+                # search successful
                 if self.Graph.searchFound:
+                    # message to user that it has been found
                     text = "The key " + str(self.search_key) + " was found in the tree!"
                     self.curr_action_label.configure(text=text, foreground="white")
+                # key not found 
                 else:
+                    # error message that it was not found in the tree
                     text = "The key " + str(self.search_key) + " was NOT found in the tree!"
                     self.curr_action_label.configure(text=text, foreground="#FF6666")
+        # update page views
         page_views_string = "Page views: " + str(self.Graph.pageViews)
         self.page_views_label.configure(text=page_views_string, foreground="white")
         # schedule the next call to my_function in 1 second
@@ -352,33 +357,34 @@ class Input:
         self.radio_action_insert.grid_forget()
         self.radio_action_search.grid_forget()
         self.radio_action_delete.grid_forget()
-        
+
         self.select_csv_button.grid_forget()
-        
         self.random_from_label.grid_forget()
         self.random_from_field.grid_forget()
         self.random_to_label.grid_forget()
         self.random_to_field.grid_forget()
         self.random_amount_legs_label.grid_forget()
         self.random_amount_legs_field.grid_forget()
-
         self.confirm_button.grid(column=24, row=1)
         
         # create suboptions belonging to main options
+        # simple mode
         if self.mode.get() == 1:
+            # elements of simple mode
             self.simple_input_label.grid(column=6, row=0, sticky="W")
             self.simple_input_field.grid(column=6, row=1, sticky="W")
-            
             self.simple_action_label.grid(column=12, row=0, sticky="W")
             self.radio_action_insert.grid(column=12, row=1, sticky="W")
             self.radio_action_search.grid(column=12, row=2, sticky="W")
             self.radio_action_delete.grid(column=12, row=3, sticky="W")
-            
+        # csv mode
         elif self.mode.get() == 2:
+            # elements of csv mode
             self.confirm_button.grid_forget()
             self.select_csv_button.grid(column=6, row=1, sticky="W")
-            
+        # random mode
         elif self.mode.get() == 3:
+            # elements of random mode
             self.random_from_label.grid(column=6, row=0, sticky="W")
             self.random_from_field.grid(column=6, row=1, sticky="W")
             self.random_to_label.grid(column=12, row=0, sticky="W")
@@ -403,16 +409,17 @@ class Input:
     
     # function to reset the graph
     def reset(self, *args):
+        # no animation currently running
         if self.Graph.currentAnimation.type == 0 and not self.commandList:
             # reset the animations
             self.saved_operations = []
             self.commandList = []
             # reset the graph
             self.Graph.reset()
+        # there IS an animation currently running
         else:
             # error message
             self.curr_action_label.configure(text="You can only reset the tree when all operations are finished!", foreground="#FF6666")
-
 
     # user updates the order
     def update_order(self):
@@ -637,6 +644,3 @@ class Input:
         else:
             # error message
             self.curr_action_label.configure(text="Invalid input! You can only input whole numbers!", foreground="#FF6666")
-                    
-
-

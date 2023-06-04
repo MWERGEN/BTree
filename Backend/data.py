@@ -14,10 +14,8 @@
 #       - user data from the GUI
 #
 
-# when executed by main
+# local imports
 from Backend import bTree
-# debugging
-#import bTree
 
 class Backend:
     def __init__(self, k):
@@ -196,27 +194,29 @@ class Backend:
         self.resetTree()
 
 # testData = Backend(2)
-# # for i in range(1, 20):
-# #     if i == 17:
-# #         print('test')
-# #     testData.insertKeyIntoTree(i)
-# testData.insertKeyIntoTree(15)
-# testData.insertKeyIntoTree(25)
+# for i in range(22,1,-1):     
+#     if i == 1:
+#         print('test')
+#     testData.insertKeyIntoTree(i)
+# testData.deleteKeyFromTree(20)
+# testData.insertKeyIntoTree(10)
+# testData.insertKeyIntoTree(20)
 # testData.insertKeyIntoTree(30)
-# testData.insertKeyIntoTree(35)
 # testData.insertKeyIntoTree(40)
-# testData.insertKeyIntoTree(45)
-# testData.insertKeyIntoTree(1)
-# testData.insertKeyIntoTree(2)
-# testData.insertKeyIntoTree(3)
-# testData.insertKeyIntoTree(4)
 # testData.insertKeyIntoTree(50)
+# testData.insertKeyIntoTree(60)
+# testData.insertKeyIntoTree(70)
+# testData.insertKeyIntoTree(80)
+# testData.insertKeyIntoTree(90)
+# testData.insertKeyIntoTree(100)
+# testData.insertKeyIntoTree(110)
+# testData.insertKeyIntoTree(120)
+# testData.insertKeyIntoTree(130)
+# testData.insertKeyIntoTree(140)
 # testData.insertKeyIntoTree(41)
-# testData.insertKeyIntoTree(14)
-# testData.insertKeyIntoTree(21)
-# testData.insertKeyIntoTree(22)
-# testData.insertKeyIntoTree(52)
-# testData.insertKeyIntoTree(26)
+# testData.insertKeyIntoTree(42)
+# testData.insertKeyIntoTree(43)
+# print('test')
 # testData.insertKeyIntoTree(27)
 # print('test')
 # testData.insertKeyIntoTree(99)

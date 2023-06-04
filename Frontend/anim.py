@@ -7,11 +7,16 @@
 #   Editors:
 #       1.  Marius Wergen on 03.05.23
 #       2.  Marius Wergen on 04.05.23
+#       3.  Marius Wergen on 01.06.23
+#       4.  Marius Wergen on 02.06.23
+#       5.  Marius Wergen on 03.06.23
 #
 ###############################################
 #
 #   File description:
 #       - animation class
+#           -> contains all information of the current animation
+#           -> can be different type (either insert=type 1 or search/delete=type 2)
 #
 
 class Animation:
@@ -44,7 +49,6 @@ class Animation:
 
         # for type = 1 or 2:
         if self.type == 1 or self.type == 2:
-
             # number which key inside an observed node is looked at
             self.highlightedKey = 0
             # a key > label was found or the last key in observed node is lower than the label
@@ -94,6 +98,7 @@ class Animation:
             self.animationSpeed = 0.02
             # flag for indicating that the node should not move at the moment
             self.flagNoMove = True
+            # is there a new root in this animation
             self.newRoot = False
 
         # for type = 2:
@@ -103,20 +108,27 @@ class Animation:
             # search node
             ##############
 
+            # key to be searched
             self.searchKey = operands[0]
+            # nodes to be checked during animation
             self.checkNodes = operands[1]
+            # bool if search was successful
             self.found = operands[2]
 
-    
+    # update the animatioon with the new lists
     def updateNewAnimation(self):
+        # update type
         self.type = self.types[self.walkthrough]
+        # update nodes
         self.nodesList = self.tree[self.walkthrough][0]
+        # update keys
         self.keysList = self.tree[self.walkthrough][1]
+        # update edges
         self.edgesList = self.tree[self.walkthrough][2]
 
-    ###########################
-    #   functions for type = 1
-    ###########################
+    ##########################
+    #   function for type = 1
+    ##########################
 
     # sets label in a bold-formatted manner
     def setLabel(self, label):
