@@ -213,7 +213,7 @@ class Input:
         tk.mainloop()
 
     def on_window_resize(self, event):
-        self.canvas.get_tk_widget().configure(width=(self.window.winfo_width() * 0.95), height=(self.window.winfo_height() * 0.75))
+        self.canvas.get_tk_widget().configure(width=(self.window.winfo_width() * 0.95), height=(self.window.winfo_height() * 0.68))
 
     def resize_canvas(self, width, height):
         # Configure the canvas size to fill the available space
