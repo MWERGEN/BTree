@@ -2,8 +2,6 @@
 #
 #   Creator: Tim Steiner
 #
-#   Tasks:  MBT-6
-#
 #   Editors:
 #       1.      Tim Steiner on 10.04.23
 #       2.      Marius Wergen on 27.04.23

@@ -2,11 +2,8 @@
 #
 #   Creator: Tim Steiner
 #
-#   Task: Backend class for bTree.
-#
 #   Editors:
 #       1.  Tim Steiner on 10.04.23
-#       2.
 #
 ###############################################
 #
@@ -15,10 +12,11 @@
 #       - inserting, deleting and searching algorithm
 #       - preparing lists for frontend (num of nodes per level, keys per level and edges)
 #
-# when executed by main
+
+# local imports
 from Backend import node
-# debugging
-#import node
+
+# library imports
 from collections import deque
 
 class BTree:

@@ -2,8 +2,6 @@
 #
 #   Creator: Marius Wergen
 #
-#   Task: 
-#
 #   Editors:
 #       1.  Marius Wergen on 03.05.23
 #       2.  Marius Wergen on 04.05.23
