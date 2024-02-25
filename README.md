@@ -24,4 +24,6 @@ If you installed the correct versions of the required python packages, you shoul
 
 You can **insert**, **search** and **delete** whole numbers in the balanced tree. Additionally, you can bundle multiple operations in a csv file and perform them all at once. Please refer to the *example.csv* file. Unsupported instructions are ignored. Random numbers can be inserted as well. 
 
-Feel free to try out different orders of the tree and multiple visualization speeds.
+Feel free to try out different orders of the tree and multiple visualization speeds. When having inserted a couple of numbers, you should see something like this:
+
+![GUI state after 20 random keys](https://github.com/MWERGEN/BTree/blob/main/images/inserted-20-keys.jpg)
