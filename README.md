@@ -4,8 +4,9 @@ This repository contains the python files creating a tool for visualizing a bala
 
 To understand the behaviour, refer to [Ubiquitous B-tree (1979)](https://dl.acm.org/doi/pdf/10.1145/356770.356776) or [Wikipedia: B-tree](https://en.wikipedia.org/wiki/B-tree).
 
+---
 
-#### Setup
+## Setup
 
 You need to install the required packages (check requirements.txt) and afterwards, you can easily run the main.py file. 
 
@@ -19,7 +20,7 @@ If you installed the correct versions of the required python packages, you shoul
 
 ---
 
-#### Usage
+## Usage
 
 You can **insert**, **search** and **delete** whole numbers in the balanced tree. Additionally, you can bundle multiple operations in a csv file and perform them all at once. Please refer to the *example.csv* file. Unsupported instructions are ignored. Random numbers can be inserted as well. 
 
