@@ -4,6 +4,7 @@ This repository contains the python files creating a tool for visualizing a bala
 
 To understand the behaviour, refer to [Ubiquitous B-tree (1979)](https://dl.acm.org/doi/pdf/10.1145/356770.356776) or [Wikipedia: B-tree](https://en.wikipedia.org/wiki/B-tree).
 
+---
 
 ## Setup
 
