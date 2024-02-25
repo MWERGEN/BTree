@@ -13,6 +13,10 @@ For more information, check our german documentation. Just open the file 'docume
 
 On *windows*, you can also run the *BTree/BTree.exe* file to launch the visualization as an executable.
 
+If you installed the correct versions of the required python packages, you should see the following GUI, when launching the application:
+
+![Initial GUI state](https://github.com/MWERGEN/BTree/blob/main/images/initial-state.jpg)
+
 ---
 
 #### Usage
